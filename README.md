@@ -1,59 +1,59 @@
 # AI Hero Assistant - WordPress Plugin
 
-Un plugin WordPress avansat care adaugă un chatbot AI cu chip animat în hero section, integrat cu Google Gemini API.
+An advanced WordPress plugin that adds an AI chatbot with animated chip in the hero section, integrated with Google Gemini API.
 
-## Caracteristici
+## Features
 
-- 🤖 **Chip animat abstract** - Sistem de particule care formează un chip umanoid abstract cu gură vorbitoare
-- 💬 **Chatbot AI** - Integrare completă cu Google Gemini API
-- 🌍 **Multilingv** - Detectare automată a limbii și răspunsuri în limba utilizatorului
-- 📝 **Typing Effect** - Subtitrare animată cu efect de scriere caracter cu caracter
-- 🎨 **Personalizabil** - Gradient colors, fonturi și mesaje configurabile din admin
-- 📊 **Lead Generation** - Capturare automată de email/telefon din conversații
-- 💾 **Database** - Salvare conversații și leads în baza de date WordPress
-- 📱 **Responsive** - Design complet responsive pentru toate dispozitivele
+- 🤖 **Animated Abstract Chip** - Particle system that forms an abstract humanoid chip with speaking mouth
+- 💬 **AI Chatbot** - Full integration with Google Gemini API
+- 🌍 **Multilingual** - Automatic language detection and responses in user's language
+- 📝 **Typing Effect** - Animated subtitle with character-by-character typing effect
+- 🎨 **Customizable** - Gradient colors, fonts and configurable messages from admin
+- 📊 **Lead Generation** - Automatic email/phone capture from conversations
+- 💾 **Database** - Save conversations and leads in WordPress database
+- 📱 **Responsive** - Fully responsive design for all devices
 
-## Instalare
+## Installation
 
-1. Copiază folderul `ai-hero-assistant` în directorul `wp-content/plugins/` al site-ului WordPress
-2. Activează plugin-ul din panoul de administrare WordPress (Plugins → Installed Plugins)
-3. Mergi la Settings → AI Hero Assistant pentru configurare
+1. Copy the `ai-hero-assistant` folder to the `wp-content/plugins/` directory of your WordPress site
+2. Activate the plugin from WordPress admin panel (Plugins → Installed Plugins)
+3. Go to Settings → AI Hero Assistant for configuration
 
-## Configurare
+## Configuration
 
-### 1. Obține API Key Gemini
+### 1. Get Gemini API Key
 
-1. Accesează [Google AI Studio](https://makersuite.google.com/app/apikey)
-2. Creează un cont sau conectează-te
-3. Generează o cheie API nouă
-4. Copiază cheia în câmpul "Google Gemini API Key" din setările plugin-ului
+1. Visit [Google AI Studio](https://makersuite.google.com/app/apikey)
+2. Create an account or sign in
+3. Generate a new API key
+4. Copy the key into the "Google Gemini API Key" field in the plugin settings
 
-### 2. Configurează Setările
+### 2. Configure Settings
 
-În pagina de setări (`Settings → AI Hero Assistant`):
+In the settings page (`Settings → AI Hero Assistant`):
 
-- **API Key**: Introdu cheia API Gemini
-- **Model**: Selectează modelul Gemini (Flash, Pro, etc.)
-- **Nume Firmă**: Numele firmei tale
-- **Mesaj Inițial Hero**: Mesajul afișat la încărcarea paginii (folosește `{company_name}` pentru nume)
-- **Instrucțiuni AI**: Instrucțiuni detaliate pentru comportamentul AI
-- **Documentație**: Încarcă fișiere PDF/DOC/TXT cu informații despre servicii
-- **Culori Gradient**: Selectează culorile pentru gradient
-- **Font Family**: Alege fontul pentru text
+- **API Key**: Enter your Gemini API key
+- **Model**: Select Gemini model (Flash, Pro, etc.)
+- **Company Name**: Your company name
+- **Initial Hero Message**: Message displayed on page load (use `{company_name}` for name)
+- **AI Instructions**: Detailed instructions for AI behavior
+- **Documentation**: Upload PDF/DOC/TXT files with service information
+- **Gradient Colors**: Select colors for gradient
+- **Font Family**: Choose font for text
 
-### 3. Adaugă Shortcode în Pagină
+### 3. Add Shortcode to Page
 
-Adaugă shortcode-ul `[ai_hero_assistant]` în pagina de home sau în hero section:
+Add the `[ai_hero_assistant]` shortcode to your home page or hero section:
 
 ```php
 [ai_hero_assistant height="600px"]
 ```
 
-Sau în editorul de pagini:
-- Adaugă un bloc "Shortcode"
-- Introdu: `[ai_hero_assistant]`
+Or in the page editor:
+- Add a "Shortcode" block
+- Enter: `[ai_hero_assistant]`
 
-## Utilizare
+## Usage
 
 ### Shortcode
 
@@ -61,65 +61,63 @@ Sau în editorul de pagini:
 [ai_hero_assistant]
 ```
 
-Parametri opționali:
-- `height` - Înălțimea secțiunii hero (ex: "600px", "80vh")
+Optional parameters:
+- `height` - Hero section height (e.g., "600px", "80vh")
 
 ### Lead Generation
 
-Plugin-ul detectează automat email-uri și numere de telefon din conversațiile utilizatorilor și le salvează în baza de date. Poți vedea leads-urile capturate în pagina de setări.
+The plugin automatically detects emails and phone numbers from user conversations and saves them to the database. You can view captured leads in the settings page.
 
-## Structură Fișiere
+## File Structure
 
 ```
 ai-hero-assistant/
-├── ai-hero-assistant.php    # Fișier principal plugin
+├── ai-hero-assistant.php    # Main plugin file
 ├── includes/
-│   ├── class-database.php    # Gestionare baza de date
-│   ├── class-gemini-api.php # Integrare Gemini API
+│   ├── class-database.php    # Database management
+│   ├── class-gemini-api.php # Gemini API integration
 │   ├── class-shortcode.php  # Shortcode handler
-│   ├── class-admin-settings.php # Pagină setări admin
-│   └── class-ajax-handler.php  # Handler AJAX requests
+│   ├── class-admin-settings.php # Admin settings page
+│   └── class-ajax-handler.php  # AJAX request handler
 ├── assets/
 │   ├── css/
-│   │   ├── frontend.css      # Stiluri frontend
-│   │   └── admin.css         # Stiluri admin
+│   │   ├── frontend.css      # Frontend styles
+│   │   └── admin.css         # Admin styles
 │   └── js/
-│       ├── frontend.js       # JavaScript frontend (particule, typing effect)
-│       └── admin.js          # JavaScript admin
-└── README.md                 # Acest fișier
+│       ├── frontend.js       # Frontend JavaScript (particles, typing effect)
+│       └── admin.js          # Admin JavaScript
+└── README.md                 # This file
 ```
 
-## Baza de Date
+## Database
 
-Plugin-ul creează următoarele tabele:
+The plugin creates the following tables:
 
-- `wp_aiha_conversations` - Conversații (session_id, user_ip, etc.)
-- `wp_aiha_messages` - Mesaje individuale din conversații
-- `wp_aiha_leads` - Leads capturate (email, telefon, nume)
+- `wp_aiha_conversations` - Conversations (session_id, user_ip, etc.)
+- `wp_aiha_messages` - Individual messages from conversations
+- `wp_aiha_leads` - Captured leads (email, phone, name)
 
-## Cerințe
+## Requirements
 
-- WordPress 5.0 sau mai nou
-- PHP 7.4 sau mai nou
-- Cheie API Google Gemini
-- jQuery (inclus în WordPress)
+- WordPress 5.0 or newer
+- PHP 7.4 or newer
+- Google Gemini API key
+- jQuery (included in WordPress)
 
-## Suport
+## Support
 
-Pentru probleme sau întrebări, contactează echipa de dezvoltare.
+For issues or questions, contact the development team.
 
-## Licență
+## License
 
 GPL v2 or later
 
 ## Changelog
 
 ### 1.0.0
-- Lansare inițială
-- Chip animat cu particule
-- Integrare Gemini API
+- Initial release
+- Animated chip with particles
+- Gemini API integration
 - Lead generation
 - Admin settings page
 - Responsive design
-
-
