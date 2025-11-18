@@ -1,0 +1,53 @@
+/**
+ * AI Hero Assistant - Admin Styles
+ */
+
+.aiha-admin-wrapper {
+    max-width: 1200px;
+}
+
+.aiha-admin-wrapper .form-table th {
+    width: 200px;
+    padding: 20px 10px 20px 0;
+}
+
+.aiha-admin-wrapper .form-table td {
+    padding: 15px 10px;
+}
+
+.aiha-admin-wrapper input[type="text"],
+.aiha-admin-wrapper input[type="email"],
+.aiha-admin-wrapper textarea,
+.aiha-admin-wrapper select {
+    width: 100%;
+    max-width: 600px;
+}
+
+.aiha-admin-wrapper textarea {
+    min-height: 150px;
+}
+
+.aiha-admin-wrapper input[type="color"] {
+    width: 80px;
+    height: 40px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    cursor: pointer;
+}
+
+.aiha-admin-wrapper .description {
+    margin-top: 8px;
+    font-style: italic;
+    color: #666;
+}
+
+.aiha-admin-wrapper .wp-list-table {
+    margin-top: 20px;
+}
+
+.aiha-admin-wrapper .wp-list-table th,
+.aiha-admin-wrapper .wp-list-table td {
+    padding: 12px;
+}
+
+
