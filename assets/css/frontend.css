@@ -14,12 +14,13 @@
     display: flex;
     flex-direction: column;
     align-items: center;
-    justify-content: center;
+    justify-content: flex-start; /* Aliniere sus pentru a face loc elementelor */
     background: linear-gradient(135deg, var(--gradient-start, #6366f1), var(--gradient-end, #ec4899));
     background-size: 200% 200%;
     animation: gradientShift 10s ease infinite;
-    padding: 40px 20px;
+    padding: 40px 20px 20px 20px; /* Padding redus jos */
     overflow: hidden;
+    gap: 20px; /* Spațiu consistent între elemente */
 }
 
 @keyframes gradientShift {
@@ -32,8 +33,9 @@
     position: relative;
     width: 300px;
     height: 300px;
-    margin-bottom: 40px;
-    z-index: 2;
+    margin-bottom: 20px; /* Redus pentru a face loc subtitle-ului */
+    margin-top: 20px; /* Spațiu sus */
+    z-index: 3; /* Peste subtitle */
     border-radius: 50%;
     overflow: hidden;
     box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
@@ -170,26 +172,57 @@
 .aiha-subtitle-container {
     width: 100%;
     max-width: 800px;
-    margin-bottom: 30px;
+    margin-top: 0; /* Fără margin negativ */
+    margin-bottom: 0; /* Folosim gap din flexbox */
     min-height: 60px;
+    max-height: 250px; /* Înălțime maximă redusă */
     display: flex;
-    align-items: center;
+    align-items: flex-start; /* Aliniere sus */
     justify-content: center;
     z-index: 2;
+    position: relative;
+    flex-shrink: 0; /* Nu se micșorează */
 }
 
 .aiha-subtitle {
     color: white;
     font-size: 18px;
     line-height: 1.6;
-    text-align: center;
+    text-align: left; /* Text aliniat la stânga pentru citire mai bună */
     padding: 15px 25px;
     background: rgba(255, 255, 255, 0.15);
     backdrop-filter: blur(10px);
     border-radius: 20px;
     box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
-    min-height: 30px;
+    min-height: 60px;
+    max-height: 230px; /* Înălțime maximă ajustată */
     font-weight: 400;
+    overflow-y: auto; /* Scroll vertical când textul depășește */
+    overflow-x: hidden; /* Fără scroll orizontal */
+    word-wrap: break-word; /* Împarte cuvintele lungi */
+    width: 100%; /* Lățime completă */
+    /* Stilizare scrollbar */
+    scrollbar-width: thin;
+    scrollbar-color: rgba(255, 255, 255, 0.5) transparent;
+}
+
+/* Stilizare scrollbar pentru WebKit browsers */
+.aiha-subtitle::-webkit-scrollbar {
+    width: 6px;
+}
+
+.aiha-subtitle::-webkit-scrollbar-track {
+    background: transparent;
+    border-radius: 10px;
+}
+
+.aiha-subtitle::-webkit-scrollbar-thumb {
+    background: rgba(255, 255, 255, 0.5);
+    border-radius: 10px;
+}
+
+.aiha-subtitle::-webkit-scrollbar-thumb:hover {
+    background: rgba(255, 255, 255, 0.7);
 }
 
 .aiha-subtitle .typing-cursor {
@@ -320,12 +353,18 @@
     .aiha-video-container {
         width: 250px;
         height: 250px;
-        margin-bottom: 30px;
+        margin-bottom: 15px;
+        margin-top: 15px;
+    }
+    
+    .aiha-subtitle-container {
+        max-height: 200px; /* Mai mic pe mobile */
     }
     
     .aiha-subtitle {
         font-size: 16px;
         padding: 12px 20px;
+        max-height: 180px; /* Ajustat pentru mobile */
     }
     
     .aiha-input-wrapper {
@@ -344,18 +383,25 @@
 
 @media (max-width: 480px) {
     .aiha-hero-section {
-        padding: 30px 15px;
+        padding: 20px 15px 15px 15px;
+        gap: 15px;
     }
     
     .aiha-video-container {
         width: 200px;
         height: 200px;
-        margin-bottom: 25px;
+        margin-bottom: 10px;
+        margin-top: 10px;
+    }
+    
+    .aiha-subtitle-container {
+        max-height: 150px; /* Mai mic pe ecrane foarte mici */
     }
     
     .aiha-subtitle {
         font-size: 14px;
         padding: 10px 15px;
+        max-height: 130px; /* Ajustat pentru ecrane mici */
     }
     
     .aiha-input-container {
