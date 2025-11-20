@@ -44,6 +44,8 @@ class AIHA_Admin_Settings
         $sanitized['gradient_end'] = sanitize_hex_color($input['gradient_end'] ?? '#ec4899');
         $sanitized['font_family'] = sanitize_text_field($input['font_family'] ?? 'Inter, sans-serif');
         $sanitized['hero_message'] = sanitize_textarea_field($input['hero_message'] ?? '');
+        $sanitized['video_silence_url'] = esc_url_raw($input['video_silence_url'] ?? '');
+        $sanitized['video_speaking_url'] = esc_url_raw($input['video_speaking_url'] ?? '');
 
         // Păstrează fișierele existente
         $current_settings = get_option('aiha_settings', array());
@@ -250,6 +252,36 @@ class AIHA_Admin_Settings
                                 <option value="Poppins, sans-serif" <?php selected($settings['font_family'] ?? '', 'Poppins, sans-serif'); ?>>Poppins</option>
                                 <option value="Montserrat, sans-serif" <?php selected($settings['font_family'] ?? '', 'Montserrat, sans-serif'); ?>>Montserrat</option>
                             </select>
+                        </td>
+                    </tr>
+                    
+                    <tr>
+                        <th scope="row">
+                            <label for="video_silence_url"><?php _e('Video URL (Silence)', 'ai-hero-assistant'); ?></label>
+                        </th>
+                        <td>
+                            <input type="url" 
+                                   id="video_silence_url" 
+                                   name="aiha_settings[video_silence_url]" 
+                                   value="<?php echo esc_attr($settings['video_silence_url'] ?? ''); ?>" 
+                                   class="regular-text"
+                                   placeholder="https://example.com/videos/tacere.mp4">
+                            <p class="description"><?php _e('URL-ul videoclipului cu persoana care tace. Acest video va fi afișat când AI nu vorbește.', 'ai-hero-assistant'); ?></p>
+                        </td>
+                    </tr>
+                    
+                    <tr>
+                        <th scope="row">
+                            <label for="video_speaking_url"><?php _e('Video URL (Speaking)', 'ai-hero-assistant'); ?></label>
+                        </th>
+                        <td>
+                            <input type="url" 
+                                   id="video_speaking_url" 
+                                   name="aiha_settings[video_speaking_url]" 
+                                   value="<?php echo esc_attr($settings['video_speaking_url'] ?? ''); ?>" 
+                                   class="regular-text"
+                                   placeholder="https://example.com/videos/vorbire.mp4">
+                            <p class="description"><?php _e('URL-ul videoclipului cu persoana care vorbește. Acest video va fi afișat când AI răspunde.', 'ai-hero-assistant'); ?></p>
                         </td>
                     </tr>
                 </table>

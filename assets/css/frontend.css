@@ -27,7 +27,81 @@
     50% { background-position: 100% 50%; }
 }
 
-/* Chip Container */
+/* Video Container - Două videoclipuri suprapuse */
+.aiha-video-container {
+    position: relative;
+    width: 300px;
+    height: 300px;
+    margin-bottom: 40px;
+    z-index: 2;
+    border-radius: 50%;
+    overflow: hidden;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+    background: rgba(255, 255, 255, 0.1);
+}
+
+.aiha-video {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    border-radius: 50%;
+    transition: opacity 0.5s ease-in-out;
+}
+
+.aiha-video-silence {
+    z-index: 1;
+    opacity: 1;
+}
+
+.aiha-video-speaking {
+    z-index: 2;
+    opacity: 0;
+}
+
+/* Când AI vorbește, video-ul vorbitor este vizibil */
+.aiha-video-container.speaking .aiha-video-silence {
+    opacity: 0;
+    z-index: 1;
+}
+
+.aiha-video-container.speaking .aiha-video-speaking {
+    opacity: 1;
+    z-index: 2;
+    display: block !important;
+}
+
+/* Când AI tace, video-ul tăcerii este vizibil */
+.aiha-video-container.silent .aiha-video-silence {
+    opacity: 1;
+    z-index: 2;
+}
+
+.aiha-video-container.silent .aiha-video-speaking {
+    opacity: 0;
+    z-index: 1;
+}
+
+.aiha-video-placeholder {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: rgba(255, 255, 255, 0.1);
+    color: white;
+    text-align: center;
+    padding: 20px;
+    border-radius: 50%;
+}
+
+/* OLD PARTICLE SYSTEM - COMMENTED OUT */
+/*
 .aiha-chip-container {
     position: relative;
     width: 300px;
@@ -90,6 +164,7 @@
     0%, 90%, 100% { transform: scaleY(1); }
     95% { transform: scaleY(0.1); }
 }
+*/
 
 /* Subtitle Container */
 .aiha-subtitle-container {
@@ -242,6 +317,55 @@
 
 /* Responsive Design */
 @media (max-width: 768px) {
+    .aiha-video-container {
+        width: 250px;
+        height: 250px;
+        margin-bottom: 30px;
+    }
+    
+    .aiha-subtitle {
+        font-size: 16px;
+        padding: 12px 20px;
+    }
+    
+    .aiha-input-wrapper {
+        padding: 12px 15px;
+    }
+    
+    .aiha-textarea {
+        font-size: 14px;
+    }
+    
+    .aiha-send-btn {
+        width: 40px;
+        height: 40px;
+    }
+}
+
+@media (max-width: 480px) {
+    .aiha-hero-section {
+        padding: 30px 15px;
+    }
+    
+    .aiha-video-container {
+        width: 200px;
+        height: 200px;
+        margin-bottom: 25px;
+    }
+    
+    .aiha-subtitle {
+        font-size: 14px;
+        padding: 10px 15px;
+    }
+    
+    .aiha-input-container {
+        max-width: 100%;
+    }
+}
+
+/* OLD PARTICLE SYSTEM RESPONSIVE - COMMENTED OUT */
+/*
+@media (max-width: 768px) {
     .aiha-chip-container {
         width: 250px;
         height: 250px;
@@ -301,6 +425,7 @@
         max-width: 100%;
     }
 }
+*/
 
 /* Bokeh Background Effect */
 .aiha-hero-section::before {

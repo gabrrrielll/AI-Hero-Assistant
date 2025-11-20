@@ -27,6 +27,10 @@ class AIHA_Shortcode {
         $gradient_end = isset($settings['gradient_end']) ? $settings['gradient_end'] : '#ec4899';
         $font_family = isset($settings['font_family']) ? $settings['font_family'] : 'Inter, sans-serif';
         
+        // Video URLs from settings
+        $video_silence_url = isset($settings['video_silence_url']) ? $settings['video_silence_url'] : '';
+        $video_speaking_url = isset($settings['video_speaking_url']) ? $settings['video_speaking_url'] : '';
+        
         // Generăm un ID unic pentru această instanță
         $instance_id = 'aiha-' . uniqid();
         
@@ -34,7 +38,45 @@ class AIHA_Shortcode {
         ?>
         <div id="<?php echo esc_attr($instance_id); ?>" class="aiha-container" data-instance-id="<?php echo esc_attr($instance_id); ?>">
             <div class="aiha-hero-section" style="--gradient-start: <?php echo esc_attr($gradient_start); ?>; --gradient-end: <?php echo esc_attr($gradient_end); ?>; --font-family: <?php echo esc_attr($font_family); ?>; height: <?php echo esc_attr($atts['height']); ?>;">
-                <!-- Chip animat cu particule -->
+                <!-- Video Container - Două videoclipuri suprapuse -->
+                <div class="aiha-video-container">
+                    <!-- Video pentru tăcere (default vizibil) -->
+                    <video 
+                        id="aiha-video-silence-<?php echo esc_attr($instance_id); ?>" 
+                        class="aiha-video aiha-video-silence" 
+                        autoplay 
+                        loop 
+                        muted 
+                        playsinline>
+                        <?php if ($video_silence_url): ?>
+                            <source src="<?php echo esc_url($video_silence_url); ?>" type="video/mp4">
+                        <?php endif; ?>
+                    </video>
+                    
+                    <!-- Video pentru vorbire (ascuns inițial) -->
+                    <video 
+                        id="aiha-video-speaking-<?php echo esc_attr($instance_id); ?>" 
+                        class="aiha-video aiha-video-speaking" 
+                        autoplay 
+                        loop 
+                        muted 
+                        playsinline
+                        style="display: none;">
+                        <?php if ($video_speaking_url): ?>
+                            <source src="<?php echo esc_url($video_speaking_url); ?>" type="video/mp4">
+                        <?php endif; ?>
+                    </video>
+                    
+                    <!-- Fallback message dacă nu sunt videoclipuri -->
+                    <?php if (empty($video_silence_url) && empty($video_speaking_url)): ?>
+                        <div class="aiha-video-placeholder">
+                            <p><?php esc_html_e('Please configure video URLs in plugin settings', 'ai-hero-assistant'); ?></p>
+                        </div>
+                    <?php endif; ?>
+                </div>
+                
+                <!-- OLD PARTICLE SYSTEM - COMMENTED OUT -->
+                <!--
                 <div class="aiha-chip-container">
                     <canvas id="aiha-canvas-<?php echo esc_attr($instance_id); ?>" class="aiha-canvas"></canvas>
                     <div class="aiha-chip-overlay">
@@ -44,6 +86,7 @@ class AIHA_Shortcode {
                         </div>
                     </div>
                 </div>
+                -->
                 
                 <!-- Subtitrare cu typing effect -->
                 <div class="aiha-subtitle-container">
@@ -80,12 +123,15 @@ class AIHA_Shortcode {
             "instanceId": "<?php echo esc_js($instance_id); ?>",
             "heroMessage": <?php echo json_encode($hero_message, JSON_UNESCAPED_UNICODE); ?>,
             "gradientStart": "<?php echo esc_js($gradient_start); ?>",
-            "gradientEnd": "<?php echo esc_js($gradient_end); ?>"
+            "gradientEnd": "<?php echo esc_js($gradient_end); ?>",
+            "videoSilenceUrl": "<?php echo esc_js($video_silence_url); ?>",
+            "videoSpeakingUrl": "<?php echo esc_js($video_speaking_url); ?>"
         }
         </script>
         <?php
         return ob_get_clean();
     }
 }
+
 
 
