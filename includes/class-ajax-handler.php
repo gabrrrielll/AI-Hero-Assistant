@@ -59,8 +59,19 @@ class AIHA_Ajax_Handler {
         $full_conversation_text = $user_message . ' ' . $ai_response;
         $this->extract_and_save_lead($conversation_id, $full_conversation_text);
         
-        // Verifică și în toată conversația existentă pentru leads pierdute
-        $this->check_conversation_for_leads($conversation_id);
+        // Verifică și în toată conversația existentă pentru leads pierdute (doar dacă nu s-a găsit deja)
+        // Obține lead-ul existent pentru a verifica dacă trebuie să scanăm din nou
+        global $wpdb;
+        $table_leads = $wpdb->prefix . 'aiha_leads';
+        $existing_lead = $wpdb->get_row($wpdb->prepare(
+            "SELECT * FROM $table_leads WHERE conversation_id = %d LIMIT 1",
+            $conversation_id
+        ));
+        
+        // Dacă nu există lead sau nu are email/telefon, scanează toată conversația
+        if (!$existing_lead || (empty($existing_lead->email) && empty($existing_lead->phone))) {
+            $this->check_conversation_for_leads($conversation_id);
+        }
         
         wp_send_json_success(array(
             'message' => $ai_response,
@@ -140,13 +151,26 @@ class AIHA_Ajax_Handler {
             $name = trim($matches[1]);
         }
         
+        // Log pentru debugging - verifică ce s-a găsit
+        if (defined('WP_DEBUG') && WP_DEBUG) {
+            error_log('AIHA Lead extraction - Text length: ' . strlen($text));
+            error_log('AIHA Lead extraction - Found email: ' . ($email ?: 'none'));
+            error_log('AIHA Lead extraction - Found phone: ' . ($phone ?: 'none'));
+            error_log('AIHA Lead extraction - Found name: ' . ($name ?: 'none'));
+        }
+        
         // Salvează lead dacă există email sau telefon
         if ($email || $phone) {
             $result = AIHA_Database::save_lead($conversation_id, $email, $phone, $name);
             
-            // Log pentru debugging (opțional - poate fi dezactivat în producție)
+            // Log pentru debugging
             if (defined('WP_DEBUG') && WP_DEBUG) {
-                error_log('AIHA Lead saved: Email=' . $email . ', Phone=' . $phone . ', Name=' . $name . ', Conversation=' . $conversation_id);
+                error_log('AIHA Lead saved: Email=' . $email . ', Phone=' . $phone . ', Name=' . $name . ', Conversation=' . $conversation_id . ', Result=' . ($result ? 'success' : 'failed'));
+            }
+        } else {
+            // Log când nu se găsește nimic
+            if (defined('WP_DEBUG') && WP_DEBUG) {
+                error_log('AIHA Lead extraction - No email or phone found in text');
             }
         }
     }

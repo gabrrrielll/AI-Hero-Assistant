@@ -139,6 +139,14 @@ class AIHA_Database {
         global $wpdb;
         $table = $wpdb->prefix . 'aiha_leads';
         
+        // Nu salva dacă nu există email sau telefon
+        if (empty($email) && empty($phone)) {
+            if (defined('WP_DEBUG') && WP_DEBUG) {
+                error_log('AIHA save_lead: Skipping - no email or phone provided');
+            }
+            return false;
+        }
+        
         // Verifică dacă lead-ul există deja
         $existing = $wpdb->get_row($wpdb->prepare(
             "SELECT * FROM $table WHERE conversation_id = %d LIMIT 1",
@@ -146,30 +154,64 @@ class AIHA_Database {
         ));
         
         if ($existing) {
-            // Update lead existent
-            return $wpdb->update(
-                $table,
-                array(
-                    'email' => $email ?: $existing->email,
-                    'phone' => $phone ?: $existing->phone,
-                    'name' => $name ?: $existing->name
-                ),
-                array('id' => $existing->id),
-                array('%s', '%s', '%s'),
-                array('%d')
-            );
+            // Update lead existent - actualizează doar câmpurile care nu sunt goale
+            $update_data = array();
+            $update_format = array();
+            
+            if (!empty($email) && $existing->email !== $email) {
+                $update_data['email'] = $email;
+                $update_format[] = '%s';
+            }
+            if (!empty($phone) && $existing->phone !== $phone) {
+                $update_data['phone'] = $phone;
+                $update_format[] = '%s';
+            }
+            if (!empty($name) && $existing->name !== $name) {
+                $update_data['name'] = $name;
+                $update_format[] = '%s';
+            }
+            
+            if (!empty($update_data)) {
+                $update_format[] = '%d'; // pentru WHERE id
+                $result = $wpdb->update(
+                    $table,
+                    $update_data,
+                    array('id' => $existing->id),
+                    $update_format,
+                    array('%d')
+                );
+                
+                if (defined('WP_DEBUG') && WP_DEBUG) {
+                    error_log('AIHA save_lead: Updated existing lead ID ' . $existing->id . ', Result: ' . ($result !== false ? 'success' : 'failed'));
+                    if ($result === false) {
+                        error_log('AIHA save_lead: DB Error: ' . $wpdb->last_error);
+                    }
+                }
+                
+                return $result !== false;
+            }
+            return true; // Nu s-a făcut update dar lead-ul există deja
         } else {
             // Creează lead nou
-            return $wpdb->insert(
+            $result = $wpdb->insert(
                 $table,
                 array(
                     'conversation_id' => $conversation_id,
-                    'email' => $email,
-                    'phone' => $phone,
-                    'name' => $name
+                    'email' => $email ?: '',
+                    'phone' => $phone ?: '',
+                    'name' => $name ?: ''
                 ),
                 array('%d', '%s', '%s', '%s')
             );
+            
+            if (defined('WP_DEBUG') && WP_DEBUG) {
+                error_log('AIHA save_lead: Inserted new lead, ID: ' . $wpdb->insert_id . ', Result: ' . ($result !== false ? 'success' : 'failed'));
+                if ($result === false) {
+                    error_log('AIHA save_lead: DB Error: ' . $wpdb->last_error);
+                }
+            }
+            
+            return $result !== false;
         }
     }
     

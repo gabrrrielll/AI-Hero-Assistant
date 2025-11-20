@@ -112,6 +112,16 @@
             }, 1000);
         }
         
+        /**
+         * Scroll automat la finalul subtitle-ului
+         */
+        scrollToBottom() {
+            if (this.subtitleEl) {
+                // Scroll smooth la final
+                this.subtitleEl.scrollTop = this.subtitleEl.scrollHeight;
+            }
+        }
+        
         typeText(text, callback) {
             // Switch to speaking state when typing starts
             this.setSpeakingState();
@@ -119,6 +129,8 @@
             this.currentText = '';
             if (this.subtitleEl) {
                 this.subtitleEl.innerHTML = '';
+                // Reset scroll la început
+                this.subtitleEl.scrollTop = 0;
             }
             
             let index = 0;
@@ -129,12 +141,18 @@
                     this.currentText += text[index];
                     if (this.subtitleEl) {
                         this.subtitleEl.innerHTML = this.currentText + '<span class="typing-cursor"></span>';
+                        // Scroll automat la fiecare caracter (doar când e aproape de final)
+                        if (index % 10 === 0 || index === text.length - 1) {
+                            this.scrollToBottom();
+                        }
                     }
                     index++;
                     setTimeout(typeChar, typingSpeed);
                 } else {
                     if (this.subtitleEl) {
                         this.subtitleEl.innerHTML = this.currentText;
+                        // Scroll final pentru a vedea tot textul
+                        this.scrollToBottom();
                     }
                     if (callback) callback();
                 }
