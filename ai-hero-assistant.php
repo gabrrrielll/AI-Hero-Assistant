@@ -78,9 +78,14 @@ class AI_Hero_Assistant
         // Init plugin
         add_action('plugins_loaded', array($this, 'init'));
 
-        // Enqueue scripts and styles
-        add_action('wp_enqueue_scripts', array($this, 'enqueue_assets'));
-        add_action('admin_enqueue_scripts', array($this, 'enqueue_admin_assets'));
+        // Inline asset loading (tested method)
+        // Frontend CSS and JS
+        add_action('wp_head', array($this, 'inline_frontend_css'));
+        add_action('wp_footer', array($this, 'inline_frontend_js'));
+
+        // Admin CSS and JS
+        add_action('admin_head', array($this, 'inline_admin_css'));
+        add_action('admin_footer', array($this, 'inline_admin_js'));
     }
 
     public function activate()
@@ -123,59 +128,130 @@ class AI_Hero_Assistant
         new AIHA_Ajax_Handler();
     }
 
-    public function enqueue_assets()
+    /**
+     * Inline Frontend CSS
+     */
+    public function inline_frontend_css()
     {
-        // CSS
-        wp_enqueue_style(
-            'aiha-frontend',
-            AIHA_PLUGIN_URL . 'assets/css/frontend.css',
-            array(),
-            AIHA_VERSION
-        );
+        // Verifică dacă există shortcode-ul pe pagină sau în widget-uri
+        global $post;
+        $has_shortcode = false;
 
-        // JavaScript
-        wp_enqueue_script(
-            'aiha-frontend',
-            AIHA_PLUGIN_URL . 'assets/js/frontend.js',
-            array('jquery'),
-            AIHA_VERSION,
-            true
-        );
+        if (is_a($post, 'WP_Post')) {
+            $has_shortcode = has_shortcode($post->post_content, 'ai_hero_assistant');
+        }
 
-        // Localize script pentru AJAX
-        wp_localize_script('aiha-frontend', 'aihaData', array(
-            'ajaxUrl' => admin_url('admin-ajax.php'),
-            'nonce' => wp_create_nonce('aiha_nonce'),
-            'settings' => get_option('aiha_settings', array())
-        ));
+        // Verifică și în widget-uri (do_action pentru widget-uri)
+        if (!$has_shortcode) {
+            // Verifică dacă există container-ul în output (pentru widget-uri sau alte locații)
+            // Dacă nu există shortcode, încărcăm CSS oricum pentru flexibilitate
+            // Poți comenta următoarea linie dacă vrei să încarci doar când există shortcode
+            // return;
+        }
+
+        $css_path = AIHA_PLUGIN_DIR . 'assets/css/frontend.css';
+
+        if (file_exists($css_path)) {
+            echo '<style type="text/css" id="aiha-frontend-css">';
+            echo file_get_contents($css_path);
+            echo '</style>';
+        }
     }
 
-    public function enqueue_admin_assets($hook)
+    /**
+     * Inline Frontend JavaScript
+     */
+    public function inline_frontend_js()
     {
-        // Doar pe pagina de settings
-        if ('settings_page_aiha-settings' !== $hook) {
+        // Verifică dacă există shortcode-ul pe pagină
+        global $post;
+        $has_shortcode = false;
+
+        if (is_a($post, 'WP_Post')) {
+            $has_shortcode = has_shortcode($post->post_content, 'ai_hero_assistant');
+        }
+
+        // Verifică dacă jQuery este disponibil și îl încarcă dacă nu este
+        if (!wp_script_is('jquery', 'enqueued') && !wp_script_is('jquery', 'done')) {
+            // jQuery va fi încărcat de WordPress automat, dar îl includem pentru siguranță
+            echo '<script src="' . includes_url('js/jquery/jquery.min.js') . '"></script>';
+        }
+
+        $js_path = AIHA_PLUGIN_DIR . 'assets/js/frontend.js';
+
+        if (file_exists($js_path)) {
+            // AJAX data pentru JavaScript
+            $ajax_data = array(
+                'ajaxUrl' => admin_url('admin-ajax.php'),
+                'nonce' => wp_create_nonce('aiha_nonce'),
+                'settings' => get_option('aiha_settings', array())
+            );
+
+            echo '<script type="text/javascript" id="aiha-frontend-js">';
+            echo 'var aihaData = ' . json_encode($ajax_data) . ';';
+            echo file_get_contents($js_path);
+            echo '</script>';
+        }
+    }
+
+    /**
+     * Inline Admin CSS
+     */
+    public function inline_admin_css()
+    {
+        if (!is_admin()) {
             return;
         }
 
-        wp_enqueue_style(
-            'aiha-admin',
-            AIHA_PLUGIN_URL . 'assets/css/admin.css',
-            array(),
-            AIHA_VERSION
-        );
+        $screen = get_current_screen();
+        $current_screen_id = $screen ? $screen->id : 'no_screen';
 
-        wp_enqueue_script(
-            'aiha-admin',
-            AIHA_PLUGIN_URL . 'assets/js/admin.js',
-            array('jquery'),
-            AIHA_VERSION,
-            true
-        );
+        // Verificăm dacă suntem pe pagina de setări
+        if ('settings_page_aiha-settings' !== $current_screen_id) {
+            return;
+        }
 
-        wp_enqueue_media(); // Pentru upload de fișiere
+        $css_path = AIHA_PLUGIN_DIR . 'assets/css/admin.css';
+
+        if (file_exists($css_path)) {
+            echo '<style type="text/css" id="aiha-admin-css">';
+            echo file_get_contents($css_path);
+            echo '</style>';
+        }
+    }
+
+    /**
+     * Inline Admin JavaScript
+     */
+    public function inline_admin_js()
+    {
+        if (!is_admin()) {
+            return;
+        }
+
+        $screen = get_current_screen();
+        $current_screen_id = $screen ? $screen->id : 'no_screen';
+
+        // Verificăm dacă suntem pe pagina de setări
+        if ('settings_page_aiha-settings' !== $current_screen_id) {
+            return;
+        }
+
+        // Enqueue jQuery și media pentru upload
+        if (!wp_script_is('jquery', 'enqueued')) {
+            wp_enqueue_script('jquery');
+        }
+        wp_enqueue_media();
+
+        $js_path = AIHA_PLUGIN_DIR . 'assets/js/admin.js';
+
+        if (file_exists($js_path)) {
+            echo '<script type="text/javascript" id="aiha-admin-js">';
+            echo file_get_contents($js_path);
+            echo '</script>';
+        }
     }
 }
 
 // Initialize plugin
 AI_Hero_Assistant::get_instance();
-
