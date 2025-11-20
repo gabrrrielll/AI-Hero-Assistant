@@ -55,8 +55,12 @@ class AIHA_Ajax_Handler {
         // Salvează răspunsul AI
         AIHA_Database::save_message($conversation_id, 'assistant', $ai_response);
         
-        // Detectează email/telefon în mesajul utilizatorului
-        $this->extract_and_save_lead($conversation_id, $user_message);
+        // Detectează email/telefon în toată conversația (mesaj utilizator + răspuns AI)
+        $full_conversation_text = $user_message . ' ' . $ai_response;
+        $this->extract_and_save_lead($conversation_id, $full_conversation_text);
+        
+        // Verifică și în toată conversația existentă pentru leads pierdute
+        $this->check_conversation_for_leads($conversation_id);
         
         wp_send_json_success(array(
             'message' => $ai_response,
@@ -89,20 +93,83 @@ class AIHA_Ajax_Handler {
     private function extract_and_save_lead($conversation_id, $text) {
         $email = '';
         $phone = '';
+        $name = '';
         
-        // Extrage email
-        if (preg_match('/\b[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Z|a-z]{2,}\b/', $text, $matches)) {
-            $email = $matches[0];
+        // Extrage email - regex îmbunătățit
+        if (preg_match('/\b[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Z|a-z]{2,}\b/i', $text, $matches)) {
+            $email = strtolower(trim($matches[0]));
+            // Validare suplimentară
+            if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
+                $email = '';
+            }
         }
         
-        // Extrage telefon (formate comune: +40..., 07..., etc.)
-        if (preg_match('/\+?\d{1,4}[\s\-]?\(?\d{1,4}\)?[\s\-]?\d{1,4}[\s\-]?\d{1,9}/', $text, $matches)) {
-            $phone = preg_replace('/[\s\-\(\)]/', '', $matches[0]);
+        // Extrage telefon - regex îmbunătățit pentru formate românești și internaționale
+        // Formate: +40..., 07..., 0040..., etc.
+        $phone_patterns = array(
+            '/\+40[\s\-]?[0-9]{2}[\s\-]?[0-9]{3}[\s\-]?[0-9]{4}/', // +40 format
+            '/0040[\s\-]?[0-9]{2}[\s\-]?[0-9]{3}[\s\-]?[0-9]{4}/', // 0040 format
+            '/07[0-9]{2}[\s\-]?[0-9]{3}[\s\-]?[0-9]{3}/', // 07 format românesc
+            '/\+?\d{1,4}[\s\-\.]?\(?\d{1,4}\)?[\s\-\.]?\d{1,4}[\s\-\.]?\d{1,9}/', // Format general
+        );
+        
+        foreach ($phone_patterns as $pattern) {
+            if (preg_match($pattern, $text, $matches)) {
+                $phone = preg_replace('/[\s\-\(\)\.]/', '', $matches[0]);
+                // Normalizează formatul
+                if (strpos($phone, '0040') === 0) {
+                    $phone = '+' . substr($phone, 2);
+                } elseif (strpos($phone, '0') === 0 && strlen($phone) == 10) {
+                    $phone = '+4' . $phone;
+                } elseif (strpos($phone, '40') === 0 && strlen($phone) >= 10) {
+                    $phone = '+' . $phone;
+                }
+                // Verifică că are cel puțin 10 cifre
+                $digits_only = preg_replace('/[^0-9]/', '', $phone);
+                if (strlen($digits_only) >= 10) {
+                    break; // Găsit un telefon valid
+                } else {
+                    $phone = ''; // Reset dacă nu e valid
+                }
+            }
         }
         
+        // Încearcă să extragă nume din context (simplificat)
+        // Caută pattern-uri comune: "numele meu este", "mă numesc", etc.
+        if (preg_match('/(?:numele\s+meu\s+este|mă\s+numesc|sunt|eu\s+sunt)\s+([A-ZĂÂÎȘȚ][a-zăâîșț]+\s+[A-ZĂÂÎȘȚ][a-zăâîșț]+)/ui', $text, $matches)) {
+            $name = trim($matches[1]);
+        }
+        
+        // Salvează lead dacă există email sau telefon
         if ($email || $phone) {
-            AIHA_Database::save_lead($conversation_id, $email, $phone);
+            $result = AIHA_Database::save_lead($conversation_id, $email, $phone, $name);
+            
+            // Log pentru debugging (opțional - poate fi dezactivat în producție)
+            if (defined('WP_DEBUG') && WP_DEBUG) {
+                error_log('AIHA Lead saved: Email=' . $email . ', Phone=' . $phone . ', Name=' . $name . ', Conversation=' . $conversation_id);
+            }
         }
+    }
+    
+    /**
+     * Verifică toată conversația pentru leads
+     */
+    private function check_conversation_for_leads($conversation_id) {
+        // Obține toate mesajele din conversație
+        $messages = AIHA_Database::get_conversation_history($conversation_id, 50);
+        
+        if (empty($messages)) {
+            return;
+        }
+        
+        // Construiește textul complet al conversației
+        $full_text = '';
+        foreach ($messages as $msg) {
+            $full_text .= $msg->content . ' ';
+        }
+        
+        // Extrage leads din toată conversația
+        $this->extract_and_save_lead($conversation_id, $full_text);
     }
     
     /**
