@@ -167,6 +167,14 @@ class AIHA_Database
         $table_messages = $wpdb->prefix . 'aiha_messages';
         $table_conversations = $wpdb->prefix . 'aiha_conversations';
 
+        // Validare
+        if (empty($conversation_id) || empty($role) || empty($content)) {
+            if (defined('WP_DEBUG') && WP_DEBUG) {
+                error_log('AIHA save_message: Invalid parameters - conversation_id=' . $conversation_id . ', role=' . $role . ', content_length=' . strlen($content));
+            }
+            return false;
+        }
+
         // Salvează mesajul în tabelul messages
         $result = $wpdb->insert(
             $table_messages,
@@ -177,6 +185,15 @@ class AIHA_Database
             ),
             array('%d', '%s', '%s')
         );
+
+        // Log pentru debugging
+        if (defined('WP_DEBUG') && WP_DEBUG) {
+            if ($result === false) {
+                error_log('AIHA save_message: Failed to insert message - ' . $wpdb->last_error);
+            } else {
+                error_log('AIHA save_message: Success - conversation_id=' . $conversation_id . ', role=' . $role . ', message_id=' . $wpdb->insert_id);
+            }
+        }
 
         // Actualizează counter-ul de mesaje (optimizat pentru performanță)
         if ($result) {
@@ -204,13 +221,22 @@ class AIHA_Database
         ));
 
         // Actualizează counter-ul
-        $wpdb->update(
+        $update_result = $wpdb->update(
             $table_conversations,
             array('message_count' => intval($count)),
             array('id' => $conversation_id),
             array('%d'),
             array('%d')
         );
+
+        // Log pentru debugging
+        if (defined('WP_DEBUG') && WP_DEBUG) {
+            if ($update_result === false) {
+                error_log('AIHA update_message_count: Failed to update - ' . $wpdb->last_error . ', conversation_id=' . $conversation_id . ', count=' . $count);
+            } else {
+                error_log('AIHA update_message_count: Success - conversation_id=' . $conversation_id . ', count=' . $count);
+            }
+        }
     }
 
     /**
@@ -450,12 +476,12 @@ class AIHA_Database
             $where_values[] = $filters['date_to'] . ' 23:59:59';
         }
 
-        // Filtrare după număr de mesaje (folosește isset pentru a permite și 0)
-        if (isset($filters['message_count_min']) && $filters['message_count_min'] !== '' && $filters['message_count_min'] !== null) {
+        // Filtrare după număr de mesaje (permite și 0)
+        if (isset($filters['message_count_min'])) {
             $where[] = "c.message_count >= %d";
             $where_values[] = intval($filters['message_count_min']);
         }
-        if (isset($filters['message_count_max']) && $filters['message_count_max'] !== '' && $filters['message_count_max'] !== null) {
+        if (isset($filters['message_count_max'])) {
             $where[] = "c.message_count <= %d";
             $where_values[] = intval($filters['message_count_max']);
         }
@@ -627,12 +653,12 @@ class AIHA_Database
             $where[] = "c.created_at <= %s";
             $where_values[] = $filters['date_to'] . ' 23:59:59';
         }
-        // Filtrare după număr de mesaje (folosește isset pentru a permite și 0)
-        if (isset($filters['message_count_min']) && $filters['message_count_min'] !== '' && $filters['message_count_min'] !== null) {
+        // Filtrare după număr de mesaje (permite și 0)
+        if (isset($filters['message_count_min'])) {
             $where[] = "c.message_count >= %d";
             $where_values[] = intval($filters['message_count_min']);
         }
-        if (isset($filters['message_count_max']) && $filters['message_count_max'] !== '' && $filters['message_count_max'] !== null) {
+        if (isset($filters['message_count_max'])) {
             $where[] = "c.message_count <= %d";
             $where_values[] = intval($filters['message_count_max']);
         }
