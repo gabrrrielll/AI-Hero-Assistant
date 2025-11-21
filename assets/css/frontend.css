@@ -76,44 +76,50 @@
     object-fit: cover;
     object-position: center;
     border-radius: 50%;
-    /* Tranziție simplă doar pentru opacity - smooth și naturală */
-    transition: opacity var(--aiha-video-transition-duration, 1s) var(--aiha-video-transition-easing, ease-in-out);
+    /* Tranziția este definită individual pentru fiecare stare pentru consistență */
     /* Previne distorsiunea */
     aspect-ratio: 1 / 1;
     will-change: opacity;
 }
 
+/* Stare inițială - ambele videoclipuri au aceeași tranziție */
 .aiha-video-silence {
     z-index: 1;
     opacity: 1;
+    transition: opacity var(--aiha-video-transition-duration, 1s) var(--aiha-video-transition-easing, ease-in-out);
 }
 
 .aiha-video-speaking {
     z-index: 2;
     opacity: 0;
+    transition: opacity var(--aiha-video-transition-duration, 1s) var(--aiha-video-transition-easing, ease-in-out);
 }
 
 /* Când AI vorbește, video-ul vorbitor apare smooth (opacity 0 -> 1) */
 .aiha-video-container.speaking .aiha-video-silence {
     opacity: 0;
     z-index: 1;
+    transition: opacity var(--aiha-video-transition-duration, 1s) var(--aiha-video-transition-easing, ease-in-out);
 }
 
 .aiha-video-container.speaking .aiha-video-speaking {
     opacity: 1;
     z-index: 2;
     display: block !important;
+    transition: opacity var(--aiha-video-transition-duration, 1s) var(--aiha-video-transition-easing, ease-in-out);
 }
 
-/* Când AI tace, video-ul tăcerii apare smooth (opacity 0 -> 1) */
+/* Când AI tace, video-ul tăcerii apare smooth (opacity 0 -> 1) - ACEEAȘI TRANZIȚIE */
 .aiha-video-container.silent .aiha-video-silence {
     opacity: 1;
     z-index: 2;
+    transition: opacity var(--aiha-video-transition-duration, 1s) var(--aiha-video-transition-easing, ease-in-out);
 }
 
 .aiha-video-container.silent .aiha-video-speaking {
     opacity: 0;
     z-index: 1;
+    transition: opacity var(--aiha-video-transition-duration, 1s) var(--aiha-video-transition-easing, ease-in-out);
 }
 
 .aiha-video-placeholder {

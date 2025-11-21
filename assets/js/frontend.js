@@ -164,6 +164,9 @@
                         }, 50);
                     }
                     if (callback) callback();
+                    // După ce se termină typing-ul, trec la silent state imediat (fără delay)
+                    // pentru a evita flash-ul
+                    this.setSilentState();
                 }
             };
             
@@ -211,15 +214,13 @@
                 if (response.success) {
                     this.typeText(response.data.message, () => {
                         // After AI finishes speaking, switch back to silent state
-                        setTimeout(() => {
-                            this.setSilentState();
-                            if (this.loadingEl) {
-                                this.loadingEl.style.display = 'none';
-                            }
-                            if (this.sendBtn) {
-                                this.sendBtn.disabled = false;
-                            }
-                        }, 500);
+                        // setSilentState() este apelat direct în typeText callback pentru tranziție smooth
+                        if (this.loadingEl) {
+                            this.loadingEl.style.display = 'none';
+                        }
+                        if (this.sendBtn) {
+                            this.sendBtn.disabled = false;
+                        }
                     });
                 } else {
                     throw new Error(response.data.message || 'Unknown error');
