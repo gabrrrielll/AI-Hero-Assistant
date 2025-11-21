@@ -1,88 +1,48 @@
 /**
  * AI Hero Assistant - Frontend Styles
- * CSS Variables sunt incluse inline înainte de acest fișier
+ * Bootstrap-based layout with minimal custom CSS
  */
 
 .aiha-container {
     width: 100%;
-    position: relative;
     font-family: var(--font-family, 'Inter', sans-serif);
 }
 
+/* Hero Section - Bootstrap Flexbox Layout */
 .aiha-hero-section {
-    position: relative;
-    width: 100%;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: space-between;
-    /* Distribuie elementele uniform */
     background: linear-gradient(135deg, var(--gradient-start, #6366f1), var(--gradient-end, #ec4899));
     background-size: 200% 200%;
     animation: gradientShift 10s ease infinite;
-    padding: 40px 20px 20px 20px;
     overflow: hidden;
-    gap: 20px;
-    min-height: 100%;
-    /* Asigură că ocupă înălțimea completă */
+    position: relative;
 }
 
 @keyframes gradientShift {
-
-    0%,
-    100% {
+    0%, 100% {
         background-position: 0% 50%;
     }
-
     50% {
         background-position: 100% 50%;
     }
 }
 
-/* Video Container - Două videoclipuri suprapuse */
-.aiha-video-container {
-    position: relative;
+/* Video Container - Bootstrap-based */
+.aiha-video-container > div {
     width: 300px;
     height: 300px;
-    min-width: 300px;
-    /* Dimensiune minimă fixă */
-    min-height: 300px;
-    /* Înălțime minimă fixă */
-    max-width: 300px;
-    /* Dimensiune maximă fixă */
-    max-height: 300px;
-    /* Înălțime maximă fixă */
-    margin-bottom: 20px;
-    margin-top: 20px;
-    z-index: 3;
-    /* Peste subtitle */
     border-radius: 50%;
     overflow: hidden;
     box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
     background: rgba(255, 255, 255, 0.1);
-    /* Previne distorsiunea - păstrează forma circulară */
-    flex-shrink: 0;
-    flex-grow: 0;
-    /* Nu permite creșterea */
-    aspect-ratio: 1 / 1;
 }
 
 .aiha-video {
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
     object-fit: cover;
-    object-position: center;
     border-radius: 50%;
-    /* Tranziția este definită individual pentru fiecare stare pentru consistență */
-    /* Previne distorsiunea */
-    aspect-ratio: 1 / 1;
     will-change: opacity;
 }
 
-/* Stare inițială - ambele videoclipuri au aceeași tranziție */
+/* Video Transitions */
 .aiha-video-silence {
     z-index: 1;
     opacity: 1;
@@ -95,70 +55,28 @@
     transition: opacity var(--aiha-video-transition-duration, 1s) var(--aiha-video-transition-easing, ease-in-out);
 }
 
-/* Când AI vorbește, video-ul vorbitor apare smooth (opacity 0 -> 1) */
 .aiha-video-container.speaking .aiha-video-silence {
     opacity: 0;
     z-index: 1;
-    transition: opacity var(--aiha-video-transition-duration, 1s) var(--aiha-video-transition-easing, ease-in-out);
 }
 
 .aiha-video-container.speaking .aiha-video-speaking {
     opacity: 1;
     z-index: 2;
     display: block !important;
-    transition: opacity var(--aiha-video-transition-duration, 1s) var(--aiha-video-transition-easing, ease-in-out);
 }
 
-/* Când AI tace, video-ul tăcerii apare smooth (opacity 0 -> 1) - ACEEAȘI TRANZIȚIE */
 .aiha-video-container.silent .aiha-video-silence {
     opacity: 1;
     z-index: 2;
-    transition: opacity var(--aiha-video-transition-duration, 1s) var(--aiha-video-transition-easing, ease-in-out);
 }
 
 .aiha-video-container.silent .aiha-video-speaking {
     opacity: 0;
     z-index: 1;
-    transition: opacity var(--aiha-video-transition-duration, 1s) var(--aiha-video-transition-easing, ease-in-out);
 }
 
-.aiha-video-placeholder {
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    background: rgba(255, 255, 255, 0.1);
-    color: white;
-    text-align: center;
-    padding: 20px;
-    border-radius: 50%;
-}
-
-
-/* Subtitle Container */
-.aiha-subtitle-container {
-    width: 100%;
-    max-width: 800px;
-    margin-top: 0;
-    margin-bottom: 0;
-    min-height: 60px;
-    max-height: 100px;
-    /* Mărit pentru mai mult text */
-    display: flex;
-    align-items: flex-start;
-    justify-content: center;
-    z-index: 2;
-    position: relative;
-    flex-shrink: 1;
-    /* Permite micșorare dacă e necesar */
-    flex-grow: 0;
-    /* Nu permite creșterea excesivă */
-}
-
+/* Subtitle - Bootstrap-based */
 .aiha-subtitle {
     color: white;
     font-size: 18px;
@@ -170,22 +88,17 @@
     border-radius: 20px;
     box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
     min-height: 60px;
-    max-height: 100px;
-    /* Înălțime maximă mărită */
+    max-height: 200px;
     font-weight: 400;
     overflow-y: auto;
-    /* Scroll vertical când textul depășește */
     overflow-x: hidden;
     word-wrap: break-word;
-    width: 100%;
-    /* Stilizare scrollbar */
     scrollbar-width: thin;
     scrollbar-color: rgba(255, 255, 255, 0.5) transparent;
-    /* Smooth scrolling */
     scroll-behavior: smooth;
 }
 
-/* Stilizare scrollbar pentru WebKit browsers */
+/* Scrollbar Styling */
 .aiha-subtitle::-webkit-scrollbar {
     width: 6px;
 }
@@ -204,6 +117,7 @@
     background: rgba(255, 255, 255, 0.7);
 }
 
+/* Typing Cursor */
 .aiha-subtitle .typing-cursor {
     display: inline-block;
     width: 2px;
@@ -214,7 +128,16 @@
     vertical-align: middle;
 }
 
-/* Formatare mesaje */
+@keyframes blinkCursor {
+    0%, 50% {
+        opacity: 1;
+    }
+    51%, 100% {
+        opacity: 0;
+    }
+}
+
+/* Markdown Formatting */
 .aiha-subtitle .aiha-message-paragraph {
     margin: 0.5em 0;
     line-height: 1.6;
@@ -235,30 +158,23 @@
     line-height: 1.6;
 }
 
-.aiha-subtitle .aiha-message-list li {
+.aiha-subtitle .aiha-message-list.aiha-numbered-list {
+    list-style-type: decimal;
+}
+
+.aiha-subtitle .aiha-list-item {
     margin: 0.4em 0;
     padding-left: 0.3em;
 }
 
-.aiha-subtitle .aiha-message-list li:first-child {
+.aiha-subtitle .aiha-list-item:first-child {
     margin-top: 0;
 }
 
-.aiha-subtitle .aiha-message-list li:last-child {
+.aiha-subtitle .aiha-list-item:last-child {
     margin-bottom: 0;
 }
 
-.aiha-subtitle strong {
-    font-weight: 600;
-    color: rgba(255, 255, 255, 0.95);
-}
-
-.aiha-subtitle em {
-    font-style: italic;
-    color: rgba(255, 255, 255, 0.9);
-}
-
-/* Formatare mesaje markdown în frontend */
 .aiha-subtitle .aiha-header {
     margin: 0.8em 0 0.5em 0;
     font-weight: 600;
@@ -339,39 +255,8 @@
     margin: 0.3em 0;
 }
 
-.aiha-subtitle .aiha-message-list.aiha-numbered-list {
-    list-style-type: decimal;
-}
-
-@keyframes blinkCursor {
-
-    0%,
-    50% {
-        opacity: 1;
-    }
-
-    51%,
-    100% {
-        opacity: 0;
-    }
-}
-
-/* Input Container */
-.aiha-input-container {
-    width: 100%;
-    max-width: 800px;
-    z-index: 2;
-    flex-shrink: 0;
-    /* Nu permite micșorarea */
-    margin-top: auto;
-    /* Push la final */
-}
-
+/* Input Wrapper - Bootstrap-based */
 .aiha-input-wrapper {
-    position: relative;
-    display: flex;
-    align-items: flex-end;
-    gap: 10px;
     background: rgba(255, 255, 255, 0.95);
     border-radius: 25px;
     padding: 15px 20px;
@@ -385,7 +270,6 @@
 }
 
 .aiha-textarea {
-    flex: 1;
     border: none;
     outline: none;
     resize: none;
@@ -395,7 +279,7 @@
     color: #333;
     background: transparent;
     padding: 5px 0;
-    max-height: 45px;
+    max-height: 120px;
     overflow-y: auto;
 }
 
@@ -407,15 +291,7 @@
     background: linear-gradient(135deg, var(--gradient-start, #6366f1), var(--gradient-end, #ec4899));
     border: none;
     border-radius: 50%;
-    width: 44px;
-    height: 44px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    cursor: pointer;
-    color: white;
     transition: transform 0.2s ease, box-shadow 0.2s ease;
-    flex-shrink: 0;
 }
 
 .aiha-send-btn:hover {
@@ -437,106 +313,9 @@
 .aiha-loading {
     display: flex;
     justify-content: center;
+    align-items: center;
     gap: 8px;
-    margin-top: 15px;
 }
-
-.aiha-loading span {
-    width: 8px;
-    height: 8px;
-    background: white;
-    border-radius: 50%;
-    animation: loadingDot 1.4s infinite ease-in-out;
-}
-
-.aiha-loading span:nth-child(1) {
-    animation-delay: -0.32s;
-}
-
-.aiha-loading span:nth-child(2) {
-    animation-delay: -0.16s;
-}
-
-@keyframes loadingDot {
-
-    0%,
-    80%,
-    100% {
-        transform: scale(0.8);
-        opacity: 0.5;
-    }
-
-    40% {
-        transform: scale(1.2);
-        opacity: 1;
-    }
-}
-
-/* Responsive Design */
-@media (max-width: 768px) {
-    .aiha-video-container {
-        width: 250px;
-        height: 250px;
-        margin-bottom: 15px;
-        margin-top: 15px;
-    }
-
-    .aiha-subtitle-container {
-        max-height: 200px;
-        /* Mai mic pe mobile */
-    }
-
-    .aiha-subtitle {
-        font-size: 16px;
-        padding: 12px 20px;
-        max-height: 180px;
-        /* Ajustat pentru mobile */
-    }
-
-    .aiha-input-wrapper {
-        padding: 12px 15px;
-    }
-
-    .aiha-textarea {
-        font-size: 14px;
-    }
-
-    .aiha-send-btn {
-        width: 40px;
-        height: 40px;
-    }
-}
-
-@media (max-width: 480px) {
-    .aiha-hero-section {
-        padding: 20px 15px 15px 15px;
-        gap: 15px;
-    }
-
-    .aiha-video-container {
-        width: 200px;
-        height: 200px;
-        margin-bottom: 10px;
-        margin-top: 10px;
-    }
-
-    .aiha-subtitle-container {
-        max-height: 150px;
-        /* Mai mic pe ecrane foarte mici */
-    }
-
-    .aiha-subtitle {
-        font-size: 14px;
-        padding: 10px 15px;
-        max-height: 130px;
-        /* Ajustat pentru ecrane mici */
-    }
-
-    .aiha-input-container {
-        max-width: 100%;
-    }
-}
-
 
 /* Bokeh Background Effect */
 .aiha-hero-section::before {
@@ -552,4 +331,35 @@
         radial-gradient(circle at 40% 80%, rgba(255, 255, 255, 0.08) 0%, transparent 50%);
     pointer-events: none;
     z-index: 1;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    .aiha-video-container > div {
+        width: 250px;
+        height: 250px;
+    }
+
+    .aiha-subtitle {
+        font-size: 16px;
+        padding: 12px 20px;
+        max-height: 180px;
+    }
+
+    .aiha-textarea {
+        font-size: 14px;
+    }
+}
+
+@media (max-width: 480px) {
+    .aiha-video-container > div {
+        width: 200px;
+        height: 200px;
+    }
+
+    .aiha-subtitle {
+        font-size: 14px;
+        padding: 10px 15px;
+        max-height: 150px;
+    }
 }

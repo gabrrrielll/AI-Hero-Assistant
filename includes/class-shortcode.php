@@ -37,60 +37,64 @@ class AIHA_Shortcode {
         ob_start();
         ?>
         <div id="<?php echo esc_attr($instance_id); ?>" class="aiha-container" data-instance-id="<?php echo esc_attr($instance_id); ?>">
-            <div class="aiha-hero-section" style="--gradient-start: <?php echo esc_attr($gradient_start); ?>; --gradient-end: <?php echo esc_attr($gradient_end); ?>; --font-family: <?php echo esc_attr($font_family); ?>; height: <?php echo esc_attr($atts['height']); ?>;">
+            <div class="aiha-hero-section container-fluid d-flex flex-column justify-content-between" style="--gradient-start: <?php echo esc_attr($gradient_start); ?>; --gradient-end: <?php echo esc_attr($gradient_end); ?>; --font-family: <?php echo esc_attr($font_family); ?>; height: <?php echo esc_attr($atts['height']); ?>; min-height: <?php echo esc_attr($atts['height']); ?>;">
                 <!-- Video Container - Două videoclipuri suprapuse -->
-                <div class="aiha-video-container">
-                    <!-- Video pentru tăcere (default vizibil) -->
-                    <video 
-                        id="aiha-video-silence-<?php echo esc_attr($instance_id); ?>" 
-                        class="aiha-video aiha-video-silence" 
-                        autoplay 
-                        loop 
-                        muted 
-                        playsinline>
-                        <?php if ($video_silence_url): ?>
-                            <source src="<?php echo esc_url($video_silence_url); ?>" type="video/mp4">
+                <div class="aiha-video-container d-flex justify-content-center align-items-center flex-shrink-0 my-3">
+                    <div class="position-relative" style="width: 300px; height: 300px;">
+                        <!-- Video pentru tăcere (default vizibil) -->
+                        <video 
+                            id="aiha-video-silence-<?php echo esc_attr($instance_id); ?>" 
+                            class="aiha-video aiha-video-silence position-absolute top-0 start-0 w-100 h-100" 
+                            autoplay 
+                            loop 
+                            muted 
+                            playsinline
+                            style="object-fit: cover; border-radius: 50%;">
+                            <?php if ($video_silence_url): ?>
+                                <source src="<?php echo esc_url($video_silence_url); ?>" type="video/mp4">
+                            <?php endif; ?>
+                        </video>
+                        
+                        <!-- Video pentru vorbire (ascuns inițial) -->
+                        <video 
+                            id="aiha-video-speaking-<?php echo esc_attr($instance_id); ?>" 
+                            class="aiha-video aiha-video-speaking position-absolute top-0 start-0 w-100 h-100" 
+                            autoplay 
+                            loop 
+                            muted 
+                            playsinline
+                            style="object-fit: cover; border-radius: 50%; display: none;">
+                            <?php if ($video_speaking_url): ?>
+                                <source src="<?php echo esc_url($video_speaking_url); ?>" type="video/mp4">
+                            <?php endif; ?>
+                        </video>
+                        
+                        <!-- Fallback message dacă nu sunt videoclipuri -->
+                        <?php if (empty($video_silence_url) && empty($video_speaking_url)): ?>
+                            <div class="aiha-video-placeholder position-absolute top-50 start-50 translate-middle text-center text-white">
+                                <p><?php esc_html_e('Please configure video URLs in plugin settings', 'ai-hero-assistant'); ?></p>
+                            </div>
                         <?php endif; ?>
-                    </video>
-                    
-                    <!-- Video pentru vorbire (ascuns inițial) -->
-                    <video 
-                        id="aiha-video-speaking-<?php echo esc_attr($instance_id); ?>" 
-                        class="aiha-video aiha-video-speaking" 
-                        autoplay 
-                        loop 
-                        muted 
-                        playsinline
-                        style="display: none;">
-                        <?php if ($video_speaking_url): ?>
-                            <source src="<?php echo esc_url($video_speaking_url); ?>" type="video/mp4">
-                        <?php endif; ?>
-                    </video>
-                    
-                    <!-- Fallback message dacă nu sunt videoclipuri -->
-                    <?php if (empty($video_silence_url) && empty($video_speaking_url)): ?>
-                        <div class="aiha-video-placeholder">
-                            <p><?php esc_html_e('Please configure video URLs in plugin settings', 'ai-hero-assistant'); ?></p>
-                        </div>
-                    <?php endif; ?>
+                    </div>
                 </div>
                 
                 <!-- Subtitrare cu typing effect -->
-                <div class="aiha-subtitle-container">
-                    <div class="aiha-subtitle" id="aiha-subtitle-<?php echo esc_attr($instance_id); ?>"></div>
+                <div class="aiha-subtitle-container d-flex justify-content-center flex-grow-1 my-3" style="min-height: 0;">
+                    <div class="aiha-subtitle w-100" id="aiha-subtitle-<?php echo esc_attr($instance_id); ?>" style="max-width: 800px;"></div>
                 </div>
                 
                 <!-- Textarea pentru input -->
-                <div class="aiha-input-container">
-                    <div class="aiha-input-wrapper">
+                <div class="aiha-input-container d-flex justify-content-center flex-shrink-0 my-3">
+                    <div class="aiha-input-wrapper w-100 d-flex align-items-end gap-2" style="max-width: 800px;">
                         <textarea 
                             id="aiha-input-<?php echo esc_attr($instance_id); ?>" 
-                            class="aiha-textarea" 
+                            class="aiha-textarea form-control" 
                             placeholder="<?php esc_attr_e('Scrieți mesajul dvs...', 'ai-hero-assistant'); ?>"
                             rows="3"></textarea>
                         <button 
                             id="aiha-send-<?php echo esc_attr($instance_id); ?>" 
-                            class="aiha-send-btn"
+                            class="aiha-send-btn btn btn-light d-flex align-items-center justify-content-center flex-shrink-0"
+                            style="width: 50px; height: 50px;"
                             aria-label="<?php esc_attr_e('Trimite mesaj', 'ai-hero-assistant'); ?>">
                             <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                                 <line x1="22" y1="2" x2="11" y2="13"></line>
@@ -98,8 +102,9 @@ class AIHA_Shortcode {
                             </svg>
                         </button>
                     </div>
-                    <div class="aiha-loading" id="aiha-loading-<?php echo esc_attr($instance_id); ?>" style="display: none;">
-                        <span></span><span></span><span></span>
+                    <div class="aiha-loading w-100 d-none justify-content-center align-items-center gap-2 mt-2" id="aiha-loading-<?php echo esc_attr($instance_id); ?>">
+                        <span class="spinner-border spinner-border-sm text-white" role="status"></span>
+                        <span class="text-white"><?php esc_html_e('Se procesează...', 'ai-hero-assistant'); ?></span>
                     </div>
                 </div>
             </div>

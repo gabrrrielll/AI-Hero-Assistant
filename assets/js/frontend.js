@@ -143,55 +143,21 @@
         }
 
         /**
-         * Formatează textul parțial pentru typing effect (cu închidere corectă a tag-urilor)
+         * Formatează textul parțial pentru typing effect (versiune optimizată rapidă)
          */
         formatPartialText(partialText) {
             if (!partialText) return '';
-            
-            // Formatează textul parțial folosind funcția globală
-            if (typeof formatMarkdownMessage !== 'undefined') {
+
+            // Folosește funcția rapidă de formatare parțială dacă există
+            if (typeof formatMarkdownPartial !== 'undefined') {
                 try {
-                    let formatted = formatMarkdownMessage(partialText);
-                    
-                    // Verifică și închide tag-urile HTML deschise incomplete
-                    const openTags = [];
-                    const tagRegex = /<(\/?)([a-z][a-z0-9]*)\b[^>]*>/gi;
-                    let match;
-                    
-                    // Reset regex
-                    tagRegex.lastIndex = 0;
-                    
-                    while ((match = tagRegex.exec(formatted)) !== null) {
-                        const isClosing = match[1] === '/';
-                        const tagName = match[2].toLowerCase();
-                        
-                        // Tag-uri self-closing (nu trebuie închise)
-                        const selfClosingTags = ['br', 'hr', 'img', 'input', 'meta', 'link', 'area', 'base', 'col', 'embed', 'source', 'track', 'wbr'];
-                        
-                        if (!isClosing && !selfClosingTags.includes(tagName)) {
-                            openTags.push(tagName);
-                        } else if (isClosing) {
-                            const lastOpen = openTags.lastIndexOf(tagName);
-                            if (lastOpen !== -1) {
-                                openTags.splice(lastOpen, 1);
-                            }
-                        }
-                    }
-                    
-                    // Închide tag-urile deschise în ordine inversă
-                    let closedTags = '';
-                    for (let i = openTags.length - 1; i >= 0; i--) {
-                        closedTags += '</' + openTags[i] + '>';
-                    }
-                    
-                    return formatted + closedTags;
+                    return formatMarkdownPartial(partialText);
                 } catch (e) {
-                    // Dacă apare o eroare, folosește formatare simplă
                     console.warn('Error formatting partial text:', e);
                     return partialText.replace(/\n/g, '<br>');
                 }
             }
-            
+
             // Fallback la formatare simplă
             return partialText.replace(/\n/g, '<br>');
         }
@@ -246,7 +212,7 @@
 
         async sendMessage() {
             const message = this.inputEl ? this.inputEl.value.trim() : '';
-            if (!message || (this.loadingEl && this.loadingEl.style.display !== 'none')) {
+            if (!message || (this.loadingEl && !this.loadingEl.classList.contains('d-none'))) {
                 return;
             }
 
@@ -264,7 +230,8 @@
 
         async sendToAI(message) {
             if (this.loadingEl) {
-                this.loadingEl.style.display = 'flex';
+                this.loadingEl.classList.remove('d-none');
+                this.loadingEl.classList.add('d-flex');
             }
             if (this.sendBtn) {
                 this.sendBtn.disabled = true;
@@ -287,7 +254,8 @@
                         // After AI finishes speaking, switch back to silent state
                         // setSilentState() este apelat direct în typeText callback pentru tranziție smooth
                         if (this.loadingEl) {
-                            this.loadingEl.style.display = 'none';
+                            this.loadingEl.classList.add('d-none');
+                            this.loadingEl.classList.remove('d-flex');
                         }
                         if (this.sendBtn) {
                             this.sendBtn.disabled = false;
@@ -301,7 +269,8 @@
                 this.typeText('Sorry, an error occurred. Please try again.', () => {
                     this.setSilentState();
                     if (this.loadingEl) {
-                        this.loadingEl.style.display = 'none';
+                        this.loadingEl.classList.add('d-none');
+                        this.loadingEl.classList.remove('d-flex');
                     }
                     if (this.sendBtn) {
                         this.sendBtn.disabled = false;

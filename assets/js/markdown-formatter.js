@@ -7,7 +7,80 @@
     'use strict';
 
     /**
-     * Formatează textul markdown în HTML
+     * Formatează textul markdown parțial rapid (pentru typing effect)
+     * @param {string} text - Textul markdown parțial de formatat
+     * @returns {string} - HTML formatat
+     */
+    window.formatMarkdownPartial = function(text) {
+        if (!text) return '';
+        
+        let formatted = text;
+        
+        // Escapă HTML-ul existent pentru siguranță
+        const div = document.createElement('div');
+        div.textContent = formatted;
+        formatted = div.innerHTML;
+        
+        // Procesează rapid doar elementele inline și simple
+        // Bold (**text** sau __text__)
+        formatted = formatted.replace(/\*\*([^*\n]+?)\*\*/g, '<strong class="aiha-bold">$1</strong>');
+        formatted = formatted.replace(/__(.+?)__/g, '<strong class="aiha-bold">$1</strong>');
+        
+        // Italic (*text* sau _text_) - doar dacă nu este la început de linie
+        formatted = formatted.replace(/(?<!^|\n|\*)\*([^*\n]+?)\*(?!\*)/g, '<em class="aiha-italic">$1</em>');
+        formatted = formatted.replace(/(?<!^|\n|_)_(?!_)([^_\n]+?)_(?!_)/g, '<em class="aiha-italic">$1</em>');
+        
+        // Headers (### H3, #### H4, etc.) - doar dacă sunt complete
+        formatted = formatted.replace(/^###\s+(.+)$/gm, '<h3 class="aiha-header aiha-h1">$1</h3>');
+        formatted = formatted.replace(/^####\s+(.+)$/gm, '<h4 class="aiha-header aiha-h2">$1</h4>');
+        formatted = formatted.replace(/^##\s+(.+)$/gm, '<h2 class="aiha-header aiha-h1">$1</h2>');
+        formatted = formatted.replace(/^#\s+(.+)$/gm, '<h1 class="aiha-header aiha-h1">$1</h1>');
+        
+        // Liste cu bullet points (* sau -) - doar dacă sunt complete
+        const lines = formatted.split('\n');
+        let result = [];
+        let inList = false;
+        
+        lines.forEach((line) => {
+            const trimmed = line.trim();
+            const listMatch = trimmed.match(/^[\*\-\•]\s+(.+)$/);
+            
+            if (listMatch) {
+                if (!inList) {
+                    result.push('<ul class="aiha-message-list">');
+                    inList = true;
+                }
+                let content = listMatch[1];
+                // Formatează conținutul listei (bold, italic)
+                content = content.replace(/\*\*([^*\n]+?)\*\*/g, '<strong class="aiha-bold">$1</strong>');
+                result.push('<li class="aiha-list-item">' + content + '</li>');
+            } else {
+                if (inList) {
+                    result.push('</ul>');
+                    inList = false;
+                }
+                if (trimmed) {
+                    result.push('<p class="aiha-message-paragraph">' + trimmed + '</p>');
+                } else {
+                    result.push('<br class="aiha-line-break">');
+                }
+            }
+        });
+        
+        if (inList) {
+            result.push('</ul>');
+        }
+        
+        formatted = result.join('');
+        
+        // Convertește newlines rămase în <br>
+        formatted = formatted.replace(/\n/g, '<br>');
+        
+        return formatted;
+    };
+
+    /**
+     * Formatează textul markdown în HTML (versiune completă)
      * @param {string} text - Textul markdown de formatat
      * @returns {string} - HTML formatat
      */

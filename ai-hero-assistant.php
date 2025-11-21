@@ -158,6 +158,9 @@ class AI_Hero_Assistant
             // return;
         }
 
+        // Include Bootstrap CSS inline
+        echo '<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-T3c6CoIi6uLrA9TneNEoa7RxnatzjcDSCmG1MXxSR1GAsXEV/Dwwykc2MPK8M2HN" crossorigin="anonymous">';
+
         // Include CSS Variables first, then main CSS
         $variables_path = AIHA_PLUGIN_DIR . 'assets/css/variables.css';
         $css_path = AIHA_PLUGIN_DIR . 'assets/css/frontend.css';
@@ -186,6 +189,9 @@ class AI_Hero_Assistant
         if (is_a($post, 'WP_Post')) {
             $has_shortcode = has_shortcode($post->post_content, 'ai_hero_assistant');
         }
+
+        // Include Bootstrap JS inline
+        echo '<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-C6RzsynM9kWDrMNeT87bh95OGNyZPhcTNXj1NW7RuBCsyN/o0jlpcV8Qyq46cDfL" crossorigin="anonymous"></script>';
 
         // Verifică dacă jQuery este disponibil și îl încarcă dacă nu este
         if (!wp_script_is('jquery', 'enqueued') && !wp_script_is('jquery', 'done')) {
