@@ -7,33 +7,35 @@ if (!defined('ABSPATH')) {
     exit;
 }
 
-class AIHA_Shortcode {
-    
-    public function __construct() {
+class AIHA_Shortcode
+{
+    public function __construct()
+    {
         add_shortcode('ai_hero_assistant', array($this, 'render_shortcode'));
     }
-    
-    public function render_shortcode($atts) {
+
+    public function render_shortcode($atts)
+    {
         $atts = shortcode_atts(array(
             'height' => '600px'
         ), $atts);
-        
+
         $settings = get_option('aiha_settings', array());
         $company_name = isset($settings['company_name']) ? $settings['company_name'] : '';
         $hero_message = isset($settings['hero_message']) ? $settings['hero_message'] : 'Bună! Sunt asistentul virtual al {company_name}. Cum vă pot ajuta cu serviciile noastre de programare?';
         $hero_message = str_replace('{company_name}', $company_name, $hero_message);
-        
+
         $gradient_start = isset($settings['gradient_start']) ? $settings['gradient_start'] : '#6366f1';
         $gradient_end = isset($settings['gradient_end']) ? $settings['gradient_end'] : '#ec4899';
         $font_family = isset($settings['font_family']) ? $settings['font_family'] : 'Inter, sans-serif';
-        
+
         // Video URLs from settings
         $video_silence_url = isset($settings['video_silence_url']) ? $settings['video_silence_url'] : '';
         $video_speaking_url = isset($settings['video_speaking_url']) ? $settings['video_speaking_url'] : '';
-        
+
         // Generăm un ID unic pentru această instanță
         $instance_id = 'aiha-' . uniqid();
-        
+
         ob_start();
         ?>
         <div id="<?php echo esc_attr($instance_id); ?>" class="aiha-container" data-instance-id="<?php echo esc_attr($instance_id); ?>">
@@ -90,7 +92,7 @@ class AIHA_Shortcode {
                             id="aiha-input-<?php echo esc_attr($instance_id); ?>" 
                             class="aiha-textarea form-control" 
                             placeholder="<?php esc_attr_e('Scrieți mesajul dvs...', 'ai-hero-assistant'); ?>"
-                            rows="3"></textarea>
+                            rows="1"></textarea>
                         <button 
                             id="aiha-send-<?php echo esc_attr($instance_id); ?>" 
                             class="aiha-send-btn btn btn-light d-flex align-items-center justify-content-center flex-shrink-0"
@@ -124,6 +126,3 @@ class AIHA_Shortcode {
         return ob_get_clean();
     }
 }
-
-
-
