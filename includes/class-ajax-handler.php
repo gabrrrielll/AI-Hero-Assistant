@@ -327,21 +327,65 @@ class AIHA_Ajax_Handler {
           // Log înainte de trimitere
           if (defined('WP_DEBUG') && WP_DEBUG) {
               error_log('AIHA maybe_send_lead_notification_email: Attempting to send email - recipient=' . $recipient . ', subject=' . $subject);
+              error_log('AIHA maybe_send_lead_notification_email: Body length=' . strlen($body) . ' chars');
           }
           
+          // Hook pentru a captura erorile PHPMailer
+          add_action('wp_mail_failed', function($wp_error) {
+              if (defined('WP_DEBUG') && WP_DEBUG) {
+                  error_log('AIHA maybe_send_lead_notification_email: wp_mail_failed hook triggered');
+                  error_log('AIHA maybe_send_lead_notification_email: WP_Error message: ' . $wp_error->get_error_message());
+                  error_log('AIHA maybe_send_lead_notification_email: WP_Error code: ' . $wp_error->get_error_code());
+                  if ($wp_error->get_error_data()) {
+                      error_log('AIHA maybe_send_lead_notification_email: WP_Error data: ' . print_r($wp_error->get_error_data(), true));
+                  }
+              }
+          });
+          
           $mail_result = wp_mail($recipient, $subject, $body, $headers);
+          
+          // Verifică PHPMailer pentru erori suplimentare
+          global $phpmailer;
+          if (isset($phpmailer) && is_object($phpmailer)) {
+              if (defined('WP_DEBUG') && WP_DEBUG) {
+                  error_log('AIHA maybe_send_lead_notification_email: PHPMailer object exists');
+                  if (!empty($phpmailer->ErrorInfo)) {
+                      error_log('AIHA maybe_send_lead_notification_email: PHPMailer ErrorInfo: ' . $phpmailer->ErrorInfo);
+                  }
+                  // Verifică dacă este configurat SMTP
+                  if (method_exists($phpmailer, 'isSMTP') && $phpmailer->isSMTP()) {
+                      error_log('AIHA maybe_send_lead_notification_email: Using SMTP - Host=' . ($phpmailer->Host ?? 'not set') . ', Port=' . ($phpmailer->Port ?? 'not set'));
+                  } else {
+                      error_log('AIHA maybe_send_lead_notification_email: WARNING - Using PHP mail() function (not SMTP)');
+                      error_log('AIHA maybe_send_lead_notification_email: PHP mail() may be blocked by server or emails may go to spam');
+                      error_log('AIHA maybe_send_lead_notification_email: SOLUTION: Install SMTP plugin (WP Mail SMTP, Easy WP SMTP, etc.)');
+                  }
+                  if (method_exists($phpmailer, 'getSMTPInstance')) {
+                      $smtp = $phpmailer->getSMTPInstance();
+                      if ($smtp && method_exists($smtp, 'getError')) {
+                          $smtp_error = $smtp->getError();
+                          if ($smtp_error) {
+                              error_log('AIHA maybe_send_lead_notification_email: SMTP Error: ' . print_r($smtp_error, true));
+                          }
+                      }
+                  }
+              }
+          } else {
+              if (defined('WP_DEBUG') && WP_DEBUG) {
+                  error_log('AIHA maybe_send_lead_notification_email: WARNING - PHPMailer object not available');
+              }
+          }
           
           // Log rezultatul
           if (defined('WP_DEBUG') && WP_DEBUG) {
               if ($mail_result) {
-                  error_log('AIHA maybe_send_lead_notification_email: SUCCESS - Email sent successfully to ' . $recipient);
+                  error_log('AIHA maybe_send_lead_notification_email: SUCCESS - wp_mail returned true for ' . $recipient);
+                  error_log('AIHA maybe_send_lead_notification_email: NOTE - If email not received, check:');
+                  error_log('AIHA maybe_send_lead_notification_email: 1. Spam/junk folder');
+                  error_log('AIHA maybe_send_lead_notification_email: 2. Server email logs');
+                  error_log('AIHA maybe_send_lead_notification_email: 3. Install SMTP plugin for reliable email delivery');
               } else {
                   error_log('AIHA maybe_send_lead_notification_email: FAILED - wp_mail returned false for ' . $recipient);
-                  // Verifică dacă există erori WordPress
-                  global $phpmailer;
-                  if (isset($phpmailer) && !empty($phpmailer->ErrorInfo)) {
-                      error_log('AIHA maybe_send_lead_notification_email: PHPMailer error: ' . $phpmailer->ErrorInfo);
-                  }
               }
           }
       }
