@@ -150,10 +150,17 @@ class AI_Hero_Assistant
             // return;
         }
 
+        // Include CSS Variables first, then main CSS
+        $variables_path = AIHA_PLUGIN_DIR . 'assets/css/variables.css';
         $css_path = AIHA_PLUGIN_DIR . 'assets/css/frontend.css';
 
         if (file_exists($css_path)) {
             echo '<style type="text/css" id="aiha-frontend-css">';
+            // Include variables first if exists
+            if (file_exists($variables_path)) {
+                echo file_get_contents($variables_path);
+            }
+            // Then include main CSS
             echo file_get_contents($css_path);
             echo '</style>';
         }

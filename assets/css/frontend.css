@@ -1,5 +1,6 @@
 /**
  * AI Hero Assistant - Frontend Styles
+ * CSS Variables sunt incluse inline înainte de acest fișier
  */
 
 .aiha-container {
@@ -75,70 +76,44 @@
     object-fit: cover;
     object-position: center;
     border-radius: 50%;
-    /* Tranziții smooth pentru crossfade effect */
-    transition: opacity 0.8s cubic-bezier(0.4, 0, 0.2, 1),
-        filter 0.6s ease-in-out,
-        transform 0.6s ease-in-out;
+    /* Tranziție simplă doar pentru opacity - smooth și naturală */
+    transition: opacity var(--aiha-video-transition-duration, 1s) var(--aiha-video-transition-easing, ease-in-out);
     /* Previne distorsiunea */
     aspect-ratio: 1 / 1;
-    will-change: opacity, filter;
+    will-change: opacity;
 }
 
 .aiha-video-silence {
     z-index: 1;
     opacity: 1;
-    filter: blur(0px);
-    transform: scale(1);
 }
 
 .aiha-video-speaking {
     z-index: 2;
     opacity: 0;
-    filter: blur(0px);
-    transform: scale(1);
 }
 
-/* Când AI vorbește, video-ul vorbitor este vizibil cu crossfade smooth */
+/* Când AI vorbește, video-ul vorbitor apare smooth (opacity 0 -> 1) */
 .aiha-video-container.speaking .aiha-video-silence {
     opacity: 0;
     z-index: 1;
-    filter: blur(2px);
-    transform: scale(0.98);
-    transition: opacity 0.8s cubic-bezier(0.4, 0, 0.2, 1),
-        filter 0.6s ease-in-out,
-        transform 0.6s ease-in-out;
 }
 
 .aiha-video-container.speaking .aiha-video-speaking {
     opacity: 1;
     z-index: 2;
     display: block !important;
-    filter: blur(0px);
-    transform: scale(1);
-    transition: opacity 0.8s cubic-bezier(0.4, 0, 0.2, 1),
-        filter 0.6s ease-in-out 0.2s,
-        transform 0.6s ease-in-out 0.2s;
 }
 
-/* Când AI tace, video-ul tăcerii este vizibil cu crossfade smooth */
+/* Când AI tace, video-ul tăcerii apare smooth (opacity 0 -> 1) */
 .aiha-video-container.silent .aiha-video-silence {
     opacity: 1;
     z-index: 2;
-    filter: blur(0px);
-    transform: scale(1);
-    transition: opacity 0.8s cubic-bezier(0.4, 0, 0.2, 1),
-        filter 0.6s ease-in-out 0.2s,
-        transform 0.6s ease-in-out 0.2s;
 }
 
 .aiha-video-container.silent .aiha-video-speaking {
     opacity: 0;
     z-index: 1;
-    filter: blur(2px);
-    transform: scale(0.98);
-    transition: opacity 0.8s cubic-bezier(0.4, 0, 0.2, 1),
-        filter 0.6s ease-in-out,
-        transform 0.6s ease-in-out;
 }
 
 .aiha-video-placeholder {

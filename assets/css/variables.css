@@ -1,0 +1,13 @@
+/**
+ * AI Hero Assistant - CSS Variables
+ * Modifică aceste valori pentru a ajusta comportamentul plugin-ului
+ */
+
+:root {
+    /* Durata tranziției între videoclipuri (în secunde) */
+    --aiha-video-transition-duration: 1s;
+    
+    /* Easing function pentru tranziții */
+    --aiha-video-transition-easing: ease-in-out;
+}
+
