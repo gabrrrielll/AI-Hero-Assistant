@@ -210,7 +210,15 @@ class AIHA_Ajax_Handler {
        * Salvează lead-ul și trimite notificare dacă este cazul
        */
       private function save_lead_and_notify($conversation_id, $email, $phone, $name = '') {
+          // Log pentru debugging
+          if (defined('WP_DEBUG') && WP_DEBUG) {
+              error_log('AIHA save_lead_and_notify: Called - conversation_id=' . $conversation_id . ', email=' . ($email ?: 'empty') . ', phone=' . ($phone ?: 'empty') . ', name=' . ($name ?: 'empty'));
+          }
+          
           if (empty($email) && empty($phone)) {
+              if (defined('WP_DEBUG') && WP_DEBUG) {
+                  error_log('AIHA save_lead_and_notify: Skipped - both email and phone are empty');
+              }
               return false;
           }
           
@@ -228,13 +236,31 @@ class AIHA_Ajax_Handler {
           $has_new_email = $normalized_new_email && $normalized_new_email !== $normalized_existing_email;
           $has_new_phone = $phone && (!$existing_lead || $existing_lead->phone !== $phone);
           
+          // Log pentru debugging
+          if (defined('WP_DEBUG') && WP_DEBUG) {
+              error_log('AIHA save_lead_and_notify: Existing lead=' . ($existing_lead ? 'yes' : 'no') . ', has_new_email=' . ($has_new_email ? 'yes' : 'no') . ', has_new_phone=' . ($has_new_phone ? 'yes' : 'no'));
+          }
+          
           $result = AIHA_Database::save_lead($conversation_id, $email, $phone, $name);
+          
+          if (defined('WP_DEBUG') && WP_DEBUG) {
+              error_log('AIHA save_lead_and_notify: save_lead result=' . ($result ? 'success' : 'failed'));
+          }
           
           if ($result && ($has_new_email || $has_new_phone)) {
               $final_email = $email ?: ($existing_lead->email ?? '');
               $final_phone = $phone ?: ($existing_lead->phone ?? '');
               $final_name = $name ?: ($existing_lead->name ?? '');
+              
+              if (defined('WP_DEBUG') && WP_DEBUG) {
+                  error_log('AIHA save_lead_and_notify: Calling maybe_send_lead_notification_email - final_email=' . ($final_email ?: 'empty') . ', final_phone=' . ($final_phone ?: 'empty') . ', final_name=' . ($final_name ?: 'empty'));
+              }
+              
               $this->maybe_send_lead_notification_email($conversation_id, $final_email, $final_phone, $final_name);
+          } else {
+              if (defined('WP_DEBUG') && WP_DEBUG) {
+                  error_log('AIHA save_lead_and_notify: NOT calling email notification - result=' . ($result ? 'success' : 'failed') . ', has_new_email=' . ($has_new_email ? 'yes' : 'no') . ', has_new_phone=' . ($has_new_phone ? 'yes' : 'no'));
+              }
           }
           
           return $result;
@@ -244,19 +270,38 @@ class AIHA_Ajax_Handler {
        * Trimite email de notificare dacă opțiunea este activă
        */
       private function maybe_send_lead_notification_email($conversation_id, $email, $phone, $name) {
+          // Log pentru debugging
+          if (defined('WP_DEBUG') && WP_DEBUG) {
+              error_log('AIHA maybe_send_lead_notification_email: Called - conversation_id=' . $conversation_id . ', email=' . ($email ?: 'empty') . ', phone=' . ($phone ?: 'empty') . ', name=' . ($name ?: 'empty'));
+          }
+          
           $settings = get_option('aiha_settings', array());
           
+          // Log setările
+          if (defined('WP_DEBUG') && WP_DEBUG) {
+              error_log('AIHA maybe_send_lead_notification_email: Settings - send_lead_email=' . (isset($settings['send_lead_email']) ? $settings['send_lead_email'] : 'not set') . ', lead_notification_email=' . (isset($settings['lead_notification_email']) ? $settings['lead_notification_email'] : 'not set'));
+          }
+          
           if (empty($settings['send_lead_email'])) {
+              if (defined('WP_DEBUG') && WP_DEBUG) {
+                  error_log('AIHA maybe_send_lead_notification_email: SKIPPED - send_lead_email is not enabled');
+              }
               return;
           }
           
           $recipient = !empty($settings['lead_notification_email']) ? sanitize_email($settings['lead_notification_email']) : '';
           if (empty($recipient)) {
               $recipient = get_option('admin_email');
+              if (defined('WP_DEBUG') && WP_DEBUG) {
+                  error_log('AIHA maybe_send_lead_notification_email: Using admin_email as recipient: ' . $recipient);
+              }
           }
           $recipient = sanitize_email($recipient);
           
           if (empty($recipient) || !is_email($recipient)) {
+              if (defined('WP_DEBUG') && WP_DEBUG) {
+                  error_log('AIHA maybe_send_lead_notification_email: SKIPPED - Invalid recipient email: ' . $recipient);
+              }
               return;
           }
           
@@ -279,7 +324,26 @@ class AIHA_Ajax_Handler {
           
           $headers = array('Content-Type: text/html; charset=UTF-8');
           
-          wp_mail($recipient, $subject, $body, $headers);
+          // Log înainte de trimitere
+          if (defined('WP_DEBUG') && WP_DEBUG) {
+              error_log('AIHA maybe_send_lead_notification_email: Attempting to send email - recipient=' . $recipient . ', subject=' . $subject);
+          }
+          
+          $mail_result = wp_mail($recipient, $subject, $body, $headers);
+          
+          // Log rezultatul
+          if (defined('WP_DEBUG') && WP_DEBUG) {
+              if ($mail_result) {
+                  error_log('AIHA maybe_send_lead_notification_email: SUCCESS - Email sent successfully to ' . $recipient);
+              } else {
+                  error_log('AIHA maybe_send_lead_notification_email: FAILED - wp_mail returned false for ' . $recipient);
+                  // Verifică dacă există erori WordPress
+                  global $phpmailer;
+                  if (isset($phpmailer) && !empty($phpmailer->ErrorInfo)) {
+                      error_log('AIHA maybe_send_lead_notification_email: PHPMailer error: ' . $phpmailer->ErrorInfo);
+                  }
+              }
+          }
       }
     
     /**
