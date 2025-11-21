@@ -80,6 +80,8 @@
     border: 1px solid #dee2e6;
     border-radius: 8px;
     overflow: hidden;
+    max-width: 100% !important;
+    width: 100%;
 }
 
 .aiha-admin-wrap .card-header {
@@ -223,7 +225,7 @@
         padding: 10px 16px;
         font-size: 0.9rem;
     }
-    
+
     .aiha-admin-wrap .card-body {
         padding: 1rem;
     }
