@@ -102,7 +102,8 @@ class AI_Hero_Assistant
             'gradient_start' => '#6366f1',
             'gradient_end' => '#ec4899',
             'font_family' => 'Inter, sans-serif',
-            'hero_message' => 'Bună! Sunt asistentul virtual al {company_name}. Cum vă pot ajuta cu serviciile noastre de programare?'
+            'hero_message' => 'Bună! Sunt asistentul virtual al {company_name}. Cum vă pot ajuta cu serviciile noastre de programare?',
+            'assistant_gender' => 'feminin'
         );
 
         add_option('aiha_settings', $default_options);

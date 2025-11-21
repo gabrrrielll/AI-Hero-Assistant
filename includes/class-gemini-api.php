@@ -72,10 +72,20 @@ class AIHA_Gemini_API {
         // Detectează limba mesajului utilizatorului
         $language = $this->detect_language($user_message);
         
+        // Obține genul asistentului
+        $assistant_gender = isset($settings['assistant_gender']) ? $settings['assistant_gender'] : 'feminin';
+        
         // Construiește sistemul de prompt
         $system_instruction = $ai_instructions;
         if ($company_name) {
             $system_instruction = str_replace('{company_name}', $company_name, $system_instruction);
+        }
+        
+        // Adaugă instrucțiuni pentru gen
+        if ($assistant_gender === 'masculin') {
+            $system_instruction .= "\n\nIMPORTANT - GEN ASISTENT: Ești un asistent virtual MASCULIN. Folosește formele masculine în răspunsurile tale (ex: 'Sunt bucuros', 'Mulțumit', 'Încântat', etc.). Adaptează-ți exprimarea pentru a reflecta genul masculin.";
+        } else {
+            $system_instruction .= "\n\nIMPORTANT - GEN ASISTENT: Ești o asistentă virtuală FEMININĂ. Folosește formele feminine în răspunsurile tale (ex: 'Sunt bucuroasă', 'Mulțumită', 'Încântată', etc.). Adaptează-ți exprimarea pentru a reflecta genul feminin.";
         }
         
         // Adaugă documentația

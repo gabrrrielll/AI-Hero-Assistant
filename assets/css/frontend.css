@@ -14,19 +14,28 @@
     display: flex;
     flex-direction: column;
     align-items: center;
-    justify-content: space-between; /* Distribuie elementele uniform */
+    justify-content: space-between;
+    /* Distribuie elementele uniform */
     background: linear-gradient(135deg, var(--gradient-start, #6366f1), var(--gradient-end, #ec4899));
     background-size: 200% 200%;
     animation: gradientShift 10s ease infinite;
     padding: 40px 20px 20px 20px;
     overflow: hidden;
     gap: 20px;
-    min-height: 100%; /* Asigură că ocupă înălțimea completă */
+    min-height: 100%;
+    /* Asigură că ocupă înălțimea completă */
 }
 
 @keyframes gradientShift {
-    0%, 100% { background-position: 0% 50%; }
-    50% { background-position: 100% 50%; }
+
+    0%,
+    100% {
+        background-position: 0% 50%;
+    }
+
+    50% {
+        background-position: 100% 50%;
+    }
 }
 
 /* Video Container - Două videoclipuri suprapuse */
@@ -34,20 +43,26 @@
     position: relative;
     width: 300px;
     height: 300px;
-    min-width: 300px; /* Dimensiune minimă fixă */
-    min-height: 300px; /* Înălțime minimă fixă */
-    max-width: 300px; /* Dimensiune maximă fixă */
-    max-height: 300px; /* Înălțime maximă fixă */
+    min-width: 300px;
+    /* Dimensiune minimă fixă */
+    min-height: 300px;
+    /* Înălțime minimă fixă */
+    max-width: 300px;
+    /* Dimensiune maximă fixă */
+    max-height: 300px;
+    /* Înălțime maximă fixă */
     margin-bottom: 20px;
     margin-top: 20px;
-    z-index: 3; /* Peste subtitle */
+    z-index: 3;
+    /* Peste subtitle */
     border-radius: 50%;
     overflow: hidden;
     box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
     background: rgba(255, 255, 255, 0.1);
     /* Previne distorsiunea - păstrează forma circulară */
     flex-shrink: 0;
-    flex-grow: 0; /* Nu permite creșterea */
+    flex-grow: 0;
+    /* Nu permite creșterea */
     aspect-ratio: 1 / 1;
 }
 
@@ -60,42 +75,70 @@
     object-fit: cover;
     object-position: center;
     border-radius: 50%;
-    transition: opacity 0.5s ease-in-out;
+    /* Tranziții smooth pentru crossfade effect */
+    transition: opacity 0.8s cubic-bezier(0.4, 0, 0.2, 1),
+        filter 0.6s ease-in-out,
+        transform 0.6s ease-in-out;
     /* Previne distorsiunea */
     aspect-ratio: 1 / 1;
+    will-change: opacity, filter;
 }
 
 .aiha-video-silence {
     z-index: 1;
     opacity: 1;
+    filter: blur(0px);
+    transform: scale(1);
 }
 
 .aiha-video-speaking {
     z-index: 2;
     opacity: 0;
+    filter: blur(0px);
+    transform: scale(1);
 }
 
-/* Când AI vorbește, video-ul vorbitor este vizibil */
+/* Când AI vorbește, video-ul vorbitor este vizibil cu crossfade smooth */
 .aiha-video-container.speaking .aiha-video-silence {
     opacity: 0;
     z-index: 1;
+    filter: blur(2px);
+    transform: scale(0.98);
+    transition: opacity 0.8s cubic-bezier(0.4, 0, 0.2, 1),
+        filter 0.6s ease-in-out,
+        transform 0.6s ease-in-out;
 }
 
 .aiha-video-container.speaking .aiha-video-speaking {
     opacity: 1;
     z-index: 2;
     display: block !important;
+    filter: blur(0px);
+    transform: scale(1);
+    transition: opacity 0.8s cubic-bezier(0.4, 0, 0.2, 1),
+        filter 0.6s ease-in-out 0.2s,
+        transform 0.6s ease-in-out 0.2s;
 }
 
-/* Când AI tace, video-ul tăcerii este vizibil */
+/* Când AI tace, video-ul tăcerii este vizibil cu crossfade smooth */
 .aiha-video-container.silent .aiha-video-silence {
     opacity: 1;
     z-index: 2;
+    filter: blur(0px);
+    transform: scale(1);
+    transition: opacity 0.8s cubic-bezier(0.4, 0, 0.2, 1),
+        filter 0.6s ease-in-out 0.2s,
+        transform 0.6s ease-in-out 0.2s;
 }
 
 .aiha-video-container.silent .aiha-video-speaking {
     opacity: 0;
     z-index: 1;
+    filter: blur(2px);
+    transform: scale(0.98);
+    transition: opacity 0.8s cubic-bezier(0.4, 0, 0.2, 1),
+        filter 0.6s ease-in-out,
+        transform 0.6s ease-in-out;
 }
 
 .aiha-video-placeholder {
@@ -122,14 +165,17 @@
     margin-top: 0;
     margin-bottom: 0;
     min-height: 60px;
-    max-height: 300px; /* Mărit pentru mai mult text */
+    max-height: 300px;
+    /* Mărit pentru mai mult text */
     display: flex;
     align-items: flex-start;
     justify-content: center;
     z-index: 2;
     position: relative;
-    flex-shrink: 1; /* Permite micșorare dacă e necesar */
-    flex-grow: 0; /* Nu permite creșterea excesivă */
+    flex-shrink: 1;
+    /* Permite micșorare dacă e necesar */
+    flex-grow: 0;
+    /* Nu permite creșterea excesivă */
 }
 
 .aiha-subtitle {
@@ -143,9 +189,11 @@
     border-radius: 20px;
     box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
     min-height: 60px;
-    max-height: 280px; /* Înălțime maximă mărită */
+    max-height: 280px;
+    /* Înălțime maximă mărită */
     font-weight: 400;
-    overflow-y: auto; /* Scroll vertical când textul depășește */
+    overflow-y: auto;
+    /* Scroll vertical când textul depășește */
     overflow-x: hidden;
     word-wrap: break-word;
     width: 100%;
@@ -186,8 +234,16 @@
 }
 
 @keyframes blinkCursor {
-    0%, 50% { opacity: 1; }
-    51%, 100% { opacity: 0; }
+
+    0%,
+    50% {
+        opacity: 1;
+    }
+
+    51%,
+    100% {
+        opacity: 0;
+    }
 }
 
 /* Input Container */
@@ -195,8 +251,10 @@
     width: 100%;
     max-width: 800px;
     z-index: 2;
-    flex-shrink: 0; /* Nu permite micșorarea */
-    margin-top: auto; /* Push la final */
+    flex-shrink: 0;
+    /* Nu permite micșorarea */
+    margin-top: auto;
+    /* Push la final */
 }
 
 .aiha-input-wrapper {
@@ -290,10 +348,14 @@
 }
 
 @keyframes loadingDot {
-    0%, 80%, 100% {
+
+    0%,
+    80%,
+    100% {
         transform: scale(0.8);
         opacity: 0.5;
     }
+
     40% {
         transform: scale(1.2);
         opacity: 1;
@@ -308,25 +370,27 @@
         margin-bottom: 15px;
         margin-top: 15px;
     }
-    
+
     .aiha-subtitle-container {
-        max-height: 200px; /* Mai mic pe mobile */
+        max-height: 200px;
+        /* Mai mic pe mobile */
     }
-    
+
     .aiha-subtitle {
         font-size: 16px;
         padding: 12px 20px;
-        max-height: 180px; /* Ajustat pentru mobile */
+        max-height: 180px;
+        /* Ajustat pentru mobile */
     }
-    
+
     .aiha-input-wrapper {
         padding: 12px 15px;
     }
-    
+
     .aiha-textarea {
         font-size: 14px;
     }
-    
+
     .aiha-send-btn {
         width: 40px;
         height: 40px;
@@ -338,24 +402,26 @@
         padding: 20px 15px 15px 15px;
         gap: 15px;
     }
-    
+
     .aiha-video-container {
         width: 200px;
         height: 200px;
         margin-bottom: 10px;
         margin-top: 10px;
     }
-    
+
     .aiha-subtitle-container {
-        max-height: 150px; /* Mai mic pe ecrane foarte mici */
+        max-height: 150px;
+        /* Mai mic pe ecrane foarte mici */
     }
-    
+
     .aiha-subtitle {
         font-size: 14px;
         padding: 10px 15px;
-        max-height: 130px; /* Ajustat pentru ecrane mici */
+        max-height: 130px;
+        /* Ajustat pentru ecrane mici */
     }
-    
+
     .aiha-input-container {
         max-width: 100%;
     }
@@ -370,12 +436,10 @@
     left: 0;
     width: 100%;
     height: 100%;
-    background-image: 
+    background-image:
         radial-gradient(circle at 20% 30%, rgba(255, 255, 255, 0.1) 0%, transparent 50%),
         radial-gradient(circle at 80% 70%, rgba(255, 255, 255, 0.1) 0%, transparent 50%),
         radial-gradient(circle at 40% 80%, rgba(255, 255, 255, 0.08) 0%, transparent 50%);
     pointer-events: none;
     z-index: 1;
 }
-
-

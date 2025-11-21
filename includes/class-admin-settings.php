@@ -46,6 +46,7 @@ class AIHA_Admin_Settings
         $sanitized['hero_message'] = sanitize_textarea_field($input['hero_message'] ?? '');
         $sanitized['video_silence_url'] = esc_url_raw($input['video_silence_url'] ?? '');
         $sanitized['video_speaking_url'] = esc_url_raw($input['video_speaking_url'] ?? '');
+        $sanitized['assistant_gender'] = sanitize_text_field($input['assistant_gender'] ?? 'feminin');
 
         // Păstrează fișierele existente
         $current_settings = get_option('aiha_settings', array());
@@ -310,6 +311,19 @@ class AIHA_Admin_Settings
                                    class="regular-text"
                                    placeholder="https://example.com/videos/vorbire.mp4">
                             <p class="description"><?php _e('URL-ul videoclipului cu persoana care vorbește. Acest video va fi afișat când AI răspunde.', 'ai-hero-assistant'); ?></p>
+                        </td>
+                    </tr>
+                    
+                    <tr>
+                        <th scope="row">
+                            <label for="assistant_gender"><?php _e('Gen Asistent Virtual', 'ai-hero-assistant'); ?></label>
+                        </th>
+                        <td>
+                            <select id="assistant_gender" name="aiha_settings[assistant_gender]">
+                                <option value="feminin" <?php selected($settings['assistant_gender'] ?? 'feminin', 'feminin'); ?>><?php _e('Feminin', 'ai-hero-assistant'); ?></option>
+                                <option value="masculin" <?php selected($settings['assistant_gender'] ?? 'feminin', 'masculin'); ?>><?php _e('Masculin', 'ai-hero-assistant'); ?></option>
+                            </select>
+                            <p class="description"><?php _e('Selectează genul asistentului virtual. Acest lucru va influența modul în care AI-ul se exprimă (ex: "bucuroasă" vs "bucuros").', 'ai-hero-assistant'); ?></p>
                         </td>
                     </tr>
                 </table>
