@@ -1,54 +1,199 @@
 /**
  * AI Hero Assistant - Admin Styles
+ * Bootstrap-enhanced admin interface
  */
 
-.aiha-admin-wrapper {
-    max-width: 1200px;
+.aiha-admin-wrap {
+    max-width: 1400px;
+    margin: 20px 0;
 }
 
-.aiha-admin-wrapper .form-table th {
-    width: 200px;
-    padding: 20px 10px 20px 0;
+/* Bootstrap Tab Customization */
+.aiha-admin-wrap .nav-tabs {
+    border-bottom: 2px solid #dee2e6;
+    margin-bottom: 2rem;
 }
 
-.aiha-admin-wrapper .form-table td {
-    padding: 15px 10px;
+.aiha-admin-wrap .nav-tabs .nav-link {
+    color: #495057;
+    border: none;
+    border-bottom: 3px solid transparent;
+    padding: 12px 24px;
+    font-weight: 500;
+    transition: all 0.3s ease;
 }
 
-.aiha-admin-wrapper input[type="text"],
-.aiha-admin-wrapper input[type="email"],
-.aiha-admin-wrapper textarea,
-.aiha-admin-wrapper select {
-    width: 100%;
-    max-width: 600px;
+.aiha-admin-wrap .nav-tabs .nav-link:hover {
+    border-color: #dee2e6;
+    color: #0073aa;
 }
 
-.aiha-admin-wrapper textarea {
-    min-height: 150px;
+.aiha-admin-wrap .nav-tabs .nav-link.active {
+    color: #0073aa;
+    background-color: transparent;
+    border-color: #0073aa;
+    border-bottom-color: #0073aa;
 }
 
-.aiha-admin-wrapper input[type="color"] {
-    width: 80px;
+/* Card Styling */
+.aiha-admin-wrap .card {
+    border: 1px solid #dee2e6;
+    border-radius: 8px;
+    overflow: hidden;
+}
+
+.aiha-admin-wrap .card-header {
+    border-bottom: 1px solid #dee2e6;
+    padding: 1.25rem 1.5rem;
+    background-color: #f8f9fa;
+}
+
+.aiha-admin-wrap .card-body {
+    padding: 1.5rem;
+}
+
+.aiha-admin-wrap .card-footer {
+    border-top: 1px solid #dee2e6;
+    padding: 1rem 1.5rem;
+    background-color: #f8f9fa;
+}
+
+/* Form Styling */
+.aiha-admin-wrap .form-label {
+    margin-bottom: 0.5rem;
+    color: #212529;
+}
+
+.aiha-admin-wrap .form-control,
+.aiha-admin-wrap .form-select {
+    border-radius: 6px;
+    border: 1px solid #ced4da;
+    padding: 0.5rem 0.75rem;
+    transition: border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
+}
+
+.aiha-admin-wrap .form-control:focus,
+.aiha-admin-wrap .form-select:focus {
+    border-color: #0073aa;
+    box-shadow: 0 0 0 0.2rem rgba(0, 115, 170, 0.25);
+}
+
+.aiha-admin-wrap .form-control-color {
+    width: 60px;
     height: 40px;
-    border: 1px solid #ddd;
-    border-radius: 4px;
+    padding: 2px;
+    border-radius: 6px;
     cursor: pointer;
 }
 
-.aiha-admin-wrapper .description {
-    margin-top: 8px;
-    font-style: italic;
-    color: #666;
+.aiha-admin-wrap .form-text {
+    margin-top: 0.5rem;
+    font-size: 0.875rem;
+    color: #6c757d;
 }
 
-.aiha-admin-wrapper .wp-list-table {
-    margin-top: 20px;
+/* Table Styling */
+.aiha-admin-wrap .table {
+    margin-bottom: 0;
 }
 
-.aiha-admin-wrapper .wp-list-table th,
-.aiha-admin-wrapper .wp-list-table td {
-    padding: 12px;
+.aiha-admin-wrap .table thead th {
+    border-bottom: 2px solid #dee2e6;
+    font-weight: 600;
+    color: #495057;
+    background-color: #f8f9fa;
 }
 
+.aiha-admin-wrap .table tbody tr:hover {
+    background-color: #f8f9fa;
+}
 
+.aiha-admin-wrap .table code {
+    background-color: #f1f3f5;
+    padding: 2px 6px;
+    border-radius: 3px;
+    font-size: 0.875em;
+}
 
+/* Alert Styling */
+.aiha-admin-wrap .alert {
+    border-radius: 6px;
+    border: none;
+    padding: 1rem 1.25rem;
+}
+
+.aiha-admin-wrap .alert-warning {
+    background-color: #fff3cd;
+    color: #856404;
+}
+
+.aiha-admin-wrap .alert-info {
+    background-color: #d1ecf1;
+    color: #0c5460;
+}
+
+/* Button Styling */
+.aiha-admin-wrap .btn {
+    border-radius: 6px;
+    padding: 0.5rem 1.5rem;
+    font-weight: 500;
+    transition: all 0.2s ease;
+}
+
+.aiha-admin-wrap .btn-primary {
+    background-color: #0073aa;
+    border-color: #0073aa;
+}
+
+.aiha-admin-wrap .btn-primary:hover {
+    background-color: #005a87;
+    border-color: #005a87;
+}
+
+.aiha-admin-wrap .btn-outline-danger {
+    color: #dc3545;
+    border-color: #dc3545;
+}
+
+.aiha-admin-wrap .btn-outline-danger:hover {
+    background-color: #dc3545;
+    border-color: #dc3545;
+    color: #fff;
+}
+
+/* List Group Styling */
+.aiha-admin-wrap .list-group-item {
+    border: 1px solid #dee2e6;
+    padding: 0.75rem 1.25rem;
+}
+
+.aiha-admin-wrap .list-group-item:first-child {
+    border-top-left-radius: 6px;
+    border-top-right-radius: 6px;
+}
+
+.aiha-admin-wrap .list-group-item:last-child {
+    border-bottom-left-radius: 6px;
+    border-bottom-right-radius: 6px;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .aiha-admin-wrap .nav-tabs .nav-link {
+        padding: 10px 16px;
+        font-size: 0.9rem;
+    }
+    
+    .aiha-admin-wrap .card-body {
+        padding: 1rem;
+    }
+}
+
+/* WordPress Admin Compatibility */
+.aiha-admin-wrap .dashicons {
+    width: 18px;
+    height: 18px;
+    font-size: 18px;
+    vertical-align: middle;
+    margin-right: 5px;
+}

@@ -3,36 +3,36 @@
  * Uses two overlapping videos that alternate based on AI speaking state
  */
 
-(function($) {
+(function ($) {
     'use strict';
-    
+
     class AIHeroAssistant {
         constructor(instanceId, config) {
             this.instanceId = instanceId;
             this.config = config;
-            
+
             // Video elements
             this.videoContainer = document.querySelector(`#${instanceId} .aiha-video-container`);
             this.videoSilence = document.getElementById(`aiha-video-silence-${instanceId}`);
             this.videoSpeaking = document.getElementById(`aiha-video-speaking-${instanceId}`);
-            
+
             // UI elements
             this.subtitleEl = document.getElementById(`aiha-subtitle-${instanceId}`);
             this.inputEl = document.getElementById(`aiha-input-${instanceId}`);
             this.sendBtn = document.getElementById(`aiha-send-${instanceId}`);
             this.loadingEl = document.getElementById(`aiha-loading-${instanceId}`);
-            
+
             this.isSpeaking = false;
             this.currentText = '';
             this.sessionId = this.generateSessionId();
-            
+
             this.init();
         }
-        
+
         generateSessionId() {
             return 'aiha_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9);
         }
-        
+
         init() {
             this.setupVideos();
             this.setupEventListeners();
@@ -40,7 +40,7 @@
             // Start with silent state
             this.setSilentState();
         }
-        
+
         setupVideos() {
             // Ensure videos are loaded and playing
             if (this.videoSilence) {
@@ -48,14 +48,14 @@
                     this.videoSilence.play().catch(e => console.log('Video play error:', e));
                 });
             }
-            
+
             if (this.videoSpeaking) {
                 this.videoSpeaking.addEventListener('loadeddata', () => {
                     this.videoSpeaking.play().catch(e => console.log('Video play error:', e));
                 });
             }
         }
-        
+
         /**
          * Set video container to silent state (show silence video)
          */
@@ -66,7 +66,7 @@
             }
             this.isSpeaking = false;
         }
-        
+
         /**
          * Set video container to speaking state (show speaking video)
          */
@@ -77,13 +77,13 @@
             }
             this.isSpeaking = true;
         }
-        
+
         setupEventListeners() {
             // Send button
             if (this.sendBtn) {
                 this.sendBtn.addEventListener('click', () => this.sendMessage());
             }
-            
+
             // Enter key (Shift+Enter pentru new line)
             if (this.inputEl) {
                 this.inputEl.addEventListener('keydown', (e) => {
@@ -92,7 +92,7 @@
                         this.sendMessage();
                     }
                 });
-                
+
                 // Auto-resize textarea
                 this.inputEl.addEventListener('input', () => {
                     this.inputEl.style.height = 'auto';
@@ -100,7 +100,7 @@
                 });
             }
         }
-        
+
         showInitialMessage() {
             setTimeout(() => {
                 this.typeText(this.config.heroMessage, () => {
@@ -111,7 +111,7 @@
                 });
             }, 1000);
         }
-        
+
         /**
          * Scroll automat la finalul subtitle-ului
          */
@@ -128,21 +128,21 @@
                 });
             }
         }
-        
+
         typeText(text, callback) {
             // Switch to speaking state when typing starts
             this.setSpeakingState();
-            
+
             this.currentText = '';
             if (this.subtitleEl) {
                 this.subtitleEl.innerHTML = '';
                 // Reset scroll la început
                 this.subtitleEl.scrollTop = 0;
             }
-            
+
             let index = 0;
             const typingSpeed = 30; // milliseconds per character
-            
+
             const typeChar = () => {
                 if (index < text.length) {
                     this.currentText += text[index];
@@ -169,16 +169,16 @@
                     this.setSilentState();
                 }
             };
-            
+
             typeChar();
         }
-        
+
         async sendMessage() {
             const message = this.inputEl ? this.inputEl.value.trim() : '';
             if (!message || (this.loadingEl && this.loadingEl.style.display !== 'none')) {
                 return;
             }
-            
+
             // Clear subtitle and send to AI
             if (this.subtitleEl) {
                 this.subtitleEl.innerHTML = '';
@@ -187,10 +187,10 @@
                 this.inputEl.value = '';
                 this.inputEl.style.height = 'auto';
             }
-            
+
             this.sendToAI(message);
         }
-        
+
         async sendToAI(message) {
             if (this.loadingEl) {
                 this.loadingEl.style.display = 'flex';
@@ -198,7 +198,7 @@
             if (this.sendBtn) {
                 this.sendBtn.disabled = true;
             }
-            
+
             try {
                 const response = await $.ajax({
                     url: aihaData.ajaxUrl,
@@ -210,7 +210,7 @@
                         session_id: this.sessionId
                     }
                 });
-                
+
                 if (response.success) {
                     this.typeText(response.data.message, () => {
                         // After AI finishes speaking, switch back to silent state
@@ -239,14 +239,14 @@
             }
         }
     }
-    
-    
+
+
     // Initialize all instances
-    $(document).ready(function() {
-        $('.aiha-container').each(function() {
+    $(document).ready(function () {
+        $('.aiha-container').each(function () {
             const instanceId = $(this).attr('id');
             const configData = $(this).siblings('.aiha-initial-data').text();
-            
+
             if (configData && instanceId) {
                 try {
                     const config = JSON.parse(configData);
@@ -257,5 +257,5 @@
             }
         });
     });
-    
+
 })(jQuery);

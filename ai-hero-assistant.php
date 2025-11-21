@@ -219,6 +219,9 @@ class AI_Hero_Assistant
             return;
         }
 
+        // Include Bootstrap CSS inline
+        echo '<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-T3c6CoIi6uLrA9TneNEoa7RxnatzjcDSCmG1MXxSR1GAsXEV/Dwwykc2MPK8M2HN" crossorigin="anonymous">';
+
         $css_path = AIHA_PLUGIN_DIR . 'assets/css/admin.css';
 
         if (file_exists($css_path)) {
