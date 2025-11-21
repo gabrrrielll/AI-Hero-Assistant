@@ -1,10 +1,10 @@
 # AI Hero Assistant - WordPress Plugin
 
-An advanced WordPress plugin that adds an AI chatbot with animated chip in the hero section, integrated with Google Gemini API.
+An advanced WordPress plugin that adds an AI chatbot with dual video overlay avatar in the hero section, integrated with Google Gemini API.
 
 ## Features
 
-- 🤖 **Animated Abstract Chip** - Particle system that forms an abstract humanoid chip with speaking mouth
+- 🤖 **Animated Video Avatar** - Two overlapping videos that alternate based on AI speaking state
 - 💬 **AI Chatbot** - Full integration with Google Gemini API
 - 🌍 **Multilingual** - Automatic language detection and responses in user's language
 - 📝 **Typing Effect** - Animated subtitle with character-by-character typing effect
@@ -84,7 +84,7 @@ ai-hero-assistant/
 │   │   ├── frontend.css      # Frontend styles
 │   │   └── admin.css         # Admin styles
 │   └── js/
-│       ├── frontend.js       # Frontend JavaScript (particles, typing effect)
+│       ├── frontend.js       # Frontend JavaScript (video control, typing effect)
 │       └── admin.js          # Admin JavaScript
 └── README.md                 # This file
 ```
@@ -116,7 +116,7 @@ GPL v2 or later
 
 ### 1.0.0
 - Initial release
-- Animated chip with particles
+- Dual video overlay system with automatic switching
 - Gemini API integration
 - Lead generation
 - Admin settings page

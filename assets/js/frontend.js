@@ -1,6 +1,6 @@
 /**
  * AI Hero Assistant - Frontend JavaScript
- * NEW VERSION: Uses two overlapping videos instead of particle system
+ * Uses two overlapping videos that alternate based on AI speaking state
  */
 
 (function($) {
@@ -117,8 +117,15 @@
          */
         scrollToBottom() {
             if (this.subtitleEl) {
-                // Scroll smooth la final
-                this.subtitleEl.scrollTop = this.subtitleEl.scrollHeight;
+                // Folosește requestAnimationFrame pentru scroll smooth și corect
+                requestAnimationFrame(() => {
+                    // Scroll la final cu un mic delay pentru a permite DOM-ului să se actualizeze
+                    setTimeout(() => {
+                        if (this.subtitleEl) {
+                            this.subtitleEl.scrollTop = this.subtitleEl.scrollHeight;
+                        }
+                    }, 10);
+                });
             }
         }
         
@@ -141,8 +148,8 @@
                     this.currentText += text[index];
                     if (this.subtitleEl) {
                         this.subtitleEl.innerHTML = this.currentText + '<span class="typing-cursor"></span>';
-                        // Scroll automat la fiecare caracter (doar când e aproape de final)
-                        if (index % 10 === 0 || index === text.length - 1) {
+                        // Scroll automat mai frecvent pentru text lung
+                        if (index % 5 === 0 || index === text.length - 1) {
                             this.scrollToBottom();
                         }
                     }
@@ -151,8 +158,10 @@
                 } else {
                     if (this.subtitleEl) {
                         this.subtitleEl.innerHTML = this.currentText;
-                        // Scroll final pentru a vedea tot textul
-                        this.scrollToBottom();
+                        // Scroll final cu delay pentru a permite DOM-ului să se actualizeze
+                        setTimeout(() => {
+                            this.scrollToBottom();
+                        }, 50);
                     }
                     if (callback) callback();
                 }
@@ -230,64 +239,6 @@
         }
     }
     
-    // OLD PARTICLE SYSTEM CODE - COMMENTED OUT
-    /*
-    // ============================================
-    // OLD PARTICLE SYSTEM IMPLEMENTATION
-    // This code is kept for reference but not used
-    // ============================================
-    
-    setupCanvas() {
-        const container = this.canvas.parentElement;
-        const size = Math.min(container.offsetWidth, 300);
-        this.canvas.width = size;
-        this.canvas.height = size;
-        this.centerX = this.canvas.width / 2;
-        this.centerY = this.canvas.height / 2;
-    }
-    
-    createParticles() {
-        const particleCount = 300;
-        const radius = Math.min(this.canvas.width, this.canvas.height) / 2 - 30;
-        
-        for (let i = 0; i < particleCount; i++) {
-            const angle = Math.random() * Math.PI * 2;
-            const distance = radius * (0.3 + Math.random() * 0.7);
-            const x = this.centerX + Math.cos(angle) * distance;
-            const y = this.centerY + Math.sin(angle) * distance;
-            
-            const speed = 0.5 + Math.random() * 1.5;
-            const angleVel = Math.random() * Math.PI * 2;
-            
-            this.particles.push({
-                x: x,
-                y: y,
-                baseX: x,
-                baseY: y,
-                vx: Math.cos(angleVel) * speed,
-                vy: Math.sin(angleVel) * speed,
-                size: 1.5 + Math.random() * 2.5,
-                opacity: 0.4 + Math.random() * 0.6,
-                targetX: x,
-                targetY: y,
-                angle: angle,
-                angleSpeed: (Math.random() - 0.5) * 0.02,
-                radius: distance,
-                pulsePhase: Math.random() * Math.PI * 2,
-                noiseOffset: Math.random() * 1000
-            });
-        }
-    }
-    
-    noise(x, y, time) {
-        return Math.sin(x * 0.01 + time) * Math.cos(y * 0.01 + time) * 0.5 + 0.5;
-    }
-    
-    animate() {
-        // ... particle animation code ...
-        // This entire function is commented out as we're using videos now
-    }
-    */
     
     // Initialize all instances
     $(document).ready(function() {

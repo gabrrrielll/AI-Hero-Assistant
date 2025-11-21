@@ -75,19 +75,6 @@ class AIHA_Shortcode {
                     <?php endif; ?>
                 </div>
                 
-                <!-- OLD PARTICLE SYSTEM - COMMENTED OUT -->
-                <!--
-                <div class="aiha-chip-container">
-                    <canvas id="aiha-canvas-<?php echo esc_attr($instance_id); ?>" class="aiha-canvas"></canvas>
-                    <div class="aiha-chip-overlay">
-                        <div class="aiha-eyes">
-                            <div class="aiha-eye left"></div>
-                            <div class="aiha-eye right"></div>
-                        </div>
-                    </div>
-                </div>
-                -->
-                
                 <!-- Subtitrare cu typing effect -->
                 <div class="aiha-subtitle-container">
                     <div class="aiha-subtitle" id="aiha-subtitle-<?php echo esc_attr($instance_id); ?>"></div>

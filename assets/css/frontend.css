@@ -14,13 +14,14 @@
     display: flex;
     flex-direction: column;
     align-items: center;
-    justify-content: flex-start; /* Aliniere sus pentru a face loc elementelor */
+    justify-content: space-between; /* Distribuie elementele uniform */
     background: linear-gradient(135deg, var(--gradient-start, #6366f1), var(--gradient-end, #ec4899));
     background-size: 200% 200%;
     animation: gradientShift 10s ease infinite;
-    padding: 40px 20px 20px 20px; /* Padding redus jos */
+    padding: 40px 20px 20px 20px;
     overflow: hidden;
-    gap: 20px; /* Spațiu consistent între elemente */
+    gap: 20px;
+    min-height: 100%; /* Asigură că ocupă înălțimea completă */
 }
 
 @keyframes gradientShift {
@@ -33,8 +34,12 @@
     position: relative;
     width: 300px;
     height: 300px;
-    margin-bottom: 20px; /* Redus pentru a face loc subtitle-ului */
-    margin-top: 20px; /* Spațiu sus */
+    min-width: 300px; /* Dimensiune minimă fixă */
+    min-height: 300px; /* Înălțime minimă fixă */
+    max-width: 300px; /* Dimensiune maximă fixă */
+    max-height: 300px; /* Înălțime maximă fixă */
+    margin-bottom: 20px;
+    margin-top: 20px;
     z-index: 3; /* Peste subtitle */
     border-radius: 50%;
     overflow: hidden;
@@ -42,6 +47,7 @@
     background: rgba(255, 255, 255, 0.1);
     /* Previne distorsiunea - păstrează forma circulară */
     flex-shrink: 0;
+    flex-grow: 0; /* Nu permite creșterea */
     aspect-ratio: 1 / 1;
 }
 
@@ -108,108 +114,46 @@
     border-radius: 50%;
 }
 
-/* OLD PARTICLE SYSTEM - COMMENTED OUT */
-/*
-.aiha-chip-container {
-    position: relative;
-    width: 300px;
-    height: 300px;
-    margin-bottom: 40px;
-    z-index: 2;
-}
-
-.aiha-canvas {
-    width: 100%;
-    height: 100%;
-    border-radius: 50%;
-    background: rgba(255, 255, 255, 0.08);
-    backdrop-filter: blur(15px);
-    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
-    border: 1px solid rgba(255, 255, 255, 0.1);
-}
-
-.aiha-chip-overlay {
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    pointer-events: none;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-}
-
-.aiha-eyes {
-    display: flex;
-    gap: 60px;
-    margin-top: -40px;
-}
-
-.aiha-eye {
-    width: 24px;
-    height: 24px;
-    background: rgba(255, 255, 255, 0.7);
-    border-radius: 50%;
-    position: relative;
-    animation: blink 4s infinite;
-    box-shadow: 0 0 20px rgba(255, 255, 255, 0.5);
-}
-
-.aiha-eye::after {
-    content: '';
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    width: 10px;
-    height: 10px;
-    background: rgba(0, 0, 0, 0.6);
-    border-radius: 50%;
-}
-
-@keyframes blink {
-    0%, 90%, 100% { transform: scaleY(1); }
-    95% { transform: scaleY(0.1); }
-}
-*/
 
 /* Subtitle Container */
 .aiha-subtitle-container {
     width: 100%;
     max-width: 800px;
-    margin-top: 0; /* Fără margin negativ */
-    margin-bottom: 0; /* Folosim gap din flexbox */
+    margin-top: 0;
+    margin-bottom: 0;
     min-height: 60px;
-    max-height: 250px; /* Înălțime maximă redusă */
+    max-height: 300px; /* Mărit pentru mai mult text */
     display: flex;
-    align-items: flex-start; /* Aliniere sus */
+    align-items: flex-start;
     justify-content: center;
     z-index: 2;
     position: relative;
-    flex-shrink: 0; /* Nu se micșorează */
+    flex-shrink: 1; /* Permite micșorare dacă e necesar */
+    flex-grow: 0; /* Nu permite creșterea excesivă */
 }
 
 .aiha-subtitle {
     color: white;
     font-size: 18px;
     line-height: 1.6;
-    text-align: left; /* Text aliniat la stânga pentru citire mai bună */
+    text-align: left;
     padding: 15px 25px;
     background: rgba(255, 255, 255, 0.15);
     backdrop-filter: blur(10px);
     border-radius: 20px;
     box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
     min-height: 60px;
-    max-height: 230px; /* Înălțime maximă ajustată */
+    max-height: 280px; /* Înălțime maximă mărită */
     font-weight: 400;
     overflow-y: auto; /* Scroll vertical când textul depășește */
-    overflow-x: hidden; /* Fără scroll orizontal */
-    word-wrap: break-word; /* Împarte cuvintele lungi */
-    width: 100%; /* Lățime completă */
+    overflow-x: hidden;
+    word-wrap: break-word;
+    width: 100%;
     /* Stilizare scrollbar */
     scrollbar-width: thin;
     scrollbar-color: rgba(255, 255, 255, 0.5) transparent;
+    /* Smooth scrolling */
+    scroll-behavior: smooth;
 }
 
 /* Stilizare scrollbar pentru WebKit browsers */
@@ -251,6 +195,8 @@
     width: 100%;
     max-width: 800px;
     z-index: 2;
+    flex-shrink: 0; /* Nu permite micșorarea */
+    margin-top: auto; /* Push la final */
 }
 
 .aiha-input-wrapper {
@@ -415,69 +361,6 @@
     }
 }
 
-/* OLD PARTICLE SYSTEM RESPONSIVE - COMMENTED OUT */
-/*
-@media (max-width: 768px) {
-    .aiha-chip-container {
-        width: 250px;
-        height: 250px;
-        margin-bottom: 30px;
-    }
-    
-    .aiha-eyes {
-        gap: 50px;
-    }
-    
-    .aiha-subtitle {
-        font-size: 16px;
-        padding: 12px 20px;
-    }
-    
-    .aiha-input-wrapper {
-        padding: 12px 15px;
-    }
-    
-    .aiha-textarea {
-        font-size: 14px;
-    }
-    
-    .aiha-send-btn {
-        width: 40px;
-        height: 40px;
-    }
-}
-
-@media (max-width: 480px) {
-    .aiha-hero-section {
-        padding: 30px 15px;
-    }
-    
-    .aiha-chip-container {
-        width: 200px;
-        height: 200px;
-        margin-bottom: 25px;
-    }
-    
-    .aiha-eyes {
-        gap: 40px;
-        margin-top: -30px;
-    }
-    
-    .aiha-eye {
-        width: 16px;
-        height: 16px;
-    }
-    
-    .aiha-subtitle {
-        font-size: 14px;
-        padding: 10px 15px;
-    }
-    
-    .aiha-input-container {
-        max-width: 100%;
-    }
-}
-*/
 
 /* Bokeh Background Effect */
 .aiha-hero-section::before {

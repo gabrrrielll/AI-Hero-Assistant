@@ -321,8 +321,34 @@ class AIHA_Admin_Settings
             
             <h2><?php _e('Leads Capturate', 'ai-hero-assistant'); ?></h2>
             <?php
+            // Verifică direct în DB pentru debugging
+            global $wpdb;
+            $table_leads = $wpdb->prefix . 'aiha_leads';
+            $direct_count = $wpdb->get_var("SELECT COUNT(*) FROM $table_leads");
+            
             $leads = AIHA_Database::get_all_leads(50);
-        if (!empty($leads)):
+            
+            // Debug: Verifică ce returnează query-ul
+            if (defined('WP_DEBUG') && WP_DEBUG) {
+                error_log('AIHA Admin: Direct DB count: ' . $direct_count);
+                error_log('AIHA Admin: Leads from function: ' . (is_array($leads) ? count($leads) : 'not array'));
+                error_log('AIHA Admin: Leads empty check: ' . (empty($leads) ? 'yes' : 'no'));
+                if (!empty($leads)) {
+                    error_log('AIHA Admin: First lead: ' . print_r($leads[0], true));
+                } else {
+                    error_log('AIHA Admin: Leads array is empty or not array');
+                }
+            }
+            
+            // Afișează count direct pentru debugging
+            if (current_user_can('manage_options') && $direct_count > 0) {
+                echo '<p style="background: #fff3cd; padding: 10px; border-left: 4px solid #ffc107; margin-bottom: 15px;">';
+                echo '<strong>Debug Info:</strong> Există ' . intval($direct_count) . ' lead(s) în baza de date. ';
+                echo 'Query-ul returnează: ' . (is_array($leads) ? count($leads) : '0') . ' lead(s).';
+                echo '</p>';
+            }
+            
+            if (!empty($leads) && is_array($leads)):
             ?>
                 <table class="wp-list-table widefat fixed striped">
                     <thead>
@@ -348,6 +374,15 @@ class AIHA_Admin_Settings
                 </table>
             <?php else: ?>
                 <p><?php _e('Nu există leads capturate încă.', 'ai-hero-assistant'); ?></p>
+                <?php
+                // Debug info pentru admin
+                if (defined('WP_DEBUG') && WP_DEBUG && current_user_can('manage_options')) {
+                    global $wpdb;
+                    $table_leads = $wpdb->prefix . 'aiha_leads';
+                    $count = $wpdb->get_var("SELECT COUNT(*) FROM $table_leads");
+                    echo '<p style="color: #666; font-size: 12px;"><em>Debug: Total leads în DB: ' . intval($count) . '</em></p>';
+                }
+                ?>
             <?php endif; ?>
         </div>
         <?php

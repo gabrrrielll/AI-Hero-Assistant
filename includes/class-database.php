@@ -223,14 +223,59 @@ class AIHA_Database {
         $table_leads = $wpdb->prefix . 'aiha_leads';
         $table_conv = $wpdb->prefix . 'aiha_conversations';
         
-        return $wpdb->get_results($wpdb->prepare(
-            "SELECT l.*, c.user_ip, c.created_at as conversation_date 
-            FROM $table_leads l
-            LEFT JOIN $table_conv c ON l.conversation_id = c.id
-            ORDER BY l.created_at DESC
-            LIMIT %d",
-            $limit
-        ));
+        // Verifică dacă tabelele există
+        $leads_exists = $wpdb->get_var("SHOW TABLES LIKE '$table_leads'");
+        $conv_exists = $wpdb->get_var("SHOW TABLES LIKE '$table_conv'");
+        
+        if (!$leads_exists) {
+            if (defined('WP_DEBUG') && WP_DEBUG) {
+                error_log('AIHA get_all_leads: Table does not exist: ' . $table_leads);
+            }
+            return array();
+        }
+        
+        // Query simplificat fără JOIN dacă tabela conversations nu există
+        if (!$conv_exists) {
+            $query = $wpdb->prepare(
+                "SELECT l.*, '' as user_ip, l.created_at as conversation_date 
+                FROM $table_leads l
+                ORDER BY l.created_at DESC
+                LIMIT %d",
+                $limit
+            );
+        } else {
+            $query = $wpdb->prepare(
+                "SELECT l.*, c.user_ip, c.created_at as conversation_date 
+                FROM $table_leads l
+                LEFT JOIN $table_conv c ON l.conversation_id = c.id
+                ORDER BY l.created_at DESC
+                LIMIT %d",
+                $limit
+            );
+        }
+        
+        // Debug logging
+        if (defined('WP_DEBUG') && WP_DEBUG) {
+            error_log('AIHA get_all_leads: Query: ' . $query);
+            error_log('AIHA get_all_leads: Table leads exists: ' . ($leads_exists ? 'yes' : 'no'));
+            error_log('AIHA get_all_leads: Table conv exists: ' . ($conv_exists ? 'yes' : 'no'));
+        }
+        
+        $results = $wpdb->get_results($query, OBJECT);
+        
+        // Debug logging pentru rezultate
+        if (defined('WP_DEBUG') && WP_DEBUG) {
+            error_log('AIHA get_all_leads: Results count: ' . (is_array($results) ? count($results) : 'not array'));
+            error_log('AIHA get_all_leads: Results type: ' . gettype($results));
+            if ($wpdb->last_error) {
+                error_log('AIHA get_all_leads: DB Error: ' . $wpdb->last_error);
+            }
+            if (!empty($results)) {
+                error_log('AIHA get_all_leads: First result: ' . print_r($results[0], true));
+            }
+        }
+        
+        return $results ? $results : array();
     }
 }
 
