@@ -47,6 +47,8 @@ class AIHA_Admin_Settings
         $sanitized['video_silence_url'] = esc_url_raw($input['video_silence_url'] ?? '');
         $sanitized['video_speaking_url'] = esc_url_raw($input['video_speaking_url'] ?? '');
         $sanitized['assistant_gender'] = sanitize_text_field($input['assistant_gender'] ?? 'feminin');
+          $sanitized['send_lead_email'] = isset($input['send_lead_email']) ? 1 : 0;
+          $sanitized['lead_notification_email'] = sanitize_email($input['lead_notification_email'] ?? '');
 
         // Păstrează fișierele existente
         $current_settings = get_option('aiha_settings', array());
@@ -567,6 +569,37 @@ class AIHA_Admin_Settings
                                                placeholder="https://example.com/videos/vorbire.mp4">
                                         <div class="form-text"><?php _e('URL-ul videoclipului cu persoana care vorbește. Acest video va fi afișat când AI răspunde.', 'ai-hero-assistant'); ?></div>
                                     </div>
+                                      
+                                      <div class="col-12">
+                                          <hr>
+                                          <h3 class="h5"><?php _e('Lead-uri & Notificări', 'ai-hero-assistant'); ?></h3>
+                                      </div>
+                                      
+                                      <div class="col-md-6">
+                                          <label for="send_lead_email" class="form-label fw-bold"><?php _e('Trimite email la lead nou', 'ai-hero-assistant'); ?></label>
+                                          <div class="form-check form-switch">
+                                              <input 
+                                                  type="checkbox" 
+                                                  class="form-check-input" 
+                                                  id="send_lead_email" 
+                                                  name="aiha_settings[send_lead_email]" 
+                                                  value="1"
+                                                  <?php checked($settings['send_lead_email'] ?? 0, 1); ?>>
+                                              <label class="form-check-label" for="send_lead_email"><?php _e('Activează trimiterea automată de email când este capturat un lead', 'ai-hero-assistant'); ?></label>
+                                          </div>
+                                      </div>
+                                      
+                                      <div class="col-md-6">
+                                          <label for="lead_notification_email" class="form-label fw-bold"><?php _e('Adresă email notificări lead', 'ai-hero-assistant'); ?></label>
+                                          <input 
+                                              type="email" 
+                                              id="lead_notification_email" 
+                                              name="aiha_settings[lead_notification_email]" 
+                                              class="form-control"
+                                              value="<?php echo esc_attr($settings['lead_notification_email'] ?? get_option('admin_email')); ?>"
+                                              placeholder="office@example.com">
+                                          <div class="form-text"><?php _e('La această adresă se trimit notificările când se identifică un număr de telefon sau o adresă de email.', 'ai-hero-assistant'); ?></div>
+                                      </div>
                                 </div>
                             </div>
                             <div class="card-footer bg-white">

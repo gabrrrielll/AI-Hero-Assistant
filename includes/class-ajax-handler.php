@@ -101,7 +101,9 @@ class AIHA_Ajax_Handler {
         $user_ip = $this->get_user_ip();
         $conversation_id = AIHA_Database::get_or_create_conversation($session_id, $user_ip);
         
-        AIHA_Database::save_lead($conversation_id, $email, $phone, $name);
+        if (!$this->save_lead_and_notify($conversation_id, $email, $phone, $name)) {
+            wp_send_json_error(array('message' => __('Lead-ul nu a putut fi salvat.', 'ai-hero-assistant')));
+        }
         
         wp_send_json_success(array('message' => 'Lead salvat cu succes'));
     }
@@ -169,7 +171,7 @@ class AIHA_Ajax_Handler {
         
         // Salvează lead dacă există email sau telefon
         if ($email || $phone) {
-            $result = AIHA_Database::save_lead($conversation_id, $email, $phone, $name);
+            $result = $this->save_lead_and_notify($conversation_id, $email, $phone, $name);
             
             // Log pentru debugging
             if (defined('WP_DEBUG') && WP_DEBUG) {
@@ -203,6 +205,82 @@ class AIHA_Ajax_Handler {
         // Extrage leads din toată conversația
         $this->extract_and_save_lead($conversation_id, $full_text);
     }
+      
+      /**
+       * Salvează lead-ul și trimite notificare dacă este cazul
+       */
+      private function save_lead_and_notify($conversation_id, $email, $phone, $name = '') {
+          if (empty($email) && empty($phone)) {
+              return false;
+          }
+          
+          global $wpdb;
+          $table_leads = $wpdb->prefix . 'aiha_leads';
+          
+          $existing_lead = $wpdb->get_row($wpdb->prepare(
+              "SELECT * FROM $table_leads WHERE conversation_id = %d LIMIT 1",
+              $conversation_id
+          ));
+          
+          $normalized_new_email = $email ? strtolower($email) : '';
+          $normalized_existing_email = ($existing_lead && !empty($existing_lead->email)) ? strtolower($existing_lead->email) : '';
+          
+          $has_new_email = $normalized_new_email && $normalized_new_email !== $normalized_existing_email;
+          $has_new_phone = $phone && (!$existing_lead || $existing_lead->phone !== $phone);
+          
+          $result = AIHA_Database::save_lead($conversation_id, $email, $phone, $name);
+          
+          if ($result && ($has_new_email || $has_new_phone)) {
+              $final_email = $email ?: ($existing_lead->email ?? '');
+              $final_phone = $phone ?: ($existing_lead->phone ?? '');
+              $final_name = $name ?: ($existing_lead->name ?? '');
+              $this->maybe_send_lead_notification_email($conversation_id, $final_email, $final_phone, $final_name);
+          }
+          
+          return $result;
+      }
+      
+      /**
+       * Trimite email de notificare dacă opțiunea este activă
+       */
+      private function maybe_send_lead_notification_email($conversation_id, $email, $phone, $name) {
+          $settings = get_option('aiha_settings', array());
+          
+          if (empty($settings['send_lead_email'])) {
+              return;
+          }
+          
+          $recipient = !empty($settings['lead_notification_email']) ? sanitize_email($settings['lead_notification_email']) : '';
+          if (empty($recipient)) {
+              $recipient = get_option('admin_email');
+          }
+          $recipient = sanitize_email($recipient);
+          
+          if (empty($recipient) || !is_email($recipient)) {
+              return;
+          }
+          
+          $subject = sprintf(__('Lead nou AI Hero Assistant (#%d)', 'ai-hero-assistant'), $conversation_id);
+          $conversation_url = admin_url('options-general.php?page=aiha-settings&tab=conversations&conversation_id=' . $conversation_id);
+          
+          $body = '<p>' . esc_html__('A fost capturat un lead nou în AI Hero Assistant.', 'ai-hero-assistant') . '</p>';
+          $body .= '<ul>';
+          if (!empty($name)) {
+              $body .= '<li><strong>' . esc_html__('Nume', 'ai-hero-assistant') . ':</strong> ' . esc_html($name) . '</li>';
+          }
+          if (!empty($email)) {
+              $body .= '<li><strong>' . esc_html__('Email', 'ai-hero-assistant') . ':</strong> ' . esc_html($email) . '</li>';
+          }
+          if (!empty($phone)) {
+              $body .= '<li><strong>' . esc_html__('Telefon', 'ai-hero-assistant') . ':</strong> ' . esc_html($phone) . '</li>';
+          }
+          $body .= '</ul>';
+          $body .= '<p><a href="' . esc_url($conversation_url) . '">' . esc_html__('Vezi conversația în WordPress', 'ai-hero-assistant') . '</a></p>';
+          
+          $headers = array('Content-Type: text/html; charset=UTF-8');
+          
+          wp_mail($recipient, $subject, $body, $headers);
+      }
     
     /**
      * Obține IP-ul utilizatorului
