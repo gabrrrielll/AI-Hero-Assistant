@@ -142,6 +142,60 @@
             return text.replace(/\n/g, '<br>');
         }
 
+        /**
+         * Formatează textul parțial pentru typing effect (cu închidere corectă a tag-urilor)
+         */
+        formatPartialText(partialText) {
+            if (!partialText) return '';
+            
+            // Formatează textul parțial folosind funcția globală
+            if (typeof formatMarkdownMessage !== 'undefined') {
+                try {
+                    let formatted = formatMarkdownMessage(partialText);
+                    
+                    // Verifică și închide tag-urile HTML deschise incomplete
+                    const openTags = [];
+                    const tagRegex = /<(\/?)([a-z][a-z0-9]*)\b[^>]*>/gi;
+                    let match;
+                    
+                    // Reset regex
+                    tagRegex.lastIndex = 0;
+                    
+                    while ((match = tagRegex.exec(formatted)) !== null) {
+                        const isClosing = match[1] === '/';
+                        const tagName = match[2].toLowerCase();
+                        
+                        // Tag-uri self-closing (nu trebuie închise)
+                        const selfClosingTags = ['br', 'hr', 'img', 'input', 'meta', 'link', 'area', 'base', 'col', 'embed', 'source', 'track', 'wbr'];
+                        
+                        if (!isClosing && !selfClosingTags.includes(tagName)) {
+                            openTags.push(tagName);
+                        } else if (isClosing) {
+                            const lastOpen = openTags.lastIndexOf(tagName);
+                            if (lastOpen !== -1) {
+                                openTags.splice(lastOpen, 1);
+                            }
+                        }
+                    }
+                    
+                    // Închide tag-urile deschise în ordine inversă
+                    let closedTags = '';
+                    for (let i = openTags.length - 1; i >= 0; i--) {
+                        closedTags += '</' + openTags[i] + '>';
+                    }
+                    
+                    return formatted + closedTags;
+                } catch (e) {
+                    // Dacă apare o eroare, folosește formatare simplă
+                    console.warn('Error formatting partial text:', e);
+                    return partialText.replace(/\n/g, '<br>');
+                }
+            }
+            
+            // Fallback la formatare simplă
+            return partialText.replace(/\n/g, '<br>');
+        }
+
         typeText(text, callback) {
             // Switch to speaking state when typing starts
             this.setSpeakingState();
@@ -161,10 +215,9 @@
                 if (index < text.length) {
                     this.currentText += text[index];
                     if (this.subtitleEl) {
-                        // Formatează textul parțial, dar păstrează formatarea corectă
-                        // Folosim text simplu pentru typing, apoi formatăm la final
-                        const displayText = this.currentText.replace(/\n/g, '<br>');
-                        this.subtitleEl.innerHTML = displayText + '<span class="typing-cursor"></span>';
+                        // Formatează textul parțial cu markdown în timpul typing-ului
+                        const partialFormatted = this.formatPartialText(this.currentText);
+                        this.subtitleEl.innerHTML = partialFormatted + '<span class="typing-cursor"></span>';
                         // Scroll automat mai frecvent pentru text lung
                         if (index % 5 === 0 || index === text.length - 1) {
                             this.scrollToBottom();
@@ -174,7 +227,7 @@
                     setTimeout(typeChar, typingSpeed);
                 } else {
                     if (this.subtitleEl) {
-                        // La final, afișează textul complet formatat cu toate stilurile
+                        // La final, afișează textul complet formatat (pentru a ne asigura că totul este corect)
                         this.subtitleEl.innerHTML = formattedText;
                         // Scroll final cu delay pentru a permite DOM-ului să se actualizeze
                         setTimeout(() => {
