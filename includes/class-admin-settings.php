@@ -229,10 +229,14 @@ class AIHA_Admin_Settings
                                     'has_leads' => isset($_GET['has_leads']) ? sanitize_text_field($_GET['has_leads']) : ''
                                 );
 
-        // Elimină filtrele goale
-        $filters = array_filter($filters, function ($value) {
+        // Elimină filtrele goale, dar păstrează 0 pentru message_count_min/max
+        $filters = array_filter($filters, function ($value, $key) {
+            // Păstrează 0 pentru message_count_min și message_count_max
+            if (in_array($key, ['message_count_min', 'message_count_max']) && $value === 0) {
+                return true;
+            }
             return $value !== '' && $value !== null;
-        });
+        }, ARRAY_FILTER_USE_BOTH);
 
         $page = isset($_GET['paged']) ? max(1, intval($_GET['paged'])) : 1;
         $per_page = 20;

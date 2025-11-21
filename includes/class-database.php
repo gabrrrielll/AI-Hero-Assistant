@@ -450,14 +450,25 @@ class AIHA_Database
             $where_values[] = $filters['date_to'] . ' 23:59:59';
         }
 
-        // Filtrare după număr de mesaje
-        if (!empty($filters['message_count_min'])) {
+        // Filtrare după număr de mesaje (folosește isset pentru a permite și 0)
+        if (isset($filters['message_count_min']) && $filters['message_count_min'] !== '' && $filters['message_count_min'] !== null) {
             $where[] = "c.message_count >= %d";
             $where_values[] = intval($filters['message_count_min']);
         }
-        if (!empty($filters['message_count_max'])) {
+        if (isset($filters['message_count_max']) && $filters['message_count_max'] !== '' && $filters['message_count_max'] !== null) {
             $where[] = "c.message_count <= %d";
             $where_values[] = intval($filters['message_count_max']);
+        }
+
+        // Filtrare după lead-uri (trebuie să fie înainte de search pentru JOIN)
+        $table_leads = $wpdb->prefix . 'aiha_leads';
+        if (isset($filters['has_leads']) && $filters['has_leads'] !== '' && $filters['has_leads'] !== null) {
+            if ($filters['has_leads'] === 'yes') {
+                $joins[] = "INNER JOIN $table_leads l_filter ON l_filter.conversation_id = c.id";
+            } elseif ($filters['has_leads'] === 'no') {
+                $joins[] = "LEFT JOIN $table_leads l_filter ON l_filter.conversation_id = c.id";
+                $where[] = "l_filter.id IS NULL";
+            }
         }
 
         // Filtrare după text în mesaje (optimizat cu JOIN în loc de EXISTS pentru performanță)
@@ -482,17 +493,6 @@ class AIHA_Database
 
         $where_clause = implode(' AND ', $where);
         $join_clause = !empty($joins) ? implode(' ', array_unique($joins)) : '';
-
-        // Adaugă JOIN pentru lead-uri dacă filtrăm după lead-uri
-        $table_leads = $wpdb->prefix . 'aiha_leads';
-        if (!empty($filters['has_leads'])) {
-            if ($filters['has_leads'] === 'yes') {
-                $joins[] = "INNER JOIN $table_leads l ON l.conversation_id = c.id";
-            } elseif ($filters['has_leads'] === 'no') {
-                $joins[] = "LEFT JOIN $table_leads l ON l.conversation_id = c.id";
-                $where[] = "l.id IS NULL";
-            }
-        }
         
         // Query optimizat: folosește message_count din tabel și include info despre lead-uri
         $query = "SELECT DISTINCT c.*,
@@ -627,18 +627,25 @@ class AIHA_Database
             $where[] = "c.created_at <= %s";
             $where_values[] = $filters['date_to'] . ' 23:59:59';
         }
-        if (!empty($filters['message_count_min'])) {
+        // Filtrare după număr de mesaje (folosește isset pentru a permite și 0)
+        if (isset($filters['message_count_min']) && $filters['message_count_min'] !== '' && $filters['message_count_min'] !== null) {
             $where[] = "c.message_count >= %d";
             $where_values[] = intval($filters['message_count_min']);
         }
-        if (!empty($filters['message_count_max'])) {
+        if (isset($filters['message_count_max']) && $filters['message_count_max'] !== '' && $filters['message_count_max'] !== null) {
             $where[] = "c.message_count <= %d";
             $where_values[] = intval($filters['message_count_max']);
         }
         
-        // Filtrare după lead-uri
-        if (!empty($filters['has_leads'])) {
-            // Se va face prin JOIN în query-ul principal
+        // Filtrare după lead-uri (trebuie să fie înainte de search pentru JOIN)
+        $table_leads = $wpdb->prefix . 'aiha_leads';
+        if (isset($filters['has_leads']) && $filters['has_leads'] !== '' && $filters['has_leads'] !== null) {
+            if ($filters['has_leads'] === 'yes') {
+                $joins[] = "INNER JOIN $table_leads l_filter ON l_filter.conversation_id = c.id";
+            } elseif ($filters['has_leads'] === 'no') {
+                $joins[] = "LEFT JOIN $table_leads l_filter ON l_filter.conversation_id = c.id";
+                $where[] = "l_filter.id IS NULL";
+            }
         }
         
         if (!empty($filters['search'])) {
@@ -652,17 +659,6 @@ class AIHA_Database
             } else {
                 $joins[] = "INNER JOIN $table_messages m ON m.conversation_id = c.id AND m.content LIKE %s";
                 $where_values[] = $search_term;
-            }
-        }
-
-        // Adaugă JOIN pentru lead-uri dacă filtrăm după lead-uri
-        $table_leads = $wpdb->prefix . 'aiha_leads';
-        if (!empty($filters['has_leads'])) {
-            if ($filters['has_leads'] === 'yes') {
-                $joins[] = "INNER JOIN $table_leads l ON l.conversation_id = c.id";
-            } elseif ($filters['has_leads'] === 'no') {
-                $joins[] = "LEFT JOIN $table_leads l ON l.conversation_id = c.id";
-                $where[] = "l.id IS NULL";
             }
         }
         
