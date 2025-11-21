@@ -14,6 +14,11 @@ class AIHA_Ajax_Handler {
         add_action('wp_ajax_nopriv_aiha_send_message', array($this, 'handle_send_message'));
         add_action('wp_ajax_aiha_save_lead', array($this, 'handle_save_lead'));
         add_action('wp_ajax_nopriv_aiha_save_lead', array($this, 'handle_save_lead'));
+        
+        // Admin AJAX handlers pentru conversații
+        add_action('wp_ajax_aiha_get_conversation', array($this, 'handle_get_conversation'));
+        add_action('wp_ajax_aiha_delete_conversation', array($this, 'handle_delete_conversation'));
+        add_action('wp_ajax_aiha_delete_conversations_bulk', array($this, 'handle_delete_conversations_bulk'));
     }
     
     /**
@@ -221,6 +226,115 @@ class AIHA_Ajax_Handler {
         }
         
         return '0.0.0.0';
+    }
+    
+    /**
+     * Obține o conversație pentru afișare în modal
+     */
+    public function handle_get_conversation() {
+        check_ajax_referer('aiha_admin_nonce', 'nonce');
+        
+        if (!current_user_can('manage_options')) {
+            wp_send_json_error(array('message' => 'Nu ai permisiunea necesară'));
+        }
+        
+        $conversation_id = intval($_POST['conversation_id'] ?? 0);
+        
+        if (!$conversation_id) {
+            wp_send_json_error(array('message' => 'ID conversație invalid'));
+        }
+        
+        $conversation = AIHA_Database::get_conversation_by_id($conversation_id);
+        
+        if (!$conversation) {
+            wp_send_json_error(array('message' => 'Conversația nu a fost găsită'));
+        }
+        
+        // Parsează JSON-ul dacă există
+        $messages = array();
+        if (!empty($conversation->conversation_json)) {
+            $messages = json_decode($conversation->conversation_json, true);
+            if (!is_array($messages)) {
+                $messages = array();
+            }
+        }
+        
+        // Dacă nu există JSON, încarcă din tabelul messages
+        if (empty($messages)) {
+            $messages_raw = AIHA_Database::get_conversation_history($conversation_id, 1000);
+            foreach ($messages_raw as $msg) {
+                $messages[] = array(
+                    'role' => $msg->role,
+                    'content' => $msg->content,
+                    'created_at' => $msg->created_at ?? ''
+                );
+            }
+        }
+        
+        wp_send_json_success(array(
+            'conversation' => $conversation,
+            'messages' => $messages
+        ));
+    }
+    
+    /**
+     * Șterge o conversație
+     */
+    public function handle_delete_conversation() {
+        check_ajax_referer('aiha_admin_nonce', 'nonce');
+        
+        if (!current_user_can('manage_options')) {
+            wp_send_json_error(array('message' => 'Nu ai permisiunea necesară'));
+        }
+        
+        $conversation_id = intval($_POST['conversation_id'] ?? 0);
+        
+        if (!$conversation_id) {
+            wp_send_json_error(array('message' => 'ID conversație invalid'));
+        }
+        
+        $result = AIHA_Database::delete_conversation($conversation_id);
+        
+        if ($result) {
+            wp_send_json_success(array('message' => 'Conversația a fost ștearsă cu succes'));
+        } else {
+            wp_send_json_error(array('message' => 'Eroare la ștergerea conversației'));
+        }
+    }
+    
+    /**
+     * Șterge multiple conversații (bulk)
+     */
+    public function handle_delete_conversations_bulk() {
+        check_ajax_referer('aiha_admin_nonce', 'nonce');
+        
+        if (!current_user_can('manage_options')) {
+            wp_send_json_error(array('message' => 'Nu ai permisiunea necesară'));
+        }
+        
+        $conversation_ids = isset($_POST['conversation_ids']) ? $_POST['conversation_ids'] : array();
+        
+        if (empty($conversation_ids) || !is_array($conversation_ids)) {
+            wp_send_json_error(array('message' => 'Nu au fost selectate conversații'));
+        }
+        
+        $conversation_ids = array_map('intval', $conversation_ids);
+        $conversation_ids = array_filter($conversation_ids);
+        
+        if (empty($conversation_ids)) {
+            wp_send_json_error(array('message' => 'ID-uri invalide'));
+        }
+        
+        $result = AIHA_Database::delete_conversations($conversation_ids);
+        
+        if ($result !== false) {
+            wp_send_json_success(array(
+                'message' => sprintf('Au fost șterse %d conversații', count($conversation_ids)),
+                'deleted_count' => count($conversation_ids)
+            ));
+        } else {
+            wp_send_json_error(array('message' => 'Eroare la ștergerea conversațiilor'));
+        }
     }
 }
 

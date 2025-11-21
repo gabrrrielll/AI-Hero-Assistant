@@ -239,3 +239,46 @@
     vertical-align: middle;
     margin-right: 5px;
 }
+
+/* Conversation Modal Styling */
+.aiha-admin-wrap .modal-dialog-scrollable .modal-body {
+    max-height: calc(100vh - 200px);
+}
+
+.aiha-admin-wrap .conversation-messages {
+    border-top: 1px solid #dee2e6;
+    padding-top: 1rem;
+}
+
+.aiha-admin-wrap .message {
+    margin-bottom: 1rem;
+}
+
+.aiha-admin-wrap .message .bg-primary {
+    background-color: #0073aa !important;
+}
+
+.aiha-admin-wrap .message .bg-light {
+    background-color: #f8f9fa !important;
+    border: 1px solid #dee2e6;
+}
+
+/* Badge Styling */
+.aiha-admin-wrap .badge {
+    padding: 0.35em 0.65em;
+    font-weight: 500;
+}
+
+/* Checkbox Styling */
+.aiha-admin-wrap .form-check-input {
+    cursor: pointer;
+}
+
+/* Button Spacing */
+.aiha-admin-wrap .btn-sm {
+    margin-right: 5px;
+}
+
+.aiha-admin-wrap .btn-sm:last-child {
+    margin-right: 0;
+}

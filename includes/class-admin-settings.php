@@ -154,7 +154,154 @@ class AIHA_Admin_Settings
                      id="conversations" 
                      role="tabpanel" 
                      aria-labelledby="conversations-tab">
+                    
+                    <!-- Filtrare Conversații -->
+                    <div class="card shadow-sm mb-4">
+                        <div class="card-header bg-white">
+                            <h2 class="h4 mb-0"><?php _e('Filtrare Conversații', 'ai-hero-assistant'); ?></h2>
+                        </div>
+                        <div class="card-body">
+                            <form id="aiha-conversations-filter" class="row g-3">
+                                <div class="col-md-2">
+                                    <label for="filter_ip" class="form-label"><?php _e('IP', 'ai-hero-assistant'); ?></label>
+                                    <input type="text" id="filter_ip" name="ip" class="form-control" value="<?php echo esc_attr($filters['ip'] ?? ''); ?>" placeholder="<?php esc_attr_e('Filtrează după IP', 'ai-hero-assistant'); ?>">
+                                </div>
+                                <div class="col-md-2">
+                                    <label for="filter_date_from" class="form-label"><?php _e('De la dată', 'ai-hero-assistant'); ?></label>
+                                    <input type="date" id="filter_date_from" name="date_from" class="form-control" value="<?php echo esc_attr($filters['date_from'] ?? ''); ?>">
+                                </div>
+                                <div class="col-md-2">
+                                    <label for="filter_date_to" class="form-label"><?php _e('Până la dată', 'ai-hero-assistant'); ?></label>
+                                    <input type="date" id="filter_date_to" name="date_to" class="form-control" value="<?php echo esc_attr($filters['date_to'] ?? ''); ?>">
+                                </div>
+                                <div class="col-md-2">
+                                    <label for="filter_message_count_min" class="form-label"><?php _e('Min. mesaje', 'ai-hero-assistant'); ?></label>
+                                    <input type="number" id="filter_message_count_min" name="message_count_min" class="form-control" value="<?php echo esc_attr($filters['message_count_min'] ?? ''); ?>" min="0" placeholder="0">
+                                </div>
+                                <div class="col-md-2">
+                                    <label for="filter_message_count_max" class="form-label"><?php _e('Max. mesaje', 'ai-hero-assistant'); ?></label>
+                                    <input type="number" id="filter_message_count_max" name="message_count_max" class="form-control" value="<?php echo esc_attr($filters['message_count_max'] ?? ''); ?>" min="0" placeholder="∞">
+                                </div>
+                                <div class="col-md-2">
+                                    <label for="filter_search" class="form-label"><?php _e('Caută în mesaje', 'ai-hero-assistant'); ?></label>
+                                    <input type="text" id="filter_search" name="search" class="form-control" value="<?php echo esc_attr($filters['search'] ?? ''); ?>" placeholder="<?php esc_attr_e('Caută text...', 'ai-hero-assistant'); ?>">
+                                </div>
+                                <div class="col-12">
+                                    <button type="submit" class="btn btn-primary"><?php _e('Filtrează', 'ai-hero-assistant'); ?></button>
+                                    <button type="button" id="reset-filters" class="btn btn-secondary"><?php _e('Resetează', 'ai-hero-assistant'); ?></button>
+                                    <span class="ms-3 text-muted">
+                                        <strong><?php echo number_format($total_conversations); ?></strong> <?php _e('conversații găsite', 'ai-hero-assistant'); ?>
+                                    </span>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                    
+                    <!-- Lista Conversații -->
                     <div class="card shadow-sm">
+                        <div class="card-header bg-white d-flex justify-content-between align-items-center">
+                            <h2 class="h4 mb-0"><?php _e('Conversații', 'ai-hero-assistant'); ?></h2>
+                            <div>
+                                <button type="button" id="bulk-delete-btn" class="btn btn-danger btn-sm" disabled>
+                                    <i class="dashicons dashicons-trash"></i> <?php _e('Șterge selectate', 'ai-hero-assistant'); ?>
+                                </button>
+                            </div>
+                        </div>
+                        <div class="card-body">
+                            <div id="conversations-list-container">
+                                <?php
+                                // Obține filtrele din URL sau POST (toate criteriile)
+                                $filters = array(
+                                    'ip' => isset($_GET['ip']) ? sanitize_text_field($_GET['ip']) : '',
+                                    'date_from' => isset($_GET['date_from']) ? sanitize_text_field($_GET['date_from']) : '',
+                                    'date_to' => isset($_GET['date_to']) ? sanitize_text_field($_GET['date_to']) : '',
+                                    'search' => isset($_GET['search']) ? sanitize_text_field($_GET['search']) : '',
+                                    'message_count_min' => isset($_GET['message_count_min']) ? intval($_GET['message_count_min']) : '',
+                                    'message_count_max' => isset($_GET['message_count_max']) ? intval($_GET['message_count_max']) : ''
+                                );
+
+        // Elimină filtrele goale
+        $filters = array_filter($filters, function ($value) {
+            return $value !== '' && $value !== null;
+        });
+
+        $page = isset($_GET['paged']) ? max(1, intval($_GET['paged'])) : 1;
+        $per_page = 20;
+        $offset = ($page - 1) * $per_page;
+
+        $conversations = AIHA_Database::get_all_conversations($per_page, $offset, $filters);
+        $total_conversations = AIHA_Database::count_conversations($filters);
+        $total_pages = ceil($total_conversations / $per_page);
+
+        if (!empty($conversations)):
+            ?>
+                                    <div class="table-responsive">
+                                        <table class="table table-striped table-hover" id="conversations-table">
+                                            <thead class="table-light">
+                                                <tr>
+                                                    <th width="40">
+                                                        <input type="checkbox" id="select-all-conversations" class="form-check-input">
+                                                    </th>
+                                                    <th><?php _e('ID', 'ai-hero-assistant'); ?></th>
+                                                    <th><?php _e('IP', 'ai-hero-assistant'); ?></th>
+                                                    <th><?php _e('Mesaje', 'ai-hero-assistant'); ?></th>
+                                                    <th><?php _e('Data', 'ai-hero-assistant'); ?></th>
+                                                    <th width="150"><?php _e('Acțiuni', 'ai-hero-assistant'); ?></th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                <?php foreach ($conversations as $conv): ?>
+                                                    <tr data-conversation-id="<?php echo esc_attr($conv->id); ?>">
+                                                        <td>
+                                                            <input type="checkbox" class="form-check-input conversation-checkbox" value="<?php echo esc_attr($conv->id); ?>">
+                                                        </td>
+                                                        <td><strong>#<?php echo esc_html($conv->id); ?></strong></td>
+                                                        <td><code><?php echo esc_html($conv->user_ip); ?></code></td>
+                                                        <td>
+                                                            <span class="badge bg-primary"><?php echo esc_html($conv->message_count ?? 0); ?></span>
+                                                        </td>
+                                                        <td><?php echo esc_html(date_i18n(get_option('date_format') . ' ' . get_option('time_format'), strtotime($conv->created_at))); ?></td>
+                                                        <td>
+                                                            <button type="button" class="btn btn-sm btn-info view-conversation" data-conversation-id="<?php echo esc_attr($conv->id); ?>">
+                                                                <i class="dashicons dashicons-visibility"></i> <?php _e('Vezi', 'ai-hero-assistant'); ?>
+                                                            </button>
+                                                            <button type="button" class="btn btn-sm btn-danger delete-conversation" data-conversation-id="<?php echo esc_attr($conv->id); ?>">
+                                                                <i class="dashicons dashicons-trash"></i>
+                                                            </button>
+                                                        </td>
+                                                    </tr>
+                                                <?php endforeach; ?>
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                    
+                                    <?php if ($total_pages > 1): ?>
+                                        <nav aria-label="Paginare conversații">
+                                            <ul class="pagination justify-content-center">
+                                                <?php
+                            $base_url = remove_query_arg('paged');
+                                        for ($i = 1; $i <= $total_pages; $i++):
+                                            $url = add_query_arg('paged', $i, $base_url);
+                                            ?>
+                                                    <li class="page-item <?php echo $i === $page ? 'active' : ''; ?>">
+                                                        <a class="page-link" href="<?php echo esc_url($url); ?>"><?php echo $i; ?></a>
+                                                    </li>
+                                                <?php endfor; ?>
+                                            </ul>
+                                        </nav>
+                                    <?php endif; ?>
+                                    
+                                <?php else: ?>
+                                    <div class="alert alert-info" role="alert">
+                                        <i class="dashicons dashicons-info"></i> <?php _e('Nu există conversații.', 'ai-hero-assistant'); ?>
+                                    </div>
+                                <?php endif; ?>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Leads Capturate -->
+                    <div class="card shadow-sm mt-4">
                         <div class="card-header bg-white">
                             <h2 class="h4 mb-0"><?php _e('Leads Capturate', 'ai-hero-assistant'); ?></h2>
                         </div>
@@ -228,6 +375,28 @@ class AIHA_Admin_Settings
                 }
                                 ?>
                             <?php endif; ?>
+                        </div>
+                    </div>
+                    
+                    <!-- Modal pentru afișarea conversației -->
+                    <div class="modal fade" id="conversationModal" tabindex="-1" aria-labelledby="conversationModalLabel" aria-hidden="true">
+                        <div class="modal-dialog modal-lg modal-dialog-scrollable">
+                            <div class="modal-content">
+                                <div class="modal-header">
+                                    <h5 class="modal-title" id="conversationModalLabel"><?php _e('Conversație', 'ai-hero-assistant'); ?></h5>
+                                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                </div>
+                                <div class="modal-body" id="conversation-modal-body">
+                                    <div class="text-center">
+                                        <div class="spinner-border" role="status">
+                                            <span class="visually-hidden"><?php _e('Se încarcă...', 'ai-hero-assistant'); ?></span>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="modal-footer">
+                                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal"><?php _e('Închide', 'ai-hero-assistant'); ?></button>
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </div>

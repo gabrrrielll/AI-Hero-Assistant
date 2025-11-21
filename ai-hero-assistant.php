@@ -254,6 +254,16 @@ class AI_Hero_Assistant
         }
         wp_enqueue_media();
 
+        // Include Bootstrap JS inline
+        echo '<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-C6RzsynM9kWDrMNeT87bh95OGNyZPhcTNXj1NW7RuBCsyN/o0jlpcV8Qyq46cDfL" crossorigin="anonymous"></script>';
+
+        // Localize script pentru AJAX
+        $admin_data = array(
+            'ajaxUrl' => admin_url('admin-ajax.php'),
+            'nonce' => wp_create_nonce('aiha_admin_nonce')
+        );
+        echo '<script type="text/javascript">window.aihaAdminData = ' . json_encode($admin_data) . ';</script>';
+
         $js_path = AIHA_PLUGIN_DIR . 'assets/js/admin.js';
 
         if (file_exists($js_path)) {
