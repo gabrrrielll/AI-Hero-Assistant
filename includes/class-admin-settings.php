@@ -219,24 +219,32 @@ class AIHA_Admin_Settings
                             <div id="conversations-list-container">
                                 <?php
                                 // Obține filtrele din URL sau POST (toate criteriile)
-                                $filters = array(
-                                    'ip' => isset($_GET['ip']) ? sanitize_text_field($_GET['ip']) : '',
-                                    'date_from' => isset($_GET['date_from']) ? sanitize_text_field($_GET['date_from']) : '',
-                                    'date_to' => isset($_GET['date_to']) ? sanitize_text_field($_GET['date_to']) : '',
-                                    'search' => isset($_GET['search']) ? sanitize_text_field($_GET['search']) : '',
-                                    'message_count_min' => isset($_GET['message_count_min']) ? intval($_GET['message_count_min']) : '',
-                                    'message_count_max' => isset($_GET['message_count_max']) ? intval($_GET['message_count_max']) : '',
-                                    'has_leads' => isset($_GET['has_leads']) ? sanitize_text_field($_GET['has_leads']) : ''
-                                );
+                                $filters = array();
 
-        // Elimină filtrele goale, dar păstrează 0 pentru message_count_min/max
-        $filters = array_filter($filters, function ($value, $key) {
-            // Păstrează 0 pentru message_count_min și message_count_max
-            if (in_array($key, ['message_count_min', 'message_count_max']) && $value === 0) {
-                return true;
-            }
-            return $value !== '' && $value !== null;
-        }, ARRAY_FILTER_USE_BOTH);
+        // Filtre text
+        if (isset($_GET['ip']) && $_GET['ip'] !== '') {
+            $filters['ip'] = sanitize_text_field($_GET['ip']);
+        }
+        if (isset($_GET['date_from']) && $_GET['date_from'] !== '') {
+            $filters['date_from'] = sanitize_text_field($_GET['date_from']);
+        }
+        if (isset($_GET['date_to']) && $_GET['date_to'] !== '') {
+            $filters['date_to'] = sanitize_text_field($_GET['date_to']);
+        }
+        if (isset($_GET['search']) && $_GET['search'] !== '') {
+            $filters['search'] = sanitize_text_field($_GET['search']);
+        }
+        if (isset($_GET['has_leads']) && $_GET['has_leads'] !== '') {
+            $filters['has_leads'] = sanitize_text_field($_GET['has_leads']);
+        }
+
+        // Filtre numerice - păstrează și 0
+        if (isset($_GET['message_count_min']) && $_GET['message_count_min'] !== '') {
+            $filters['message_count_min'] = intval($_GET['message_count_min']);
+        }
+        if (isset($_GET['message_count_max']) && $_GET['message_count_max'] !== '') {
+            $filters['message_count_max'] = intval($_GET['message_count_max']);
+        }
 
         $page = isset($_GET['paged']) ? max(1, intval($_GET['paged'])) : 1;
         $per_page = 20;
