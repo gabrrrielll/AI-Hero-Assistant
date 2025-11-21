@@ -161,7 +161,7 @@ class AIHA_Admin_Settings
                             <h2 class="h4 mb-0"><?php _e('Filtrare Conversații', 'ai-hero-assistant'); ?></h2>
                         </div>
                         <div class="card-body">
-                            <form id="aiha-conversations-filter" class="row g-3">
+                            <form id="aiha-conversations-filter" method="get" action="<?php echo esc_url(admin_url('options-general.php?page=aiha-settings&tab=conversations')); ?>" class="row g-3">
                                 <div class="col-md-2">
                                     <label for="filter_ip" class="form-label"><?php _e('IP', 'ai-hero-assistant'); ?></label>
                                     <input type="text" id="filter_ip" name="ip" class="form-control" value="<?php echo esc_attr($filters['ip'] ?? ''); ?>" placeholder="<?php esc_attr_e('Filtrează după IP', 'ai-hero-assistant'); ?>">

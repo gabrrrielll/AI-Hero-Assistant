@@ -104,13 +104,20 @@
         $('#aiha-conversations-filter').on('submit', function (e) {
             e.preventDefault();
             const formData = $(this).serialize();
-            const url = window.location.pathname + '?' + formData;
+            // Construiește URL-ul corect cu pagina și tab-ul
+            const baseUrl = window.aihaAdminData && window.aihaAdminData.settingsPageUrl 
+                ? window.aihaAdminData.settingsPageUrl 
+                : window.location.href.split('?')[0].replace(/&tab=[^&]*/, '').replace(/tab=[^&]*&?/, '') + '&tab=conversations';
+            const url = baseUrl + (formData ? '&' + formData : '');
             window.location.href = url;
         });
 
         // Reset filtre
         $('#reset-filters').on('click', function () {
-            window.location.href = window.location.pathname;
+            const baseUrl = window.aihaAdminData && window.aihaAdminData.settingsPageUrl 
+                ? window.aihaAdminData.settingsPageUrl 
+                : window.location.href.split('?')[0] + '?page=aiha-settings&tab=conversations';
+            window.location.href = baseUrl;
         });
 
         // Select all checkbox

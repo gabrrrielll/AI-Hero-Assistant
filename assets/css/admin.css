@@ -4,8 +4,23 @@
  */
 
 .aiha-admin-wrap {
-    max-width: 1400px;
+    max-width: 100%;
     margin: 20px 0;
+    font-size: 13px;
+    /* Redus de la default 14px */
+}
+
+.aiha-admin-wrap h1 {
+    font-size: 20px;
+    /* Redus de la default 23px */
+    margin-bottom: 1rem;
+}
+
+.aiha-admin-wrap h2,
+.aiha-admin-wrap .h4 {
+    font-size: 15px;
+    /* Redus de la default 18px */
+    font-weight: 600;
 }
 
 /* Bootstrap Tab Customization */
@@ -27,8 +42,11 @@
     color: #495057;
     border: none;
     border-bottom: 3px solid transparent;
-    padding: 12px 24px;
+    padding: 8px 16px;
+    /* Redus de la 12px 24px */
     font-weight: 500;
+    font-size: 13px;
+    /* Redus */
     transition: all 0.3s ease;
     white-space: nowrap;
     display: block;
@@ -86,31 +104,41 @@
 
 .aiha-admin-wrap .card-header {
     border-bottom: 1px solid #dee2e6;
-    padding: 1.25rem 1.5rem;
+    padding: 0.75rem 1rem;
+    /* Redus de la 1.25rem 1.5rem */
     background-color: #f8f9fa;
 }
 
 .aiha-admin-wrap .card-body {
-    padding: 1.5rem;
+    padding: 1rem;
+    /* Redus de la 1.5rem */
 }
 
 .aiha-admin-wrap .card-footer {
     border-top: 1px solid #dee2e6;
-    padding: 1rem 1.5rem;
+    padding: 0.75rem 1rem;
+    /* Redus de la 1rem 1.5rem */
     background-color: #f8f9fa;
 }
 
 /* Form Styling */
 .aiha-admin-wrap .form-label {
-    margin-bottom: 0.5rem;
+    margin-bottom: 0.375rem;
+    /* Redus de la 0.5rem */
     color: #212529;
+    font-size: 12px;
+    /* Redus */
+    font-weight: 500;
 }
 
 .aiha-admin-wrap .form-control,
 .aiha-admin-wrap .form-select {
     border-radius: 6px;
     border: 1px solid #ced4da;
-    padding: 0.5rem 0.75rem;
+    padding: 0.375rem 0.5rem;
+    /* Redus de la 0.5rem 0.75rem */
+    font-size: 13px;
+    /* Redus */
     transition: border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
 }
 
@@ -129,8 +157,10 @@
 }
 
 .aiha-admin-wrap .form-text {
-    margin-top: 0.5rem;
-    font-size: 0.875rem;
+    margin-top: 0.375rem;
+    /* Redus de la 0.5rem */
+    font-size: 11px;
+    /* Redus de la 0.875rem */
     color: #6c757d;
 }
 
@@ -142,8 +172,19 @@
 .aiha-admin-wrap .table thead th {
     border-bottom: 2px solid #dee2e6;
     font-weight: 600;
+    font-size: 12px;
+    /* Redus */
     color: #495057;
     background-color: #f8f9fa;
+    padding: 0.5rem 0.75rem;
+    /* Redus */
+}
+
+.aiha-admin-wrap .table tbody td {
+    font-size: 12px;
+    /* Redus */
+    padding: 0.5rem 0.75rem;
+    /* Redus */
 }
 
 .aiha-admin-wrap .table tbody tr:hover {
@@ -161,7 +202,10 @@
 .aiha-admin-wrap .alert {
     border-radius: 6px;
     border: none;
-    padding: 1rem 1.25rem;
+    padding: 0.75rem 1rem;
+    /* Redus de la 1rem 1.25rem */
+    font-size: 12px;
+    /* Redus */
 }
 
 .aiha-admin-wrap .alert-warning {
@@ -177,9 +221,19 @@
 /* Button Styling */
 .aiha-admin-wrap .btn {
     border-radius: 6px;
-    padding: 0.5rem 1.5rem;
+    padding: 0.375rem 1rem;
+    /* Redus de la 0.5rem 1.5rem */
     font-weight: 500;
+    font-size: 12px;
+    /* Redus */
     transition: all 0.2s ease;
+}
+
+.aiha-admin-wrap .btn-sm {
+    padding: 0.25rem 0.5rem;
+    /* Redus */
+    font-size: 11px;
+    /* Redus */
 }
 
 .aiha-admin-wrap .btn-primary {
@@ -265,8 +319,11 @@
 
 /* Badge Styling */
 .aiha-admin-wrap .badge {
-    padding: 0.35em 0.65em;
+    padding: 0.25em 0.5em;
+    /* Redus de la 0.35em 0.65em */
     font-weight: 500;
+    font-size: 11px;
+    /* Redus */
 }
 
 /* Checkbox Styling */
