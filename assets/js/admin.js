@@ -182,7 +182,11 @@
                                 html += '<div class="message mb-3 ' + alignClass + '">';
                                 html += '<div class="d-inline-block p-3 rounded ' + bgClass + '" style="max-width: 80%;">';
                                 html += '<div class="fw-bold mb-1">' + (isUser ? 'Utilizator' : 'AI') + '</div>';
-                                html += '<div>' + msg.content.replace(/\n/g, '<br>') + '</div>';
+                                // Folosește formatare markdown
+                                const formattedContent = typeof formatMarkdownMessage !== 'undefined' 
+                                    ? formatMarkdownMessage(msg.content) 
+                                    : msg.content.replace(/\n/g, '<br>');
+                                html += '<div class="aiha-message-content">' + formattedContent + '</div>';
                                 if (msg.created_at) {
                                     html += '<div class="small mt-2 opacity-75">' + msg.created_at + '</div>';
                                 }

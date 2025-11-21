@@ -317,6 +317,103 @@
     border: 1px solid #dee2e6;
 }
 
+/* Formatare mesaje markdown în admin */
+.aiha-admin-wrap .aiha-message-content {
+    line-height: 1.6;
+}
+
+.aiha-admin-wrap .aiha-message-content .aiha-header {
+    margin: 0.8em 0 0.5em 0;
+    font-weight: 600;
+    line-height: 1.3;
+}
+
+.aiha-admin-wrap .aiha-message-content .aiha-h1,
+.aiha-admin-wrap .aiha-message-content h3.aiha-header {
+    font-size: 1.4em;
+    color: #0073aa;
+}
+
+.aiha-admin-wrap .aiha-message-content .aiha-h2,
+.aiha-admin-wrap .aiha-message-content h4.aiha-header {
+    font-size: 1.2em;
+    color: #005177;
+}
+
+.aiha-admin-wrap .aiha-message-content .aiha-h3,
+.aiha-admin-wrap .aiha-message-content h5.aiha-header {
+    font-size: 1.1em;
+    color: #0073aa;
+}
+
+.aiha-admin-wrap .aiha-message-content .aiha-message-paragraph {
+    margin: 0.6em 0;
+    line-height: 1.6;
+}
+
+.aiha-admin-wrap .aiha-message-content .aiha-message-list {
+    margin: 0.8em 0;
+    padding-left: 1.8em;
+    line-height: 1.6;
+}
+
+.aiha-admin-wrap .aiha-message-content .aiha-message-list.aiha-numbered-list {
+    list-style-type: decimal;
+}
+
+.aiha-admin-wrap .aiha-message-content .aiha-list-item {
+    margin: 0.4em 0;
+}
+
+.aiha-admin-wrap .aiha-message-content .aiha-bold {
+    font-weight: 600;
+    color: inherit;
+}
+
+.aiha-admin-wrap .aiha-message-content .aiha-italic {
+    font-style: italic;
+}
+
+.aiha-admin-wrap .aiha-message-content .aiha-strikethrough {
+    text-decoration: line-through;
+    opacity: 0.7;
+}
+
+.aiha-admin-wrap .aiha-message-content .aiha-link {
+    color: #0073aa;
+    text-decoration: underline;
+}
+
+.aiha-admin-wrap .aiha-message-content .aiha-link:hover {
+    color: #005177;
+}
+
+.aiha-admin-wrap .aiha-message-content .aiha-code-block {
+    background-color: #f1f1f1;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    padding: 1em;
+    margin: 1em 0;
+    overflow-x: auto;
+    font-family: 'Courier New', Courier, monospace;
+    font-size: 0.9em;
+    line-height: 1.4;
+}
+
+.aiha-admin-wrap .aiha-message-content .aiha-inline-code {
+    background-color: #f1f1f1;
+    border: 1px solid #ddd;
+    border-radius: 3px;
+    padding: 0.2em 0.4em;
+    font-family: 'Courier New', Courier, monospace;
+    font-size: 0.9em;
+}
+
+.aiha-admin-wrap .aiha-message-content .aiha-line-break {
+    display: block;
+    margin: 0.3em 0;
+}
+
 /* Badge Styling */
 .aiha-admin-wrap .badge {
     padding: 0.25em 0.5em;

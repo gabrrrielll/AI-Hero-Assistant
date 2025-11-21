@@ -130,64 +130,16 @@
         }
 
         /**
-         * Formatează textul pentru afișare (markdown simplu -> HTML)
+         * Formatează textul pentru afișare (folosește formatare markdown comună)
          */
         formatMessageText(text) {
             if (!text) return '';
-            
-            let formatted = text;
-            
-            // Escapă HTML-ul existent pentru siguranță
-            const div = document.createElement('div');
-            div.textContent = formatted;
-            formatted = div.innerHTML;
-            
-            // Convertește **bold** în <strong>
-            formatted = formatted.replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>');
-            
-            // Convertește *italic* în <em> (doar dacă nu este la început de linie pentru liste)
-            formatted = formatted.replace(/(?<!^|\n)\*([^*\n]+?)\*(?!\*)/g, '<em>$1</em>');
-            
-            // Convertește liste cu bullet points (* sau -)
-            // Format: * item sau - item
-            const lines = formatted.split('\n');
-            let inList = false;
-            let result = [];
-            
-            lines.forEach((line, index) => {
-                const trimmed = line.trim();
-                const isListItem = /^[\*\-\•]\s+(.+)$/.test(trimmed);
-                
-                if (isListItem) {
-                    if (!inList) {
-                        result.push('<ul class="aiha-message-list">');
-                        inList = true;
-                    }
-                    const content = trimmed.replace(/^[\*\-\•]\s+/, '');
-                    result.push('<li>' + content + '</li>');
-                } else {
-                    if (inList) {
-                        result.push('</ul>');
-                        inList = false;
-                    }
-                    if (trimmed) {
-                        result.push('<p class="aiha-message-paragraph">' + trimmed + '</p>');
-                    } else {
-                        result.push('<br>');
-                    }
-                }
-            });
-            
-            if (inList) {
-                result.push('</ul>');
+            // Folosește funcția globală de formatare markdown dacă există
+            if (typeof formatMarkdownMessage !== 'undefined') {
+                return formatMarkdownMessage(text);
             }
-            
-            formatted = result.join('');
-            
-            // Convertește newlines rămase în <br>
-            formatted = formatted.replace(/\n/g, '<br>');
-            
-            return formatted;
+            // Fallback la formatare simplă
+            return text.replace(/\n/g, '<br>');
         }
 
         typeText(text, callback) {
