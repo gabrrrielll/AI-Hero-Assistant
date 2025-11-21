@@ -92,7 +92,7 @@ class AI_Hero_Assistant
     {
         // Creează tabelele în baza de date
         AIHA_Database::create_tables();
-        
+
         // Verifică și actualizează schema (pentru upgrade-uri)
         AIHA_Database::ensure_schema_up_to_date();
 

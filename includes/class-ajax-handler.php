@@ -47,9 +47,12 @@ class AIHA_Ajax_Handler {
         // Obține istoricul conversației
         $history = AIHA_Database::get_conversation_history($conversation_id);
         
+        // Obține header-ul Accept-Language din browser
+        $accept_language = isset($_SERVER['HTTP_ACCEPT_LANGUAGE']) ? $_SERVER['HTTP_ACCEPT_LANGUAGE'] : '';
+        
         // Trimite request către Gemini
         $gemini = new AIHA_Gemini_API();
-        $response = $gemini->chat($user_message, $history);
+        $response = $gemini->chat($user_message, $history, $accept_language);
         
         if (!$response['success']) {
             wp_send_json_error(array('message' => $response['error'] ?? 'Eroare la comunicarea cu AI'));

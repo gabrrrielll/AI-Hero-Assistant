@@ -41,11 +41,11 @@ class AIHA_Database
 
         // Adaugă câmpurile noi dacă nu există (pentru upgrade) - verificare manuală pentru compatibilitate
         $columns = $wpdb->get_col("DESCRIBE $table_conversations");
-        
+
         if (!in_array('conversation_json', $columns)) {
             $wpdb->query("ALTER TABLE $table_conversations ADD COLUMN conversation_json longtext AFTER user_agent");
         }
-        
+
         if (!in_array('message_count', $columns)) {
             $wpdb->query("ALTER TABLE $table_conversations ADD COLUMN message_count int(11) UNSIGNED DEFAULT 0 AFTER conversation_json");
         }
@@ -56,11 +56,11 @@ class AIHA_Database
         foreach ($indexes as $index) {
             $index_names[] = $index->Key_name;
         }
-        
+
         if (!in_array('created_at', $index_names)) {
             $wpdb->query("ALTER TABLE $table_conversations ADD INDEX created_at (created_at)");
         }
-        
+
         if (!in_array('message_count', $index_names)) {
             $wpdb->query("ALTER TABLE $table_conversations ADD INDEX message_count (message_count)");
         }
@@ -110,7 +110,7 @@ class AIHA_Database
         // Migrare: actualizează message_count pentru conversațiile existente
         self::migrate_message_counts();
     }
-    
+
     /**
      * Asigură că schema este actualizată (pentru upgrade-uri)
      */
@@ -118,44 +118,44 @@ class AIHA_Database
     {
         global $wpdb;
         $table_conversations = $wpdb->prefix . 'aiha_conversations';
-        
+
         // Verifică dacă tabelul există
         $table_exists = $wpdb->get_var("SHOW TABLES LIKE '$table_conversations'") === $table_conversations;
-        
+
         if (!$table_exists) {
             // Dacă tabelul nu există, creează-l complet
             self::create_tables();
             return;
         }
-        
+
         // Verifică coloanele existente
         $columns = $wpdb->get_col("DESCRIBE $table_conversations");
-        
+
         // Adaugă coloanele lipsă
         if (!in_array('conversation_json', $columns)) {
             $wpdb->query("ALTER TABLE $table_conversations ADD COLUMN conversation_json longtext AFTER user_agent");
         }
-        
+
         if (!in_array('message_count', $columns)) {
             $wpdb->query("ALTER TABLE $table_conversations ADD COLUMN message_count int(11) UNSIGNED DEFAULT 0 AFTER conversation_json");
         }
-        
+
         // Verifică indexurile
         $indexes = $wpdb->get_results("SHOW INDEX FROM $table_conversations");
         $index_names = array();
         foreach ($indexes as $index) {
             $index_names[] = $index->Key_name;
         }
-        
+
         if (!in_array('created_at', $index_names)) {
             $wpdb->query("ALTER TABLE $table_conversations ADD INDEX created_at (created_at)");
         }
-        
+
         if (!in_array('message_count', $index_names)) {
             $wpdb->query("ALTER TABLE $table_conversations ADD INDEX message_count (message_count)");
         }
     }
-    
+
     /**
      * Migrare: actualizează message_count pentru conversațiile existente
      */
@@ -217,7 +217,7 @@ class AIHA_Database
             'user_agent' => $user_agent
         );
         $insert_format = array('%s', '%s', '%s');
-        
+
         // Adaugă message_count doar dacă coloana există
         if ($has_message_count) {
             $insert_data['message_count'] = 0;
