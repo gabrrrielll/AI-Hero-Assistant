@@ -158,7 +158,11 @@ class AIHA_Ajax_Handler {
         // Încearcă să extragă nume din context (simplificat)
         // Caută pattern-uri comune: "numele meu este", "mă numesc", etc.
         if (preg_match('/(?:numele\s+meu\s+este|mă\s+numesc|sunt|eu\s+sunt)\s+([A-ZĂÂÎȘȚ][a-zăâîșț]+\s+[A-ZĂÂÎȘȚ][a-zăâîșț]+)/ui', $text, $matches)) {
-            $name = trim($matches[1]);
+            $extracted_name = trim($matches[1]);
+            // Validează numele înainte de a-l folosi
+            if ($this->is_valid_name($extracted_name)) {
+                $name = $extracted_name;
+            }
         }
         
         // Log pentru debugging - verifică ce s-a găsit
@@ -267,6 +271,62 @@ class AIHA_Ajax_Handler {
       }
       
       /**
+       * Validează dacă un nume este valid (nu este o frază sau cuvinte comune)
+       */
+      private function is_valid_name($name) {
+          if (empty($name)) {
+              return false;
+          }
+          
+          // Elimină spațiile multiple și normalizează
+          $name = trim(preg_replace('/\s+/', ' ', $name));
+          
+          // Verifică lungimea minimă (cel puțin 4 caractere)
+          if (strlen($name) < 4) {
+              return false;
+          }
+          
+          // Verifică dacă are cel puțin 2 cuvinte (prenume + nume)
+          $words = explode(' ', $name);
+          if (count($words) < 2) {
+              return false;
+          }
+          
+          // Listă de cuvinte comune care nu sunt nume
+          $invalid_words = array(
+              'sunt', 'suntem', 'sunteți', 'este', 'să', 'sau', 'și', 'cu', 'de', 'la', 'în', 'pe',
+              'încântată', 'încântat', 'bucuroasă', 'bucuros', 'mulțumită', 'mulțumit',
+              'fericită', 'fericit', 'satisfăcută', 'satisfăcut', 'mulțumesc', 'mulțumim',
+              'vă', 'te', 'mă', 'ne', 'le', 'lui', 'ei', 'lor', 'meu', 'mea', 'mei', 'mele',
+              'tău', 'ta', 'tăi', 'tale', 'său', 'sa', 'săi', 'sale', 'nostru', 'noastră',
+              'voastră', 'voștri', 'voastre', 'lor', 'lui', 'ei'
+          );
+          
+          // Verifică dacă conține cuvinte invalide
+          $name_lower = mb_strtolower($name);
+          foreach ($invalid_words as $invalid_word) {
+              if (strpos($name_lower, $invalid_word) !== false) {
+                  return false;
+              }
+          }
+          
+          // Verifică dacă fiecare cuvânt începe cu literă mare
+          foreach ($words as $word) {
+              $word = trim($word);
+              if (empty($word)) {
+                  continue;
+              }
+              // Verifică dacă prima literă este majusculă
+              $first_char = mb_substr($word, 0, 1);
+              if (!preg_match('/[A-ZĂÂÎȘȚ]/u', $first_char)) {
+                  return false;
+              }
+          }
+          
+          return true;
+      }
+      
+      /**
        * Trimite email de notificare dacă opțiunea este activă
        */
       private function maybe_send_lead_notification_email($conversation_id, $email, $phone, $name) {
@@ -310,7 +370,8 @@ class AIHA_Ajax_Handler {
           
           $body = '<p>' . esc_html__('A fost capturat un lead nou în AI Hero Assistant.', 'ai-hero-assistant') . '</p>';
           $body .= '<ul>';
-          if (!empty($name)) {
+          // Afișează numele doar dacă este valid
+          if (!empty($name) && $this->is_valid_name($name)) {
               $body .= '<li><strong>' . esc_html__('Nume', 'ai-hero-assistant') . ':</strong> ' . esc_html($name) . '</li>';
           }
           if (!empty($email)) {
