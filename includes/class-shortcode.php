@@ -84,8 +84,8 @@ class AIHA_Shortcode {
                 </div>
                 
                 <!-- Textarea pentru input -->
-                <div class="aiha-input-container d-flex justify-content-center flex-shrink-0 my-3">
-                    <div class="aiha-input-wrapper w-100 d-flex align-items-end gap-2" style="max-width: 800px;">
+                <div class="aiha-input-container d-flex flex-column align-items-center flex-shrink-0 my-3 w-100">
+                    <div class="aiha-input-wrapper d-flex align-items-end gap-2" style="max-width: 800px; width: 100%;">
                         <textarea 
                             id="aiha-input-<?php echo esc_attr($instance_id); ?>" 
                             class="aiha-textarea form-control" 
@@ -102,7 +102,7 @@ class AIHA_Shortcode {
                             </svg>
                         </button>
                     </div>
-                    <div class="aiha-loading w-100 d-none justify-content-center align-items-center gap-2 mt-2" id="aiha-loading-<?php echo esc_attr($instance_id); ?>">
+                    <div class="aiha-loading d-none justify-content-center align-items-center gap-2 mt-2" id="aiha-loading-<?php echo esc_attr($instance_id); ?>" style="max-width: 800px; width: 100%;">
                         <span class="spinner-border spinner-border-sm text-white" role="status"></span>
                         <span class="text-white"><?php esc_html_e('Se procesează...', 'ai-hero-assistant'); ?></span>
                     </div>
