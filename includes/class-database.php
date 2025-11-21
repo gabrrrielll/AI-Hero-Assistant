@@ -88,6 +88,41 @@ class AIHA_Database
         dbDelta($sql_conversations);
         dbDelta($sql_messages);
         dbDelta($sql_leads);
+        
+        // Migrare: actualizează message_count pentru conversațiile existente
+        self::migrate_message_counts();
+    }
+    
+    /**
+     * Migrare: actualizează message_count pentru conversațiile existente
+     */
+    public static function migrate_message_counts()
+    {
+        global $wpdb;
+        $table_conv = $wpdb->prefix . 'aiha_conversations';
+        $table_messages = $wpdb->prefix . 'aiha_messages';
+        
+        // Obține conversațiile care au message_count = 0 sau NULL
+        $conversations = $wpdb->get_results(
+            "SELECT id FROM $table_conv WHERE message_count = 0 OR message_count IS NULL LIMIT 100"
+        );
+        
+        foreach ($conversations as $conv) {
+            $count = $wpdb->get_var($wpdb->prepare(
+                "SELECT COUNT(*) FROM $table_messages WHERE conversation_id = %d",
+                $conv->id
+            ));
+            
+            if ($count > 0) {
+                $wpdb->update(
+                    $table_conv,
+                    array('message_count' => intval($count)),
+                    array('id' => $conv->id),
+                    array('%d'),
+                    array('%d')
+                );
+            }
+        }
     }
 
     /**
@@ -114,11 +149,12 @@ class AIHA_Database
             array(
                 'session_id' => $session_id,
                 'user_ip' => $user_ip,
-                'user_agent' => $user_agent
+                'user_agent' => $user_agent,
+                'message_count' => 0
             ),
-            array('%s', '%s', '%s')
+            array('%s', '%s', '%s', '%d')
         );
-
+        
         return $wpdb->insert_id;
     }
 
@@ -447,22 +483,58 @@ class AIHA_Database
         $where_clause = implode(' AND ', $where);
         $join_clause = !empty($joins) ? implode(' ', array_unique($joins)) : '';
 
-        // Query optimizat: folosește message_count din tabel în loc de subquery
-        $query = "SELECT DISTINCT c.* 
+        // Adaugă JOIN pentru lead-uri dacă filtrăm după lead-uri
+        $table_leads = $wpdb->prefix . 'aiha_leads';
+        if (!empty($filters['has_leads'])) {
+            if ($filters['has_leads'] === 'yes') {
+                $joins[] = "INNER JOIN $table_leads l ON l.conversation_id = c.id";
+            } elseif ($filters['has_leads'] === 'no') {
+                $joins[] = "LEFT JOIN $table_leads l ON l.conversation_id = c.id";
+                $where[] = "l.id IS NULL";
+            }
+        }
+        
+        // Query optimizat: folosește message_count din tabel și include info despre lead-uri
+        $query = "SELECT DISTINCT c.*,
+                  CASE WHEN EXISTS (SELECT 1 FROM $table_leads l WHERE l.conversation_id = c.id) THEN 1 ELSE 0 END as has_lead
                   FROM $table_conv c
                   $join_clause
                   WHERE $where_clause
                   ORDER BY c.created_at DESC
                   LIMIT %d OFFSET %d";
-
+        
         $where_values[] = $limit;
         $where_values[] = $offset;
-
+        
         if (!empty($where_values)) {
             $query = $wpdb->prepare($query, $where_values);
         }
-
-        return $wpdb->get_results($query) ?: array();
+        
+        $results = $wpdb->get_results($query) ?: array();
+        
+        // Actualizează message_count pentru conversațiile care nu au counter-ul actualizat
+        foreach ($results as $conv) {
+            if ($conv->message_count == 0) {
+                // Verifică dacă există mesaje
+                $actual_count = $wpdb->get_var($wpdb->prepare(
+                    "SELECT COUNT(*) FROM $table_messages WHERE conversation_id = %d",
+                    $conv->id
+                ));
+                if ($actual_count > 0) {
+                    // Actualizează counter-ul
+                    $wpdb->update(
+                        $table_conv,
+                        array('message_count' => intval($actual_count)),
+                        array('id' => $conv->id),
+                        array('%d'),
+                        array('%d')
+                    );
+                    $conv->message_count = intval($actual_count);
+                }
+            }
+        }
+        
+        return $results;
     }
 
     /**
@@ -563,6 +635,12 @@ class AIHA_Database
             $where[] = "c.message_count <= %d";
             $where_values[] = intval($filters['message_count_max']);
         }
+        
+        // Filtrare după lead-uri
+        if (!empty($filters['has_leads'])) {
+            // Se va face prin JOIN în query-ul principal
+        }
+        
         if (!empty($filters['search'])) {
             $search_term = '%' . $wpdb->esc_like($filters['search']) . '%';
             $has_fulltext = $wpdb->get_var("SHOW INDEX FROM $table_messages WHERE Key_name = 'content_search'");
@@ -577,9 +655,20 @@ class AIHA_Database
             }
         }
 
+        // Adaugă JOIN pentru lead-uri dacă filtrăm după lead-uri
+        $table_leads = $wpdb->prefix . 'aiha_leads';
+        if (!empty($filters['has_leads'])) {
+            if ($filters['has_leads'] === 'yes') {
+                $joins[] = "INNER JOIN $table_leads l ON l.conversation_id = c.id";
+            } elseif ($filters['has_leads'] === 'no') {
+                $joins[] = "LEFT JOIN $table_leads l ON l.conversation_id = c.id";
+                $where[] = "l.id IS NULL";
+            }
+        }
+        
         $where_clause = implode(' AND ', $where);
         $join_clause = !empty($joins) ? implode(' ', array_unique($joins)) : '';
-
+        
         $query = "SELECT COUNT(DISTINCT c.id) FROM $table_conv c $join_clause WHERE $where_clause";
 
         if (!empty($where_values)) {

@@ -186,6 +186,14 @@ class AIHA_Admin_Settings
                                     <label for="filter_search" class="form-label"><?php _e('Caută în mesaje', 'ai-hero-assistant'); ?></label>
                                     <input type="text" id="filter_search" name="search" class="form-control" value="<?php echo esc_attr($filters['search'] ?? ''); ?>" placeholder="<?php esc_attr_e('Caută text...', 'ai-hero-assistant'); ?>">
                                 </div>
+                                <div class="col-md-2">
+                                    <label for="filter_has_leads" class="form-label"><?php _e('Are Lead-uri', 'ai-hero-assistant'); ?></label>
+                                    <select id="filter_has_leads" name="has_leads" class="form-select">
+                                        <option value=""><?php _e('Toate', 'ai-hero-assistant'); ?></option>
+                                        <option value="yes" <?php selected($filters['has_leads'] ?? '', 'yes'); ?>><?php _e('Da', 'ai-hero-assistant'); ?></option>
+                                        <option value="no" <?php selected($filters['has_leads'] ?? '', 'no'); ?>><?php _e('Nu', 'ai-hero-assistant'); ?></option>
+                                    </select>
+                                </div>
                                 <div class="col-12">
                                     <button type="submit" class="btn btn-primary"><?php _e('Filtrează', 'ai-hero-assistant'); ?></button>
                                     <button type="button" id="reset-filters" class="btn btn-secondary"><?php _e('Resetează', 'ai-hero-assistant'); ?></button>
@@ -217,7 +225,8 @@ class AIHA_Admin_Settings
                                     'date_to' => isset($_GET['date_to']) ? sanitize_text_field($_GET['date_to']) : '',
                                     'search' => isset($_GET['search']) ? sanitize_text_field($_GET['search']) : '',
                                     'message_count_min' => isset($_GET['message_count_min']) ? intval($_GET['message_count_min']) : '',
-                                    'message_count_max' => isset($_GET['message_count_max']) ? intval($_GET['message_count_max']) : ''
+                                    'message_count_max' => isset($_GET['message_count_max']) ? intval($_GET['message_count_max']) : '',
+                                    'has_leads' => isset($_GET['has_leads']) ? sanitize_text_field($_GET['has_leads']) : ''
                                 );
 
         // Elimină filtrele goale
@@ -245,12 +254,36 @@ class AIHA_Admin_Settings
                                                     <th><?php _e('ID', 'ai-hero-assistant'); ?></th>
                                                     <th><?php _e('IP', 'ai-hero-assistant'); ?></th>
                                                     <th><?php _e('Mesaje', 'ai-hero-assistant'); ?></th>
+                                                    <th><?php _e('Lead-uri', 'ai-hero-assistant'); ?></th>
                                                     <th><?php _e('Data', 'ai-hero-assistant'); ?></th>
                                                     <th width="150"><?php _e('Acțiuni', 'ai-hero-assistant'); ?></th>
                                                 </tr>
                                             </thead>
                                             <tbody>
-                                                <?php foreach ($conversations as $conv): ?>
+                                                <?php
+                                                global $wpdb;
+            $table_leads = $wpdb->prefix . 'aiha_leads';
+
+            foreach ($conversations as $conv):
+                // Obține lead-urile pentru această conversație
+                $leads = $wpdb->get_results($wpdb->prepare(
+                    "SELECT email, phone, name FROM $table_leads WHERE conversation_id = %d LIMIT 5",
+                    $conv->id
+                ));
+                $has_lead = !empty($leads);
+
+                // Verifică și actualizează message_count dacă este 0 dar există mesaje
+                if (($conv->message_count ?? 0) == 0) {
+                    $actual_count = $wpdb->get_var($wpdb->prepare(
+                        "SELECT COUNT(*) FROM {$wpdb->prefix}aiha_messages WHERE conversation_id = %d",
+                        $conv->id
+                    ));
+                    if ($actual_count > 0) {
+                        AIHA_Database::update_message_count($conv->id);
+                        $conv->message_count = intval($actual_count);
+                    }
+                }
+                ?>
                                                     <tr data-conversation-id="<?php echo esc_attr($conv->id); ?>">
                                                         <td>
                                                             <input type="checkbox" class="form-check-input conversation-checkbox" value="<?php echo esc_attr($conv->id); ?>">
@@ -259,6 +292,27 @@ class AIHA_Admin_Settings
                                                         <td><code><?php echo esc_html($conv->user_ip); ?></code></td>
                                                         <td>
                                                             <span class="badge bg-primary"><?php echo esc_html($conv->message_count ?? 0); ?></span>
+                                                        </td>
+                                                        <td>
+                                                            <?php if ($has_lead): ?>
+                                                                <span class="badge bg-success" title="<?php esc_attr_e('Are lead-uri capturate', 'ai-hero-assistant'); ?>">
+                                                                    <i class="dashicons dashicons-yes"></i> <?php echo count($leads); ?>
+                                                                </span>
+                                                                <?php if (count($leads) > 0): ?>
+                                                                    <div class="small text-muted mt-1">
+                                                                        <?php foreach ($leads as $lead): ?>
+                                                                            <?php if (!empty($lead->email)): ?>
+                                                                                <div><i class="dashicons dashicons-email"></i> <?php echo esc_html($lead->email); ?></div>
+                                                                            <?php endif; ?>
+                                                                            <?php if (!empty($lead->phone)): ?>
+                                                                                <div><i class="dashicons dashicons-phone"></i> <?php echo esc_html($lead->phone); ?></div>
+                                                                            <?php endif; ?>
+                                                                        <?php endforeach; ?>
+                                                                    </div>
+                                                                <?php endif; ?>
+                                                            <?php else: ?>
+                                                                <span class="badge bg-secondary"><?php _e('Nu', 'ai-hero-assistant'); ?></span>
+                                                            <?php endif; ?>
                                                         </td>
                                                         <td><?php echo esc_html(date_i18n(get_option('date_format') . ' ' . get_option('time_format'), strtotime($conv->created_at))); ?></td>
                                                         <td>
@@ -297,84 +351,6 @@ class AIHA_Admin_Settings
                                     </div>
                                 <?php endif; ?>
                             </div>
-                        </div>
-                    </div>
-                    
-                    <!-- Leads Capturate -->
-                    <div class="card shadow-sm mt-4">
-                        <div class="card-header bg-white">
-                            <h2 class="h4 mb-0"><?php _e('Leads Capturate', 'ai-hero-assistant'); ?></h2>
-                        </div>
-                        <div class="card-body">
-                            <?php
-                            // Verifică direct în DB pentru debugging
-                            global $wpdb;
-        $table_leads = $wpdb->prefix . 'aiha_leads';
-        $direct_count = $wpdb->get_var("SELECT COUNT(*) FROM $table_leads");
-
-        $leads = AIHA_Database::get_all_leads(50);
-
-        // Debug: Verifică ce returnează query-ul
-        if (defined('WP_DEBUG') && WP_DEBUG) {
-            error_log('AIHA Admin: Direct DB count: ' . $direct_count);
-            error_log('AIHA Admin: Leads from function: ' . (is_array($leads) ? count($leads) : 'not array'));
-            error_log('AIHA Admin: Leads empty check: ' . (empty($leads) ? 'yes' : 'no'));
-            if (!empty($leads)) {
-                error_log('AIHA Admin: First lead: ' . print_r($leads[0], true));
-            } else {
-                error_log('AIHA Admin: Leads array is empty or not array');
-            }
-        }
-
-        // Afișează count direct pentru debugging
-        if (current_user_can('manage_options') && $direct_count > 0) {
-            echo '<div class="alert alert-warning alert-dismissible fade show" role="alert">';
-            echo '<strong>Debug Info:</strong> Există ' . intval($direct_count) . ' lead(s) în baza de date. ';
-            echo 'Query-ul returnează: ' . (is_array($leads) ? count($leads) : '0') . ' lead(s).';
-            echo '<button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>';
-            echo '</div>';
-        }
-
-        if (!empty($leads) && is_array($leads)):
-            ?>
-                                <div class="table-responsive">
-                                    <table class="table table-striped table-hover">
-                                        <thead class="table-light">
-                                            <tr>
-                                                <th><?php _e('Email', 'ai-hero-assistant'); ?></th>
-                                                <th><?php _e('Telefon', 'ai-hero-assistant'); ?></th>
-                                                <th><?php _e('Nume', 'ai-hero-assistant'); ?></th>
-                                                <th><?php _e('IP', 'ai-hero-assistant'); ?></th>
-                                                <th><?php _e('Data', 'ai-hero-assistant'); ?></th>
-                                            </tr>
-                                        </thead>
-                                        <tbody>
-                                            <?php foreach ($leads as $lead): ?>
-                                                <tr>
-                                                    <td><?php echo esc_html($lead->email ?: '-'); ?></td>
-                                                    <td><?php echo esc_html($lead->phone ?: '-'); ?></td>
-                                                    <td><?php echo esc_html($lead->name ?: '-'); ?></td>
-                                                    <td><code><?php echo esc_html($lead->user_ip); ?></code></td>
-                                                    <td><?php echo esc_html($lead->conversation_date); ?></td>
-                                                </tr>
-                                            <?php endforeach; ?>
-                                        </tbody>
-                                    </table>
-                                </div>
-                            <?php else: ?>
-                                <div class="alert alert-info" role="alert">
-                                    <i class="dashicons dashicons-info"></i> <?php _e('Nu există leads capturate încă.', 'ai-hero-assistant'); ?>
-                                </div>
-                                <?php
-                // Debug info pentru admin
-                if (defined('WP_DEBUG') && WP_DEBUG && current_user_can('manage_options')) {
-                    global $wpdb;
-                    $table_leads = $wpdb->prefix . 'aiha_leads';
-                    $count = $wpdb->get_var("SELECT COUNT(*) FROM $table_leads");
-                    echo '<p class="text-muted small"><em>Debug: Total leads în DB: ' . intval($count) . '</em></p>';
-                }
-                                ?>
-                            <?php endif; ?>
                         </div>
                     </div>
                     
