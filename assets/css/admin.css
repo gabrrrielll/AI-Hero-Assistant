@@ -12,6 +12,15 @@
 .aiha-admin-wrap .nav-tabs {
     border-bottom: 2px solid #dee2e6;
     margin-bottom: 2rem;
+    display: flex;
+    flex-wrap: nowrap;
+    width: 100%;
+    overflow: visible;
+}
+
+.aiha-admin-wrap .nav-tabs .nav-item {
+    flex: 0 0 auto;
+    margin-right: 0;
 }
 
 .aiha-admin-wrap .nav-tabs .nav-link {
@@ -21,11 +30,18 @@
     padding: 12px 24px;
     font-weight: 500;
     transition: all 0.3s ease;
+    white-space: nowrap;
+    display: block;
+    width: 100%;
+    text-align: center;
+    background: transparent;
+    cursor: pointer;
 }
 
 .aiha-admin-wrap .nav-tabs .nav-link:hover {
     border-color: #dee2e6;
     color: #0073aa;
+    background-color: #f8f9fa;
 }
 
 .aiha-admin-wrap .nav-tabs .nav-link.active {
@@ -33,6 +49,30 @@
     background-color: transparent;
     border-color: #0073aa;
     border-bottom-color: #0073aa;
+}
+
+/* Tab Content */
+.aiha-admin-wrap .tab-content {
+    width: 100%;
+    overflow: visible;
+}
+
+.aiha-admin-wrap .tab-pane {
+    display: none;
+    width: 100%;
+}
+
+.aiha-admin-wrap .tab-pane.active {
+    display: block;
+}
+
+.aiha-admin-wrap .tab-pane.fade {
+    opacity: 0;
+    transition: opacity 0.15s linear;
+}
+
+.aiha-admin-wrap .tab-pane.fade.show {
+    opacity: 1;
 }
 
 /* Card Styling */

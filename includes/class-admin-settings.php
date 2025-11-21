@@ -162,34 +162,34 @@ class AIHA_Admin_Settings
                             <?php
                             // Verifică direct în DB pentru debugging
                             global $wpdb;
-                            $table_leads = $wpdb->prefix . 'aiha_leads';
-                            $direct_count = $wpdb->get_var("SELECT COUNT(*) FROM $table_leads");
-                            
-                            $leads = AIHA_Database::get_all_leads(50);
-                            
-                            // Debug: Verifică ce returnează query-ul
-                            if (defined('WP_DEBUG') && WP_DEBUG) {
-                                error_log('AIHA Admin: Direct DB count: ' . $direct_count);
-                                error_log('AIHA Admin: Leads from function: ' . (is_array($leads) ? count($leads) : 'not array'));
-                                error_log('AIHA Admin: Leads empty check: ' . (empty($leads) ? 'yes' : 'no'));
-                                if (!empty($leads)) {
-                                    error_log('AIHA Admin: First lead: ' . print_r($leads[0], true));
-                                } else {
-                                    error_log('AIHA Admin: Leads array is empty or not array');
-                                }
-                            }
-                            
-                            // Afișează count direct pentru debugging
-                            if (current_user_can('manage_options') && $direct_count > 0) {
-                                echo '<div class="alert alert-warning alert-dismissible fade show" role="alert">';
-                                echo '<strong>Debug Info:</strong> Există ' . intval($direct_count) . ' lead(s) în baza de date. ';
-                                echo 'Query-ul returnează: ' . (is_array($leads) ? count($leads) : '0') . ' lead(s).';
-                                echo '<button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>';
-                                echo '</div>';
-                            }
-                            
-                            if (!empty($leads) && is_array($leads)):
-                            ?>
+        $table_leads = $wpdb->prefix . 'aiha_leads';
+        $direct_count = $wpdb->get_var("SELECT COUNT(*) FROM $table_leads");
+
+        $leads = AIHA_Database::get_all_leads(50);
+
+        // Debug: Verifică ce returnează query-ul
+        if (defined('WP_DEBUG') && WP_DEBUG) {
+            error_log('AIHA Admin: Direct DB count: ' . $direct_count);
+            error_log('AIHA Admin: Leads from function: ' . (is_array($leads) ? count($leads) : 'not array'));
+            error_log('AIHA Admin: Leads empty check: ' . (empty($leads) ? 'yes' : 'no'));
+            if (!empty($leads)) {
+                error_log('AIHA Admin: First lead: ' . print_r($leads[0], true));
+            } else {
+                error_log('AIHA Admin: Leads array is empty or not array');
+            }
+        }
+
+        // Afișează count direct pentru debugging
+        if (current_user_can('manage_options') && $direct_count > 0) {
+            echo '<div class="alert alert-warning alert-dismissible fade show" role="alert">';
+            echo '<strong>Debug Info:</strong> Există ' . intval($direct_count) . ' lead(s) în baza de date. ';
+            echo 'Query-ul returnează: ' . (is_array($leads) ? count($leads) : '0') . ' lead(s).';
+            echo '<button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>';
+            echo '</div>';
+        }
+
+        if (!empty($leads) && is_array($leads)):
+            ?>
                                 <div class="table-responsive">
                                     <table class="table table-striped table-hover">
                                         <thead class="table-light">
@@ -219,13 +219,13 @@ class AIHA_Admin_Settings
                                     <i class="dashicons dashicons-info"></i> <?php _e('Nu există leads capturate încă.', 'ai-hero-assistant'); ?>
                                 </div>
                                 <?php
-                                // Debug info pentru admin
-                                if (defined('WP_DEBUG') && WP_DEBUG && current_user_can('manage_options')) {
-                                    global $wpdb;
-                                    $table_leads = $wpdb->prefix . 'aiha_leads';
-                                    $count = $wpdb->get_var("SELECT COUNT(*) FROM $table_leads");
-                                    echo '<p class="text-muted small"><em>Debug: Total leads în DB: ' . intval($count) . '</em></p>';
-                                }
+                // Debug info pentru admin
+                if (defined('WP_DEBUG') && WP_DEBUG && current_user_can('manage_options')) {
+                    global $wpdb;
+                    $table_leads = $wpdb->prefix . 'aiha_leads';
+                    $count = $wpdb->get_var("SELECT COUNT(*) FROM $table_leads");
+                    echo '<p class="text-muted small"><em>Debug: Total leads în DB: ' . intval($count) . '</em></p>';
+                }
                                 ?>
                             <?php endif; ?>
                         </div>
