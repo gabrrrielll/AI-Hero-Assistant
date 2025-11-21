@@ -92,6 +92,9 @@ class AI_Hero_Assistant
     {
         // Creează tabelele în baza de date
         AIHA_Database::create_tables();
+        
+        // Verifică și actualizează schema (pentru upgrade-uri)
+        AIHA_Database::ensure_schema_up_to_date();
 
         // Setează opțiuni default
         $default_options = array(
@@ -122,6 +125,9 @@ class AI_Hero_Assistant
     {
         // Load text domain pentru traduceri
         load_plugin_textdomain('ai-hero-assistant', false, dirname(AIHA_PLUGIN_BASENAME) . '/languages');
+
+        // Asigură că schema este actualizată (pentru upgrade-uri)
+        AIHA_Database::ensure_schema_up_to_date();
 
         // Initialize components
         new AIHA_Admin_Settings();
