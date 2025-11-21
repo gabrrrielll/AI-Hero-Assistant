@@ -214,6 +214,50 @@
     vertical-align: middle;
 }
 
+/* Formatare mesaje */
+.aiha-subtitle .aiha-message-paragraph {
+    margin: 0.5em 0;
+    line-height: 1.6;
+}
+
+.aiha-subtitle .aiha-message-paragraph:first-child {
+    margin-top: 0;
+}
+
+.aiha-subtitle .aiha-message-paragraph:last-child {
+    margin-bottom: 0;
+}
+
+.aiha-subtitle .aiha-message-list {
+    margin: 0.8em 0;
+    padding-left: 1.5em;
+    list-style-type: disc;
+    line-height: 1.6;
+}
+
+.aiha-subtitle .aiha-message-list li {
+    margin: 0.4em 0;
+    padding-left: 0.3em;
+}
+
+.aiha-subtitle .aiha-message-list li:first-child {
+    margin-top: 0;
+}
+
+.aiha-subtitle .aiha-message-list li:last-child {
+    margin-bottom: 0;
+}
+
+.aiha-subtitle strong {
+    font-weight: 600;
+    color: rgba(255, 255, 255, 0.95);
+}
+
+.aiha-subtitle em {
+    font-style: italic;
+    color: rgba(255, 255, 255, 0.9);
+}
+
 @keyframes blinkCursor {
 
     0%,

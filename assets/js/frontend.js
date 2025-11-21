@@ -129,6 +129,67 @@
             }
         }
 
+        /**
+         * Formatează textul pentru afișare (markdown simplu -> HTML)
+         */
+        formatMessageText(text) {
+            if (!text) return '';
+            
+            let formatted = text;
+            
+            // Escapă HTML-ul existent pentru siguranță
+            const div = document.createElement('div');
+            div.textContent = formatted;
+            formatted = div.innerHTML;
+            
+            // Convertește **bold** în <strong>
+            formatted = formatted.replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>');
+            
+            // Convertește *italic* în <em> (doar dacă nu este la început de linie pentru liste)
+            formatted = formatted.replace(/(?<!^|\n)\*([^*\n]+?)\*(?!\*)/g, '<em>$1</em>');
+            
+            // Convertește liste cu bullet points (* sau -)
+            // Format: * item sau - item
+            const lines = formatted.split('\n');
+            let inList = false;
+            let result = [];
+            
+            lines.forEach((line, index) => {
+                const trimmed = line.trim();
+                const isListItem = /^[\*\-\•]\s+(.+)$/.test(trimmed);
+                
+                if (isListItem) {
+                    if (!inList) {
+                        result.push('<ul class="aiha-message-list">');
+                        inList = true;
+                    }
+                    const content = trimmed.replace(/^[\*\-\•]\s+/, '');
+                    result.push('<li>' + content + '</li>');
+                } else {
+                    if (inList) {
+                        result.push('</ul>');
+                        inList = false;
+                    }
+                    if (trimmed) {
+                        result.push('<p class="aiha-message-paragraph">' + trimmed + '</p>');
+                    } else {
+                        result.push('<br>');
+                    }
+                }
+            });
+            
+            if (inList) {
+                result.push('</ul>');
+            }
+            
+            formatted = result.join('');
+            
+            // Convertește newlines rămase în <br>
+            formatted = formatted.replace(/\n/g, '<br>');
+            
+            return formatted;
+        }
+
         typeText(text, callback) {
             // Switch to speaking state when typing starts
             this.setSpeakingState();
@@ -142,12 +203,16 @@
 
             let index = 0;
             const typingSpeed = 30; // milliseconds per character
+            const formattedText = this.formatMessageText(text);
 
             const typeChar = () => {
                 if (index < text.length) {
                     this.currentText += text[index];
                     if (this.subtitleEl) {
-                        this.subtitleEl.innerHTML = this.currentText + '<span class="typing-cursor"></span>';
+                        // Formatează textul parțial, dar păstrează formatarea corectă
+                        // Folosim text simplu pentru typing, apoi formatăm la final
+                        const displayText = this.currentText.replace(/\n/g, '<br>');
+                        this.subtitleEl.innerHTML = displayText + '<span class="typing-cursor"></span>';
                         // Scroll automat mai frecvent pentru text lung
                         if (index % 5 === 0 || index === text.length - 1) {
                             this.scrollToBottom();
@@ -157,7 +222,8 @@
                     setTimeout(typeChar, typingSpeed);
                 } else {
                     if (this.subtitleEl) {
-                        this.subtitleEl.innerHTML = this.currentText;
+                        // La final, afișează textul complet formatat cu toate stilurile
+                        this.subtitleEl.innerHTML = formattedText;
                         // Scroll final cu delay pentru a permite DOM-ului să se actualizeze
                         setTimeout(() => {
                             this.scrollToBottom();
