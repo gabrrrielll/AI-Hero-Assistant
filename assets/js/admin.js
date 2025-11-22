@@ -75,11 +75,14 @@
         function activateTabFromHash() {
             const urlHash = window.location.hash;
             if (urlHash) {
-                const tabId = urlHash.substring(1);
-                const tabButton = $('#' + tabId + '-tab');
+                const tabId = urlHash.substring(1); // Remove #
+                // Try to find tab button by target ID (conversations or settings)
+                const tabButton = $('[data-bs-target="#' + tabId + '"]');
                 if (tabButton.length) {
-                    switchTab(tabButton[0]);
-                    localStorage.setItem('aiha_active_tab', tabId);
+                    setTimeout(function() {
+                        switchTab(tabButton[0]);
+                        localStorage.setItem('aiha_active_tab', tabId);
+                    }, 100);
                     return true;
                 }
             }
@@ -91,11 +94,12 @@
             // If no hash, try to get from localStorage as fallback
             const savedTab = localStorage.getItem('aiha_active_tab');
             if (savedTab) {
-                const tabButton = $('#' + savedTab + '-tab');
+                // Find tab button by target ID
+                const tabButton = $('[data-bs-target="#' + savedTab + '"]');
                 if (tabButton.length) {
                     setTimeout(function () {
                         switchTab(tabButton[0]);
-                    }, 50);
+                    }, 150);
                 }
             }
         }

@@ -8,8 +8,8 @@
     margin: 20px 0;
     font-size: 13px;
     /* Redus de la default 14px */
-    background-color: #f5f7fa;
-    /* Fundal general pentru întreaga pagină */
+    background: linear-gradient(135deg, #f5f7fa 0%, #e9ecef 100%);
+    /* Fundal general cu gradient pentru întreaga pagină */
     padding: 20px;
     border-radius: 8px;
 }
@@ -122,6 +122,30 @@
     padding: 1rem;
     /* Redus de la 1.5rem */
     background-color: #ffffff;
+}
+
+/* Alternating background colors for different sections */
+.aiha-admin-wrap .card:nth-child(odd) {
+    background-color: #ffffff;
+}
+
+.aiha-admin-wrap .card:nth-child(even) {
+    background-color: #fafbfc;
+}
+
+/* Specific backgrounds for filter and list sections */
+.aiha-admin-wrap #conversations .card:first-child {
+    background-color: #f8f9fa;
+    border-left: 4px solid #0073aa;
+}
+
+.aiha-admin-wrap #conversations .card:last-child {
+    background-color: #ffffff;
+}
+
+.aiha-admin-wrap #settings .card {
+    background-color: #fefefe;
+    border-left: 4px solid #28a745;
 }
 
 .aiha-admin-wrap .card-footer {
