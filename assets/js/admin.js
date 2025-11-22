@@ -23,13 +23,16 @@
             $(tabButton).addClass('active').attr('aria-selected', 'true');
             targetPane.addClass('show active');
 
-            // Update URL hash
-            const hash = targetId.substring(1);
+            // Update URL hash immediately
+            const hash = targetId.substring(1); // Remove # from #conversations or #settings
             if (history.pushState) {
                 history.pushState(null, null, '#' + hash);
             } else {
                 window.location.hash = hash;
             }
+            
+            // Also update localStorage
+            localStorage.setItem('aiha_active_tab', hash);
         }
 
         // Handle tab clicks - try Bootstrap first, fallback to manual
@@ -107,6 +110,9 @@
         // Update tab click handler to save to localStorage
         $('.nav-tabs .nav-link').off('click').on('click', function (e) {
             e.preventDefault();
+            
+            const targetId = $(this).attr('data-bs-target') || $(this).data('target');
+            const hash = targetId ? targetId.substring(1) : '';
 
             // Try Bootstrap Tab if available
             if (typeof bootstrap !== 'undefined' && bootstrap.Tab) {
@@ -114,23 +120,36 @@
                     const bsTab = new bootstrap.Tab(this);
                     bsTab.show();
 
-                    // Update URL hash and localStorage
-                    $(this).one('shown.bs.tab', function () {
-                        const targetId = $(this).attr('data-bs-target').substring(1);
+                    // Update URL hash and localStorage immediately, then again after Bootstrap event
+                    if (hash) {
                         if (history.pushState) {
-                            history.pushState(null, null, '#' + targetId);
+                            history.pushState(null, null, '#' + hash);
                         } else {
-                            window.location.hash = targetId;
+                            window.location.hash = hash;
                         }
-                        localStorage.setItem('aiha_active_tab', targetId);
+                        localStorage.setItem('aiha_active_tab', hash);
+                    }
+
+                    // Also update after Bootstrap event fires (for redundancy)
+                    $(this).one('shown.bs.tab', function () {
+                        const targetIdAfter = $(this).attr('data-bs-target') || $(this).data('target');
+                        const hashAfter = targetIdAfter ? targetIdAfter.substring(1) : '';
+                        if (hashAfter) {
+                            if (history.pushState) {
+                                history.pushState(null, null, '#' + hashAfter);
+                            } else {
+                                window.location.hash = hashAfter;
+                            }
+                            localStorage.setItem('aiha_active_tab', hashAfter);
+                        }
                     });
                 } catch (err) {
                     // Fallback to manual switching
-                    switchTabWithSave(this);
+                    switchTab(this);
                 }
             } else {
                 // Manual switching if Bootstrap not available
-                switchTabWithSave(this);
+                switchTab(this);
             }
         });
 
