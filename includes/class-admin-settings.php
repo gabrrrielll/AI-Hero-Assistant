@@ -386,7 +386,9 @@ class AIHA_Admin_Settings
                                     </div>
                                 </div>
                                 <div class="modal-footer">
-                                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal"><?php _e('Închide', 'ai-hero-assistant'); ?></button>
+                                    <button type="button" class="btn btn-danger" id="delete-conversation-from-modal">
+                                        <i class="dashicons dashicons-trash"></i> <?php _e('Șterge Conversația', 'ai-hero-assistant'); ?>
+                                    </button>
                                 </div>
                             </div>
                         </div>

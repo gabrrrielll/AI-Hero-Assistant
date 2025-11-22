@@ -419,13 +419,13 @@
                     }
                 }
             };
-            
+
             // Listen for various user interactions (but don't stop speech on these)
             const interactionEvents = ['click', 'touchstart', 'keydown', 'mousedown'];
             interactionEvents.forEach(eventType => {
                 document.addEventListener(eventType, markUserInteraction, { once: true, passive: true });
             });
-            
+
             // Send button
             if (this.sendBtn) {
                 this.sendBtn.addEventListener('click', () => {
@@ -444,7 +444,7 @@
                     }
                     // Don't stop speech when user types - only when sending message
                 });
-                
+
                 this.inputEl.addEventListener('focus', markUserInteraction, { once: true });
                 this.inputEl.addEventListener('click', (e) => {
                     markUserInteraction();
@@ -528,11 +528,11 @@
             // Stop any ongoing speech only if this is a new message
             // (not when user just clicks in textarea)
             this.stopSpeaking();
-            
+
             // Reset video to silent first, then switch to speaking when typing starts
             // This ensures video resets correctly for each new message
             this.setSilentState();
-            
+
             // Small delay to ensure video transition is visible
             setTimeout(() => {
                 // Switch to speaking state when typing starts

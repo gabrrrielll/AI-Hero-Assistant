@@ -166,11 +166,16 @@
                         const messages = response.data.messages || [];
 
                         let html = '<div class="conversation-details mb-3">';
-                        html += '<p><strong>ID:</strong> #' + conv.id + '</p>';
-                        html += '<p><strong>IP:</strong> <code>' + conv.user_ip + '</code></p>';
-                        html += '<p><strong>Data:</strong> ' + conv.created_at + '</p>';
-                        html += '<p><strong>Mesaje:</strong> ' + messages.length + '</p>';
+                        html += '<div class="row g-3">';
+                        html += '<div class="col-md-3 col-6"><strong>ID:</strong> #' + conv.id + '</div>';
+                        html += '<div class="col-md-3 col-6"><strong>IP:</strong> <code>' + conv.user_ip + '</code></div>';
+                        html += '<div class="col-md-3 col-6"><strong>Data:</strong> ' + conv.created_at + '</div>';
+                        html += '<div class="col-md-3 col-6"><strong>Mesaje:</strong> ' + messages.length + '</div>';
                         html += '</div>';
+                        html += '</div>';
+                        
+                        // Store conversation ID for delete button
+                        $('#conversationModal').data('conversation-id', conversationId);
 
                         html += '<div class="conversation-messages" style="max-height: 500px; overflow-y: auto;">';
                         if (messages.length > 0) {
@@ -209,7 +214,7 @@
             });
         });
 
-        // Delete single conversation
+        // Delete single conversation from table
         $(document).on('click', '.delete-conversation', function () {
             if (!confirm('Ești sigur că vrei să ștergi această conversație?')) {
                 return;
@@ -234,6 +239,53 @@
                                 $('#conversations-list-container').html('<div class="alert alert-info">Nu există conversații.</div>');
                             }
                         });
+                    } else {
+                        alert('Eroare: ' + (response.data?.message || 'Eroare necunoscută'));
+                    }
+                },
+                error: function () {
+                    alert('Eroare la comunicarea cu serverul.');
+                }
+            });
+        });
+        
+        // Delete conversation from modal
+        $(document).on('click', '#delete-conversation-from-modal', function () {
+            if (!confirm('Ești sigur că vrei să ștergi această conversație?')) {
+                return;
+            }
+
+            const conversationId = $('#conversationModal').data('conversation-id');
+            const modal = bootstrap.Modal.getInstance(document.getElementById('conversationModal'));
+            const row = $('tr[data-conversation-id="' + conversationId + '"]');
+
+            $.ajax({
+                url: window.aihaAdminData.ajaxUrl,
+                type: 'POST',
+                data: {
+                    action: 'aiha_delete_conversation',
+                    nonce: window.aihaAdminData.nonce,
+                    conversation_id: conversationId
+                },
+                success: function (response) {
+                    if (response.success) {
+                        // Close modal
+                        if (modal) {
+                            modal.hide();
+                        }
+                        
+                        // Remove row from table
+                        if (row.length) {
+                            row.fadeOut(300, function () {
+                                $(this).remove();
+                                if ($('#conversations-table tbody tr').length === 0) {
+                                    $('#conversations-list-container').html('<div class="alert alert-info">Nu există conversații.</div>');
+                                }
+                            });
+                        } else {
+                            // Reload page if row not found
+                            window.location.reload();
+                        }
                     } else {
                         alert('Eroare: ' + (response.data?.message || 'Eroare necunoscută'));
                     }
