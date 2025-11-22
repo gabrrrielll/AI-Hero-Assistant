@@ -197,9 +197,13 @@ class AIHA_Gemini_API
         if ($language === 'ro') {
             $system_instruction .= "\n\nIMPORTANT: În timpul conversației, încearcă să obții de la utilizator numărul de telefon sau adresa de email pentru a putea fi contactat de echipa noastră. Fă acest lucru într-un mod natural și prietenos, nu agresiv.";
             $system_instruction .= "\n\nCRITIC - FORMATARE TEXT: NU folosi NICIODATĂ spații de două rânduri între propoziții sau paragrafe. Folosește DOAR un singur rând între paragrafe. Nu adăuga linii goale multiple în răspunsurile tale. Textul trebuie să fie compact și fără spații excesive.";
+            $system_instruction .= "\n\nCRITIC - FORMATARE LISTE: Când folosești liste cu bullet-uri (* sau -), NU adăuga linii goale înainte sau după listă. Lista trebuie să fie direct conectată cu textul dinainte și după, fără spații suplimentare. Între elementele listei NU adăuga linii goale. După ultimul element al listei, continuă direct cu textul următor, fără linie goală.";
+            $system_instruction .= "\n\nEXEMPLU CORECT:\nText introductiv.\n* Item 1\n* Item 2\n* Item 3\nText continuare.\n\nEXEMPLU GREȘIT (NU face asta):\nText introductiv.\n\n* Item 1\n\n* Item 2\n\n* Item 3\n\nText continuare.";
         } else {
             $system_instruction .= "\n\nIMPORTANT: During the conversation, try to obtain the user's phone number or email address so they can be contacted by our team. Do this in a natural and friendly way, not aggressively.";
             $system_instruction .= "\n\nCRITICAL - TEXT FORMATTING: NEVER use double line breaks between sentences or paragraphs. Use ONLY a single line break between paragraphs. Do not add multiple empty lines in your responses. Text must be compact without excessive spacing.";
+            $system_instruction .= "\n\nCRITICAL - LIST FORMATTING: When using bullet lists (* or -), DO NOT add empty lines before or after the list. The list must be directly connected to the text before and after, without additional spacing. Between list items DO NOT add empty lines. After the last list item, continue directly with the next text, without an empty line.";
+            $system_instruction .= "\n\nCORRECT EXAMPLE:\nIntroductory text.\n* Item 1\n* Item 2\n* Item 3\nContinuation text.\n\nWRONG EXAMPLE (DO NOT do this):\nIntroductory text.\n\n* Item 1\n\n* Item 2\n\n* Item 3\n\nContinuation text.";
         }
 
         // Construiește mesajele pentru API

@@ -16,7 +16,7 @@
 
         // Normalizează textul: elimină linii goale multiple consecutive
         text = text.replace(/\r\n/g, '\n').replace(/\r/g, '\n');
-        text = text.replace(/\n{3,}/g, '\n\n'); // Maxim 2 newlines consecutive (1 linie goală)
+        text = text.replace(/\n{2,}/g, '\n'); // Elimină 2+ newlines consecutive (păstrează doar 1)
         text = text.replace(/[ \t]+/g, ' '); // Elimină spații multiple
         
         let formatted = text;
@@ -94,7 +94,7 @@
 
         // Normalizează textul: elimină linii goale multiple consecutive
         text = text.replace(/\r\n/g, '\n').replace(/\r/g, '\n');
-        text = text.replace(/\n{3,}/g, '\n\n'); // Maxim 2 newlines consecutive (1 linie goală)
+        text = text.replace(/\n{2,}/g, '\n'); // Elimină 2+ newlines consecutive (păstrează doar 1)
         text = text.replace(/[ \t]+/g, ' '); // Elimină spații multiple
         
         let formatted = text;

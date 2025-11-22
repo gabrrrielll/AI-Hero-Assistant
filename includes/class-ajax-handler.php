@@ -648,9 +648,9 @@ class AIHA_Ajax_Handler
         $text = str_replace("\r\n", "\n", $text);
         $text = str_replace("\r", "\n", $text);
         
-        // Elimină linii goale multiple consecutive (3+ linii goale devin maxim 1)
-        // Folosim regex pentru a înlocui 2+ newlines consecutive cu maxim 2 newlines (1 linie goală)
-        $text = preg_replace('/\n{3,}/', "\n\n", $text);
+        // Elimină linii goale multiple consecutive (2+ linii goale devin maxim 1)
+        // Folosim regex pentru a înlocui 2+ newlines consecutive cu maxim 1 newline (fără linie goală)
+        $text = preg_replace('/\n{2,}/', "\n", $text);
         
         // Elimină spații multiple consecutive (păstrează maxim 1 spațiu)
         $text = preg_replace('/[ \t]+/', ' ', $text);
