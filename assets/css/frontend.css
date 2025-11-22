@@ -354,7 +354,7 @@
     color: #ffffff !important;
     background: transparent !important;
     border: transparent !important;
-    box-shadow: transparent !important;
+    box-shadow: unset !important;
 }
 
 .aiha-textarea::placeholder {

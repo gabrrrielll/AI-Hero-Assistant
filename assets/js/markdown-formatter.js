@@ -14,6 +14,11 @@
     window.formatMarkdownPartial = function (text) {
         if (!text) return '';
 
+        // Normalizează textul: elimină linii goale multiple consecutive
+        text = text.replace(/\r\n/g, '\n').replace(/\r/g, '\n');
+        text = text.replace(/\n{3,}/g, '\n\n'); // Maxim 2 newlines consecutive (1 linie goală)
+        text = text.replace(/[ \t]+/g, ' '); // Elimină spații multiple
+        
         let formatted = text;
 
         // Escapă HTML-ul existent pentru siguranță
@@ -87,6 +92,11 @@
     window.formatMarkdownMessage = function (text) {
         if (!text) return '';
 
+        // Normalizează textul: elimină linii goale multiple consecutive
+        text = text.replace(/\r\n/g, '\n').replace(/\r/g, '\n');
+        text = text.replace(/\n{3,}/g, '\n\n'); // Maxim 2 newlines consecutive (1 linie goală)
+        text = text.replace(/[ \t]+/g, ' '); // Elimină spații multiple
+        
         let formatted = text;
 
         // Escapă HTML-ul existent pentru siguranță

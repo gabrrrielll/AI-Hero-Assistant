@@ -62,6 +62,9 @@ class AIHA_Ajax_Handler
         }
 
         $ai_response = $response['text'];
+        
+        // Normalizează textul: elimină linii goale multiple consecutive (maxim 1 linie goală între paragrafe)
+        $ai_response = $this->normalize_text_spacing($ai_response);
 
         // Salvează răspunsul AI
         AIHA_Database::save_message($conversation_id, 'assistant', $ai_response);
@@ -628,5 +631,38 @@ class AIHA_Ajax_Handler
         } else {
             wp_send_json_error(array('message' => 'Eroare la ștergerea conversațiilor'));
         }
+    }
+    
+    /**
+     * Normalizează spațierea textului: elimină linii goale multiple consecutive
+     * Păstrează maxim o linie goală între paragrafe
+     * @param string $text - Textul de normalizat
+     * @return string - Textul normalizat
+     */
+    private function normalize_text_spacing($text) {
+        if (empty($text)) {
+            return $text;
+        }
+        
+        // Elimină toate caracterele de tip carriage return
+        $text = str_replace("\r\n", "\n", $text);
+        $text = str_replace("\r", "\n", $text);
+        
+        // Elimină linii goale multiple consecutive (3+ linii goale devin maxim 1)
+        // Folosim regex pentru a înlocui 2+ newlines consecutive cu maxim 2 newlines (1 linie goală)
+        $text = preg_replace('/\n{3,}/', "\n\n", $text);
+        
+        // Elimină spații multiple consecutive (păstrează maxim 1 spațiu)
+        $text = preg_replace('/[ \t]+/', ' ', $text);
+        
+        // Elimină spații de la începutul și sfârșitul fiecărei linii
+        $lines = explode("\n", $text);
+        $lines = array_map('trim', $lines);
+        $text = implode("\n", $lines);
+        
+        // Elimină linii goale de la început și sfârșit
+        $text = trim($text);
+        
+        return $text;
     }
 }
