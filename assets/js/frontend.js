@@ -25,6 +25,13 @@
             this.isSpeaking = false;
             this.currentText = '';
             this.sessionId = this.generateSessionId();
+            
+            // Voice settings
+            this.enableVoice = config.enableVoice || false;
+            this.voiceName = config.voiceName || 'default';
+            this.synth = null;
+            this.voices = [];
+            this.selectedVoice = null;
 
             this.init();
         }
@@ -36,9 +43,138 @@
         init() {
             this.setupVideos();
             this.setupEventListeners();
+            this.setupVoice();
             this.showInitialMessage();
             // Start with silent state
             this.setSilentState();
+        }
+        
+        /**
+         * Initialize text-to-speech
+         */
+        setupVoice() {
+            if (!('speechSynthesis' in window)) {
+                console.warn('Speech synthesis not supported in this browser');
+                return;
+            }
+            
+            this.synth = window.speechSynthesis;
+            
+            // Load voices (may need to wait for voices to be loaded)
+            const loadVoices = () => {
+                this.voices = this.synth.getVoices();
+                this.selectVoice();
+            };
+            
+            // Chrome loads voices asynchronously
+            if (this.synth.onvoiceschanged !== undefined) {
+                this.synth.onvoiceschanged = loadVoices;
+            }
+            
+            // Try to load voices immediately
+            loadVoices();
+        }
+        
+        /**
+         * Select the voice based on voiceName setting
+         */
+        selectVoice() {
+            if (!this.voices || this.voices.length === 0) {
+                return;
+            }
+            
+            if (this.voiceName === 'default') {
+                // Use default voice (usually first available)
+                this.selectedVoice = this.voices.find(v => v.default) || this.voices[0];
+            } else {
+                // Try to find exact match first
+                this.selectedVoice = this.voices.find(v => v.name === this.voiceName);
+                
+                // If not found, try partial match
+                if (!this.selectedVoice) {
+                    this.selectedVoice = this.voices.find(v => 
+                        v.name.toLowerCase().includes(this.voiceName.toLowerCase())
+                    );
+                }
+                
+                // Fallback to default if still not found
+                if (!this.selectedVoice) {
+                    this.selectedVoice = this.voices.find(v => v.default) || this.voices[0];
+                    console.warn(`Voice "${this.voiceName}" not found, using default voice`);
+                }
+            }
+        }
+        
+        /**
+         * Speak text using text-to-speech
+         */
+        speakText(text) {
+            if (!this.enableVoice || !this.synth || !text) {
+                return;
+            }
+            
+            // Stop any ongoing speech
+            this.synth.cancel();
+            
+            // Remove markdown formatting and HTML tags for clean speech
+            const cleanText = text
+                .replace(/<[^>]*>/g, '') // Remove HTML tags
+                .replace(/\*\*(.*?)\*\*/g, '$1') // Remove bold markdown
+                .replace(/\*(.*?)\*/g, '$1') // Remove italic markdown
+                .replace(/#{1,6}\s/g, '') // Remove headers
+                .replace(/`([^`]*)`/g, '$1') // Remove inline code
+                .replace(/\[([^\]]*)\]\([^\)]*\)/g, '$1') // Remove links
+                .trim();
+            
+            if (!cleanText) {
+                return;
+            }
+            
+            // Wait for voices to be loaded if needed
+            if (this.voices.length === 0) {
+                setTimeout(() => {
+                    this.setupVoice();
+                    this.speakText(text);
+                }, 100);
+                return;
+            }
+            
+            // Ensure voice is selected
+            if (!this.selectedVoice) {
+                this.selectVoice();
+            }
+            
+            const utterance = new SpeechSynthesisUtterance(cleanText);
+            
+            if (this.selectedVoice) {
+                utterance.voice = this.selectedVoice;
+            }
+            
+            // Configure speech properties
+            utterance.rate = 1.0; // Normal speed
+            utterance.pitch = 1.0; // Normal pitch
+            utterance.volume = 1.0; // Full volume
+            
+            // Handle speech events
+            utterance.onend = () => {
+                // Speech finished
+            };
+            
+            utterance.onerror = (event) => {
+                console.warn('Speech synthesis error:', event);
+            };
+            
+            // Speak
+            this.synth.speak(utterance);
+        }
+        
+        /**
+         * Stop speaking
+         */
+        stopSpeaking() {
+            if (this.synth) {
+                this.synth.cancel();
+            }
         }
 
         setupVideos() {
@@ -65,6 +201,8 @@
                 this.videoContainer.classList.add('silent');
             }
             this.isSpeaking = false;
+            // Stop any ongoing speech when going silent
+            this.stopSpeaking();
         }
 
         /**
@@ -165,6 +303,9 @@
         typeText(text, callback) {
             // Switch to speaking state when typing starts
             this.setSpeakingState();
+            
+            // Stop any ongoing speech
+            this.stopSpeaking();
 
             this.currentText = '';
             if (this.subtitleEl) {
@@ -176,6 +317,11 @@
             let index = 0;
             const typingSpeed = 30; // milliseconds per character
             const formattedText = this.formatMessageText(text);
+            
+            // Start speaking if voice is enabled
+            if (this.enableVoice) {
+                this.speakText(text);
+            }
 
             const typeChar = () => {
                 if (index < text.length) {

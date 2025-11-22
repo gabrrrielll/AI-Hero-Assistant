@@ -32,6 +32,10 @@ class AIHA_Shortcode
         // Video URLs from settings
         $video_silence_url = isset($settings['video_silence_url']) ? $settings['video_silence_url'] : '';
         $video_speaking_url = isset($settings['video_speaking_url']) ? $settings['video_speaking_url'] : '';
+        
+        // Voice settings
+        $enable_voice = isset($settings['enable_voice']) ? (int)$settings['enable_voice'] : 0;
+        $voice_name = isset($settings['voice_name']) ? $settings['voice_name'] : 'default';
 
         // Generăm un ID unic pentru această instanță
         $instance_id = 'aiha-' . uniqid();
@@ -119,7 +123,9 @@ class AIHA_Shortcode
             "gradientStart": "<?php echo esc_js($gradient_start); ?>",
             "gradientEnd": "<?php echo esc_js($gradient_end); ?>",
             "videoSilenceUrl": "<?php echo esc_js($video_silence_url); ?>",
-            "videoSpeakingUrl": "<?php echo esc_js($video_speaking_url); ?>"
+            "videoSpeakingUrl": "<?php echo esc_js($video_speaking_url); ?>",
+            "enableVoice": <?php echo $enable_voice ? 'true' : 'false'; ?>,
+            "voiceName": "<?php echo esc_js($voice_name); ?>"
         }
         </script>
         <?php

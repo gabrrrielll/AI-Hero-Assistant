@@ -107,6 +107,8 @@ class AI_Hero_Assistant
             'font_family' => 'Inter, sans-serif',
             'hero_message' => 'Bună! Sunt asistentul virtual al {company_name}. Cum vă pot ajuta cu serviciile noastre de programare?',
               'assistant_gender' => 'feminin',
+              'enable_voice' => 0,
+              'voice_name' => 'default',
               'send_lead_email' => 0,
               'lead_notification_email' => get_option('admin_email')
         );

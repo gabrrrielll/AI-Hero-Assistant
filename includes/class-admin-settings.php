@@ -47,6 +47,8 @@ class AIHA_Admin_Settings
         $sanitized['video_silence_url'] = esc_url_raw($input['video_silence_url'] ?? '');
         $sanitized['video_speaking_url'] = esc_url_raw($input['video_speaking_url'] ?? '');
         $sanitized['assistant_gender'] = sanitize_text_field($input['assistant_gender'] ?? 'feminin');
+        $sanitized['enable_voice'] = isset($input['enable_voice']) ? 1 : 0;
+        $sanitized['voice_name'] = sanitize_text_field($input['voice_name'] ?? 'default');
           $sanitized['send_lead_email'] = isset($input['send_lead_email']) ? 1 : 0;
           $sanitized['lead_notification_email'] = sanitize_email($input['lead_notification_email'] ?? '');
 
@@ -568,6 +570,49 @@ class AIHA_Admin_Settings
                                                class="form-control"
                                                placeholder="https://example.com/videos/vorbire.mp4">
                                         <div class="form-text"><?php _e('URL-ul videoclipului cu persoana care vorbește. Acest video va fi afișat când AI răspunde.', 'ai-hero-assistant'); ?></div>
+                                    </div>
+                                    
+                                    <!-- Voice Settings -->
+                                    <div class="col-12">
+                                        <hr>
+                                        <h3 class="h5"><?php _e('Setări Voce', 'ai-hero-assistant'); ?></h3>
+                                    </div>
+                                    
+                                    <div class="col-md-6">
+                                        <label for="enable_voice" class="form-label fw-bold"><?php _e('Activează Voce', 'ai-hero-assistant'); ?></label>
+                                        <div class="form-check form-switch">
+                                            <input 
+                                                type="checkbox" 
+                                                class="form-check-input" 
+                                                id="enable_voice" 
+                                                name="aiha_settings[enable_voice]" 
+                                                value="1"
+                                                <?php checked($settings['enable_voice'] ?? 0, 1); ?>>
+                                            <label class="form-check-label" for="enable_voice"><?php _e('Activează citirea vocală a răspunsurilor AI', 'ai-hero-assistant'); ?></label>
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="col-md-6">
+                                        <label for="voice_name" class="form-label fw-bold"><?php _e('Voce', 'ai-hero-assistant'); ?></label>
+                                        <select id="voice_name" name="aiha_settings[voice_name]" class="form-select">
+                                            <optgroup label="<?php _e('Voci Femei', 'ai-hero-assistant'); ?>">
+                                                <option value="Google UK English Female" <?php selected($settings['voice_name'] ?? 'default', 'Google UK English Female'); ?>>Google UK English Female</option>
+                                                <option value="Google US English Female" <?php selected($settings['voice_name'] ?? 'default', 'Google US English Female'); ?>>Google US English Female</option>
+                                                <option value="Microsoft Zira - English (United States)" <?php selected($settings['voice_name'] ?? 'default', 'Microsoft Zira - English (United States)'); ?>>Microsoft Zira (US English)</option>
+                                                <option value="Microsoft Hazel - English (Great Britain)" <?php selected($settings['voice_name'] ?? 'default', 'Microsoft Hazel - English (Great Britain)'); ?>>Microsoft Hazel (UK English)</option>
+                                                <option value="Samantha" <?php selected($settings['voice_name'] ?? 'default', 'Samantha'); ?>>Samantha (macOS)</option>
+                                                <option value="Victoria" <?php selected($settings['voice_name'] ?? 'default', 'Victoria'); ?>>Victoria (macOS)</option>
+                                            </optgroup>
+                                            <optgroup label="<?php _e('Voci Bărbați', 'ai-hero-assistant'); ?>">
+                                                <option value="Google UK English Male" <?php selected($settings['voice_name'] ?? 'default', 'Google UK English Male'); ?>>Google UK English Male</option>
+                                                <option value="Google US English Male" <?php selected($settings['voice_name'] ?? 'default', 'Google US English Male'); ?>>Google US English Male</option>
+                                                <option value="Microsoft David - English (United States)" <?php selected($settings['voice_name'] ?? 'default', 'Microsoft David - English (United States)'); ?>>Microsoft David (US English)</option>
+                                                <option value="Microsoft Mark - English (United States)" <?php selected($settings['voice_name'] ?? 'default', 'Microsoft Mark - English (United States)'); ?>>Microsoft Mark (US English)</option>
+                                                <option value="Alex" <?php selected($settings['voice_name'] ?? 'default', 'Alex'); ?>>Alex (macOS)</option>
+                                                <option value="Daniel" <?php selected($settings['voice_name'] ?? 'default', 'Daniel'); ?>>Daniel (macOS)</option>
+                                            </optgroup>
+                                        </select>
+                                        <div class="form-text"><?php _e('Selectează vocea care va citi răspunsurile AI. Notă: Voci disponibile pot varia în funcție de browser și sistem de operare.', 'ai-hero-assistant'); ?></div>
                                     </div>
                                       
                                       <div class="col-12">
