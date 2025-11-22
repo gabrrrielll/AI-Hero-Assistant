@@ -32,7 +32,7 @@ class AIHA_Shortcode
         // Video URLs from settings
         $video_silence_url = isset($settings['video_silence_url']) ? $settings['video_silence_url'] : '';
         $video_speaking_url = isset($settings['video_speaking_url']) ? $settings['video_speaking_url'] : '';
-        
+
         // Voice settings
         $enable_voice = isset($settings['enable_voice']) ? (int)$settings['enable_voice'] : 0;
         $voice_name = isset($settings['voice_name']) ? $settings['voice_name'] : 'default';
