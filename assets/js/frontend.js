@@ -25,7 +25,7 @@
             this.isSpeaking = false;
             this.currentText = '';
             this.sessionId = this.generateSessionId();
-
+            
             // Voice settings
             this.enableVoice = config.enableVoice || false;
             this.voiceName = config.voiceName || 'default';
@@ -33,6 +33,8 @@
             this.voices = [];
             this.selectedVoice = null;
             this.userHasInteracted = false; // Track if user has interacted (required for Chrome autoplay policy)
+            this.pendingMessageForSpeech = null; // Store message for speech synthesis
+            this.isSpeechActive = false; // Track if speech is currently active
 
             this.init();
         }
@@ -176,7 +178,13 @@
                 }
                 return;
             }
+
+            // Mark speech as active
+            this.isSpeechActive = true;
             
+            // Ensure video is in speaking state
+            this.setSpeakingState();
+
             // Stop any ongoing speech
             this.synth.cancel();
 
@@ -246,56 +254,61 @@
 
             // Speak all chunks sequentially
             let chunkIndex = 0;
-
+            
             const speakChunk = () => {
                 if (chunkIndex >= textChunks.length) {
                     // All chunks spoken
+                    this.isSpeechActive = false;
                     if (onComplete) {
                         onComplete();
                     }
                     return;
                 }
-
+                
                 const utterance = new SpeechSynthesisUtterance(textChunks[chunkIndex]);
                 utterance.voice = this.selectedVoice;
-
+                
                 // Configure speech properties
                 utterance.rate = 1.0; // Normal speed
                 utterance.pitch = 1.0; // Normal pitch
                 utterance.volume = 1.0; // Full volume
-
+                
                 // Handle speech events
                 utterance.onend = () => {
                     chunkIndex++;
                     if (chunkIndex < textChunks.length) {
-                        // Speak next chunk
+                        // Speak next chunk - keep video in speaking state
+                        this.setSpeakingState();
                         speakChunk();
                     } else {
                         // All chunks finished
+                        this.isSpeechActive = false;
                         if (onComplete) {
                             onComplete();
                         }
                     }
                 };
-
+                
                 utterance.onerror = (event) => {
                     console.warn('Speech synthesis error:', event);
                     chunkIndex++;
                     if (chunkIndex < textChunks.length) {
-                        // Try next chunk even if error
+                        // Try next chunk even if error - keep video in speaking state
+                        this.setSpeakingState();
                         speakChunk();
                     } else {
                         // All chunks finished (or failed)
+                        this.isSpeechActive = false;
                         if (onComplete) {
                             onComplete();
                         }
                     }
                 };
-
+                
                 // Speak this chunk
                 this.synth.speak(utterance);
             };
-
+            
             // Start speaking first chunk
             speakChunk();
         }
@@ -307,6 +320,7 @@
             if (this.synth) {
                 this.synth.cancel();
             }
+            this.isSpeechActive = false;
         }
 
         setupVideos() {
@@ -477,17 +491,9 @@
             const typingSpeed = 30; // milliseconds per character
             const formattedText = this.formatMessageText(text);
 
-            // Start speaking if voice is enabled and not skipped
-            // Voice starts immediately with typing for synchronization
-            if (this.enableVoice && !skipSpeech) {
-                // Small delay to ensure voices are loaded and user gesture is registered
-                setTimeout(() => {
-                    this.speakText(text, () => {
-                        // When speech is complete, switch to silent state
-                        this.setSilentState();
-                    });
-                }, 100);
-            }
+            // Speech is now started from sendToAI handler (user gesture context)
+            // So we skip speech here if it's already been started
+            // This ensures Chrome autoplay policy is satisfied
 
             const typeChar = () => {
                 if (index < text.length) {
@@ -515,7 +521,8 @@
                     if (callback) callback();
                     // Nu trecem la silent state imediat dacă vocea este activată
                     // setSilentState va fi apelat automat când se termină citirea vocală
-                    if (!this.enableVoice) {
+                    // Menținem video-ul în starea speaking cât timp speech-ul este activ
+                    if (!this.enableVoice || !this.isSpeechActive) {
                         this.setSilentState();
                     }
                 }
@@ -551,6 +558,9 @@
                 this.inputEl.style.height = 'auto';
             }
 
+            // Store message for potential speech synthesis
+            this.pendingMessageForSpeech = message;
+
             this.sendToAI(message);
         }
 
@@ -576,9 +586,25 @@
                 });
 
                 if (response.success) {
-                    this.typeText(response.data.message, () => {
-                        // After AI finishes speaking, switch back to silent state
-                        // setSilentState() este apelat direct în typeText callback pentru tranziție smooth
+                    // Start speech immediately while still in user gesture context (Chrome requirement)
+                    // Store the response message for speech
+                    const aiResponse = response.data.message;
+                    
+                    // Start speech synthesis immediately (still in click handler context)
+                    if (this.enableVoice && this.userHasInteracted) {
+                        // Ensure video is in speaking state
+                        this.setSpeakingState();
+                        
+                        // Start speech synthesis right away
+                        this.speakText(aiResponse, () => {
+                            // When speech is complete, switch to silent state
+                            this.setSilentState();
+                        });
+                    }
+                    
+                    // Then start typing animation
+                    this.typeText(aiResponse, () => {
+                        // After typing finishes
                         if (this.loadingEl) {
                             this.loadingEl.classList.add('d-none');
                             this.loadingEl.classList.remove('d-flex');
@@ -586,7 +612,11 @@
                         if (this.sendBtn) {
                             this.sendBtn.disabled = false;
                         }
-                    });
+                        // Don't switch to silent here if speech is still active
+                        if (!this.enableVoice || !this.isSpeechActive) {
+                            this.setSilentState();
+                        }
+                    }, !this.enableVoice); // Skip speech in typeText since we already started it
                 } else {
                     throw new Error(response.data.message || 'Unknown error');
                 }
