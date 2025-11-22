@@ -62,16 +62,72 @@
         });
 
         // Handle tab switching with URL hash on page load
-        const urlHash = window.location.hash;
-        if (urlHash) {
-            const tabId = urlHash.substring(1);
-            const tabButton = $('#' + tabId + '-tab');
-            if (tabButton.length) {
-                setTimeout(function () {
+        function activateTabFromHash() {
+            const urlHash = window.location.hash;
+            if (urlHash) {
+                const tabId = urlHash.substring(1);
+                const tabButton = $('#' + tabId + '-tab');
+                if (tabButton.length) {
                     switchTab(tabButton[0]);
-                }, 100);
+                    return true;
+                }
+            }
+            return false;
+        }
+
+        // Try to activate tab from hash on page load
+        if (!activateTabFromHash()) {
+            // If no hash, try to get from localStorage as fallback
+            const savedTab = localStorage.getItem('aiha_active_tab');
+            if (savedTab) {
+                const tabButton = $('#' + savedTab + '-tab');
+                if (tabButton.length) {
+                    setTimeout(function () {
+                        switchTab(tabButton[0]);
+                    }, 50);
+                }
             }
         }
+
+        // Save active tab to localStorage when switching
+        function switchTabWithSave(tabButton) {
+            switchTab(tabButton);
+            const targetId = $(tabButton).attr('data-bs-target') || $(tabButton).data('target');
+            if (targetId) {
+                const hash = targetId.substring(1);
+                localStorage.setItem('aiha_active_tab', hash);
+            }
+        }
+
+        // Update tab click handler to save to localStorage
+        $('.nav-tabs .nav-link').off('click').on('click', function (e) {
+            e.preventDefault();
+
+            // Try Bootstrap Tab if available
+            if (typeof bootstrap !== 'undefined' && bootstrap.Tab) {
+                try {
+                    const bsTab = new bootstrap.Tab(this);
+                    bsTab.show();
+
+                    // Update URL hash and localStorage
+                    $(this).one('shown.bs.tab', function () {
+                        const targetId = $(this).attr('data-bs-target').substring(1);
+                        if (history.pushState) {
+                            history.pushState(null, null, '#' + targetId);
+                        } else {
+                            window.location.hash = targetId;
+                        }
+                        localStorage.setItem('aiha_active_tab', targetId);
+                    });
+                } catch (err) {
+                    // Fallback to manual switching
+                    switchTabWithSave(this);
+                }
+            } else {
+                // Manual switching if Bootstrap not available
+                switchTabWithSave(this);
+            }
+        });
 
         // Preview gradient colors
         const gradientStart = $('#gradient_start');
