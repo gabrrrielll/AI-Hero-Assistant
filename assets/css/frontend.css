@@ -19,6 +19,7 @@
     height: 100vh;
     min-height: 600px;
     max-height: 1000px;
+    padding: 1rem;
 }
 
 @keyframes gradientShift {
@@ -346,13 +347,14 @@
 
 /* Responsive Design */
 @media (max-width: 768px) {
+
     /* Tablet */
     .aiha-hero-section {
         height: 100vh;
         min-height: 700px;
         max-height: 900px;
     }
-    
+
     .aiha-video-container>div {
         width: 250px;
         height: 250px;
@@ -371,13 +373,14 @@
 }
 
 @media (max-width: 480px) {
+
     /* Mobile */
     .aiha-hero-section {
         height: 100vh;
         min-height: 600px;
         max-height: 850px;
     }
-    
+
     .aiha-video-container>div {
         width: 200px;
         height: 200px;
@@ -394,11 +397,11 @@
 /* Landscape orientation for mobile */
 @media (max-width: 768px) and (orientation: landscape) {
     .aiha-hero-section {
-        height: 100vh;
-        min-height: 500px;
-        max-height: 600px;
+        height: 90vh;
+        min-height: 450px;
+        max-height: 540px;
     }
-    
+
     .aiha-subtitle {
         max-height: 300px;
     }
