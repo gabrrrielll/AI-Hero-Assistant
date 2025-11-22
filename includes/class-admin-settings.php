@@ -595,24 +595,31 @@ class AIHA_Admin_Settings
                                     <div class="col-md-6">
                                         <label for="voice_name" class="form-label fw-bold"><?php _e('Voce', 'ai-hero-assistant'); ?></label>
                                         <select id="voice_name" name="aiha_settings[voice_name]" class="form-select">
-                                            <optgroup label="<?php _e('Voci Femei', 'ai-hero-assistant'); ?>">
-                                                <option value="Google UK English Female" <?php selected($settings['voice_name'] ?? 'default', 'Google UK English Female'); ?>>Google UK English Female</option>
-                                                <option value="Google US English Female" <?php selected($settings['voice_name'] ?? 'default', 'Google US English Female'); ?>>Google US English Female</option>
-                                                <option value="Microsoft Zira - English (United States)" <?php selected($settings['voice_name'] ?? 'default', 'Microsoft Zira - English (United States)'); ?>>Microsoft Zira (US English)</option>
-                                                <option value="Microsoft Hazel - English (Great Britain)" <?php selected($settings['voice_name'] ?? 'default', 'Microsoft Hazel - English (Great Britain)'); ?>>Microsoft Hazel (UK English)</option>
-                                                <option value="Samantha" <?php selected($settings['voice_name'] ?? 'default', 'Samantha'); ?>>Samantha (macOS)</option>
-                                                <option value="Victoria" <?php selected($settings['voice_name'] ?? 'default', 'Victoria'); ?>>Victoria (macOS)</option>
+                                            <option value="default" <?php selected($settings['voice_name'] ?? 'default', 'default'); ?>><?php _e('Voce Implicită', 'ai-hero-assistant'); ?></option>
+                                            <optgroup label="<?php _e('Română', 'ai-hero-assistant'); ?>">
+                                                <option value="Microsoft Andrei - Romanian (Romania)" <?php selected($settings['voice_name'] ?? 'default', 'Microsoft Andrei - Romanian (Romania)'); ?>>Microsoft Andrei (Română)</option>
                                             </optgroup>
-                                            <optgroup label="<?php _e('Voci Bărbați', 'ai-hero-assistant'); ?>">
+                                            <optgroup label="<?php _e('Engleză - Femei', 'ai-hero-assistant'); ?>">
+                                                <option value="Google UK English Female" <?php selected($settings['voice_name'] ?? 'default', 'Google UK English Female'); ?>>Google UK English Female</option>
+                                                <option value="Google US English" <?php selected($settings['voice_name'] ?? 'default', 'Google US English'); ?>>Google US English</option>
+                                            </optgroup>
+                                            <optgroup label="<?php _e('Engleză - Bărbați', 'ai-hero-assistant'); ?>">
                                                 <option value="Google UK English Male" <?php selected($settings['voice_name'] ?? 'default', 'Google UK English Male'); ?>>Google UK English Male</option>
-                                                <option value="Google US English Male" <?php selected($settings['voice_name'] ?? 'default', 'Google US English Male'); ?>>Google US English Male</option>
-                                                <option value="Microsoft David - English (United States)" <?php selected($settings['voice_name'] ?? 'default', 'Microsoft David - English (United States)'); ?>>Microsoft David (US English)</option>
-                                                <option value="Microsoft Mark - English (United States)" <?php selected($settings['voice_name'] ?? 'default', 'Microsoft Mark - English (United States)'); ?>>Microsoft Mark (US English)</option>
-                                                <option value="Alex" <?php selected($settings['voice_name'] ?? 'default', 'Alex'); ?>>Alex (macOS)</option>
-                                                <option value="Daniel" <?php selected($settings['voice_name'] ?? 'default', 'Daniel'); ?>>Daniel (macOS)</option>
+                                                <option value="Google US English" <?php selected($settings['voice_name'] ?? 'default', 'Google US English'); ?>>Google US English</option>
+                                            </optgroup>
+                                            <optgroup label="<?php _e('Alte Limbi', 'ai-hero-assistant'); ?>">
+                                                <option value="Google Deutsch" <?php selected($settings['voice_name'] ?? 'default', 'Google Deutsch'); ?>>Google Deutsch (Germană)</option>
+                                                <option value="Google español" <?php selected($settings['voice_name'] ?? 'default', 'Google español'); ?>>Google español (Spaniolă)</option>
+                                                <option value="Google español de Estados Unidos" <?php selected($settings['voice_name'] ?? 'default', 'Google español de Estados Unidos'); ?>>Google español de Estados Unidos (Spaniolă US)</option>
+                                                <option value="Google français" <?php selected($settings['voice_name'] ?? 'default', 'Google français'); ?>>Google français (Franceză)</option>
+                                                <option value="Google italiano" <?php selected($settings['voice_name'] ?? 'default', 'Google italiano'); ?>>Google italiano (Italiană)</option>
+                                                <option value="Google Nederlands" <?php selected($settings['voice_name'] ?? 'default', 'Google Nederlands'); ?>>Google Nederlands (Olandeză)</option>
+                                                <option value="Google polski" <?php selected($settings['voice_name'] ?? 'default', 'Google polski'); ?>>Google polski (Poloneză)</option>
+                                                <option value="Google português do Brasil" <?php selected($settings['voice_name'] ?? 'default', 'Google português do Brasil'); ?>>Google português do Brasil (Portugheză)</option>
+                                                <option value="Google русский" <?php selected($settings['voice_name'] ?? 'default', 'Google русский'); ?>>Google русский (Rusă)</option>
                                             </optgroup>
                                         </select>
-                                        <div class="form-text"><?php _e('Selectează vocea care va citi răspunsurile AI. Notă: Voci disponibile pot varia în funcție de browser și sistem de operare.', 'ai-hero-assistant'); ?></div>
+                                        <div class="form-text"><?php _e('Selectează vocea care va citi răspunsurile AI. Notă: Voci disponibile pot varia în funcție de browser și sistem de operare. Plugin-ul va încerca să găsească cea mai apropiată voce disponibilă.', 'ai-hero-assistant'); ?></div>
                                     </div>
                                       
                                       <div class="col-12">

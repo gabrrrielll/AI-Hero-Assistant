@@ -171,13 +171,6 @@
          */
         speakText(text, onComplete) {
             if (!this.enableVoice || !this.synth || !text) {
-                return;
-            }
-            
-            // Chrome requires user interaction before allowing speech synthesis
-            // Skip speech for initial message if user hasn't interacted yet
-            if (!this.userHasInteracted) {
-                console.log('Speech synthesis skipped - waiting for user interaction (Chrome autoplay policy)');
                 if (onComplete) {
                     onComplete();
                 }
@@ -366,13 +359,13 @@
                     }
                 }
             };
-            
+
             // Listen for various user interactions
             const interactionEvents = ['click', 'touchstart', 'keydown', 'mousedown'];
             interactionEvents.forEach(eventType => {
                 document.addEventListener(eventType, markUserInteraction, { once: true, passive: true });
             });
-            
+
             // Send button
             if (this.sendBtn) {
                 this.sendBtn.addEventListener('click', () => {
@@ -390,7 +383,7 @@
                         this.sendMessage();
                     }
                 });
-                
+
                 this.inputEl.addEventListener('focus', markUserInteraction, { once: true });
                 this.inputEl.addEventListener('click', markUserInteraction, { once: true });
 
@@ -485,11 +478,15 @@
             const formattedText = this.formatMessageText(text);
 
             // Start speaking if voice is enabled and not skipped
+            // Voice starts immediately with typing for synchronization
             if (this.enableVoice && !skipSpeech) {
-                this.speakText(text, () => {
-                    // When speech is complete, switch to silent state
-                    this.setSilentState();
-                });
+                // Small delay to ensure voices are loaded and user gesture is registered
+                setTimeout(() => {
+                    this.speakText(text, () => {
+                        // When speech is complete, switch to silent state
+                        this.setSilentState();
+                    });
+                }, 100);
             }
 
             const typeChar = () => {
@@ -531,6 +528,15 @@
             const message = this.inputEl ? this.inputEl.value.trim() : '';
             if (!message || (this.loadingEl && !this.loadingEl.classList.contains('d-none'))) {
                 return;
+            }
+
+            // Mark user interaction - this enables speech synthesis in Chrome
+            // (sending a message is a valid user gesture)
+            this.userHasInteracted = true;
+            
+            // Re-initialize voice after user interaction if needed
+            if (this.enableVoice && this.voices.length === 0) {
+                this.setupVoice();
             }
 
             // Stop any ongoing speech
