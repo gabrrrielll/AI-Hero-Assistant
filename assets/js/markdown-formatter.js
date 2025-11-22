@@ -77,8 +77,8 @@
 
         formatted = result.join('');
 
-        // Convertește newlines rămase în <br>
-        formatted = formatted.replace(/\n/g, '<br>');
+        // Nu convertim newlines rămase în <br> - le ignorăm pentru a evita spații excesive
+        // Spațierea este controlată de CSS prin margin-ul paragrafelor
 
         return formatted;
     };
