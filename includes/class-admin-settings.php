@@ -44,6 +44,8 @@ class AIHA_Admin_Settings
         $sanitized['gradient_end'] = sanitize_hex_color($input['gradient_end'] ?? '#ec4899');
         $sanitized['gradient_color_3'] = sanitize_hex_color($input['gradient_color_3'] ?? '#8b5cf6');
         $sanitized['gradient_color_4'] = sanitize_hex_color($input['gradient_color_4'] ?? '#3b82f6');
+        $sanitized['animation_duration_base'] = absint($input['animation_duration_base'] ?? 15);
+        $sanitized['animation_duration_wave'] = absint($input['animation_duration_wave'] ?? 20);
         $sanitized['font_family'] = sanitize_text_field($input['font_family'] ?? 'Inter, sans-serif');
         $sanitized['hero_message'] = sanitize_textarea_field($input['hero_message'] ?? '');
         $sanitized['video_silence_url'] = esc_url_raw($input['video_silence_url'] ?? '');
@@ -546,6 +548,33 @@ class AIHA_Admin_Settings
                                                name="aiha_settings[gradient_color_4]" 
                                                value="<?php echo esc_attr($settings['gradient_color_4'] ?? '#3b82f6'); ?>"
                                                class="form-control form-control-color">
+                                    </div>
+                                    
+                                    <!-- Animation Durations -->
+                                    <div class="col-md-6">
+                                        <label for="animation_duration_base" class="form-label fw-bold"><?php _e('Durata Animație Gradient Base (secunde)', 'ai-hero-assistant'); ?></label>
+                                        <input type="number" 
+                                               id="animation_duration_base" 
+                                               name="aiha_settings[animation_duration_base]" 
+                                               value="<?php echo esc_attr($settings['animation_duration_base'] ?? 15); ?>"
+                                               min="1"
+                                               max="60"
+                                               step="1"
+                                               class="form-control">
+                                        <small class="form-text text-muted"><?php _e('Durata animației pentru gradientul de bază (1-60 secunde)', 'ai-hero-assistant'); ?></small>
+                                    </div>
+                                    
+                                    <div class="col-md-6">
+                                        <label for="animation_duration_wave" class="form-label fw-bold"><?php _e('Durata Animație Valuri (secunde)', 'ai-hero-assistant'); ?></label>
+                                        <input type="number" 
+                                               id="animation_duration_wave" 
+                                               name="aiha_settings[animation_duration_wave]" 
+                                               value="<?php echo esc_attr($settings['animation_duration_wave'] ?? 20); ?>"
+                                               min="1"
+                                               max="60"
+                                               step="1"
+                                               class="form-control">
+                                        <small class="form-text text-muted"><?php _e('Durata animației pentru valurile de culori (1-60 secunde)', 'ai-hero-assistant'); ?></small>
                                     </div>
                                     
                                     <!-- Font Family -->

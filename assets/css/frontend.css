@@ -16,7 +16,7 @@
         radial-gradient(circle at 100% 100%, var(--gradient-end-rgba-40, rgba(236, 72, 153, 0.4)) 0%, transparent 50%),
         linear-gradient(135deg, var(--gradient-start, #6366f1), var(--gradient-end, #ec4899));
     background-size: 200% 200%;
-    animation: baseGradientShift 15s ease infinite;
+    animation: baseGradientShift var(--animation-duration-base, 15s) ease infinite;
     overflow: hidden;
     position: relative;
     /* Responsive heights - default for desktop (90% to account for header) */
@@ -39,7 +39,7 @@
         radial-gradient(circle at 80% 70%, var(--gradient-end-rgba-80, rgba(236, 72, 153, 0.8)) 0%, transparent 50%),
         radial-gradient(circle at 40% 80%, var(--gradient-color-3-rgba-60, rgba(139, 92, 246, 0.6)) 0%, transparent 50%),
         radial-gradient(circle at 60% 20%, var(--gradient-color-4-rgba-70, rgba(59, 130, 246, 0.7)) 0%, transparent 50%);
-    animation: colorWave1 20s ease-in-out infinite;
+    animation: colorWave1 var(--animation-duration-wave, 20s) ease-in-out infinite;
     opacity: 0.9;
     z-index: 0;
     pointer-events: none;
@@ -340,15 +340,20 @@
     font-family: var(--font-family, 'Inter', sans-serif);
     font-size: 16px;
     line-height: 1.3;
-    color: #ffffff;
-    background: transparent;
+    color: #ffffff !important;
+    background: transparent !important;
     padding: 8px 0;
     max-height: 50px;
     overflow-y: auto;
 }
 
+.aiha-textarea:focus {
+    color: #ffffff !important;
+    background: transparent !important;
+}
+
 .aiha-textarea::placeholder {
-    color: rgba(255, 255, 255, 0.6);
+    color: rgba(255, 255, 255, 0.6) !important;
 }
 
 .aiha-send-btn {

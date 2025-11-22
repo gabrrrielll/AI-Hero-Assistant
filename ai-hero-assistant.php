@@ -106,6 +106,8 @@ class AI_Hero_Assistant
             'gradient_end' => '#ec4899',
             'gradient_color_3' => '#8b5cf6',
             'gradient_color_4' => '#3b82f6',
+            'animation_duration_base' => 15,
+            'animation_duration_wave' => 20,
             'font_family' => 'Inter, sans-serif',
             'hero_message' => 'Bună! Sunt asistentul virtual al {company_name}. Cum vă pot ajuta cu serviciile noastre de programare?',
               'assistant_gender' => 'feminin',
