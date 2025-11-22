@@ -114,7 +114,7 @@
     z-index: 2;
     opacity: 0;
     /* Opacity se schimbă doar aici: 0 când tace, 1 când vorbește */
-    transition: opacity var(--aiha-video-transition-duration, 1.5s) var(--aiha-video-transition-easing, cubic-bezier(0.4, 0, 0.2, 1));
+    transition: opacity var(--aiha-video-transition-duration, 0.75s) var(--aiha-video-transition-easing, cubic-bezier(0.4, 0, 0.2, 1));
     will-change: opacity;
     pointer-events: none;
 }

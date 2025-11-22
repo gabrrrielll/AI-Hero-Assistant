@@ -5,7 +5,7 @@
 
 :root {
     /* Durata tranziției între videoclipuri (în secunde) */
-    --aiha-video-transition-duration: 1.5s;
+    --aiha-video-transition-duration: 0.75s;
     
     /* Easing function pentru tranziții - cubic-bezier pentru tranziție mai lină */
     --aiha-video-transition-easing: cubic-bezier(0.4, 0, 0.2, 1);
