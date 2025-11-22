@@ -18,7 +18,7 @@
         text = text.replace(/\r\n/g, '\n').replace(/\r/g, '\n');
         text = text.replace(/\n{2,}/g, '\n'); // Elimină 2+ newlines consecutive (păstrează doar 1)
         text = text.replace(/[ \t]+/g, ' '); // Elimină spații multiple
-        
+
         let formatted = text;
 
         // Escapă HTML-ul existent pentru siguranță
@@ -95,7 +95,7 @@
         text = text.replace(/\r\n/g, '\n').replace(/\r/g, '\n');
         text = text.replace(/\n{2,}/g, '\n'); // Elimină 2+ newlines consecutive (păstrează doar 1)
         text = text.replace(/[ \t]+/g, ' '); // Elimină spații multiple
-        
+
         let formatted = text;
 
         // Escapă HTML-ul existent pentru siguranță

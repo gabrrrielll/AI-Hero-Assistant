@@ -427,11 +427,14 @@
          * Set video container to silent state (show silence video)
          */
         setSilentState() {
-            if (this.videoContainer) {
-                this.videoContainer.classList.remove('speaking');
-                this.videoContainer.classList.add('silent');
-            }
-            this.isSpeaking = false;
+            // Adaugă un delay mic pentru tranziție mai lină
+            setTimeout(() => {
+                if (this.videoContainer) {
+                    this.videoContainer.classList.remove('speaking');
+                    this.videoContainer.classList.add('silent');
+                }
+                this.isSpeaking = false;
+            }, 100); // Delay mic pentru tranziție mai lină
             // Don't stop speech automatically - let it finish naturally
             // Speech will be stopped only when explicitly needed (new message, etc.)
         }

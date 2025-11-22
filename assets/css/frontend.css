@@ -107,13 +107,15 @@
 .aiha-video-silence {
     z-index: 1;
     opacity: 1;
-    transition: opacity var(--aiha-video-transition-duration, 1s) var(--aiha-video-transition-easing, ease-in-out);
+    transition: opacity var(--aiha-video-transition-duration, 1.5s) var(--aiha-video-transition-easing, cubic-bezier(0.4, 0, 0.2, 1));
+    will-change: opacity;
 }
 
 .aiha-video-speaking {
     z-index: 2;
     opacity: 0;
-    transition: opacity var(--aiha-video-transition-duration, 1s) var(--aiha-video-transition-easing, ease-in-out);
+    transition: opacity var(--aiha-video-transition-duration, 1.5s) var(--aiha-video-transition-easing, cubic-bezier(0.4, 0, 0.2, 1));
+    will-change: opacity;
 }
 
 .aiha-video-container.speaking .aiha-video-silence {
