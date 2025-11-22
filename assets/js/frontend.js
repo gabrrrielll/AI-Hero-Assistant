@@ -25,13 +25,14 @@
             this.isSpeaking = false;
             this.currentText = '';
             this.sessionId = this.generateSessionId();
-            
+
             // Voice settings
             this.enableVoice = config.enableVoice || false;
             this.voiceName = config.voiceName || 'default';
             this.synth = null;
             this.voices = [];
             this.selectedVoice = null;
+            this.userHasInteracted = false; // Track if user has interacted (required for Chrome autoplay policy)
 
             this.init();
         }
@@ -48,7 +49,7 @@
             // Start with silent state
             this.setSilentState();
         }
-        
+
         /**
          * Initialize text-to-speech
          */
@@ -57,24 +58,24 @@
                 console.warn('Speech synthesis not supported in this browser');
                 return;
             }
-            
+
             this.synth = window.speechSynthesis;
-            
+
             // Load voices (may need to wait for voices to be loaded)
             const loadVoices = () => {
                 this.voices = this.synth.getVoices();
                 this.selectVoice();
             };
-            
+
             // Chrome loads voices asynchronously
             if (this.synth.onvoiceschanged !== undefined) {
                 this.synth.onvoiceschanged = loadVoices;
             }
-            
+
             // Try to load voices immediately
             loadVoices();
         }
-        
+
         /**
          * Select the voice based on voiceName setting
          */
@@ -83,36 +84,36 @@
                 console.warn('No voices available');
                 return;
             }
-            
+
             // Log available voices for debugging
             console.log('Available voices:', this.voices.map(v => ({ name: v.name, lang: v.lang, default: v.default })));
             console.log('Looking for voice:', this.voiceName);
-            
+
             if (this.voiceName === 'default') {
                 // Use default voice (usually first available)
                 this.selectedVoice = this.voices.find(v => v.default) || this.voices[0];
                 console.log('Using default voice:', this.selectedVoice?.name);
             } else {
                 // Try multiple matching strategies
-                
+
                 // 1. Exact match
                 this.selectedVoice = this.voices.find(v => v.name === this.voiceName);
-                
+
                 // 2. Case-insensitive exact match
                 if (!this.selectedVoice) {
-                    this.selectedVoice = this.voices.find(v => 
+                    this.selectedVoice = this.voices.find(v =>
                         v.name.toLowerCase() === this.voiceName.toLowerCase()
                     );
                 }
-                
+
                 // 3. Contains match (case-insensitive)
                 if (!this.selectedVoice) {
-                    this.selectedVoice = this.voices.find(v => 
+                    this.selectedVoice = this.voices.find(v =>
                         v.name.toLowerCase().includes(this.voiceName.toLowerCase()) ||
                         this.voiceName.toLowerCase().includes(v.name.toLowerCase())
                     );
                 }
-                
+
                 // 4. Match by key words (e.g., "Female", "Male", "UK", "US")
                 if (!this.selectedVoice) {
                     const keywords = this.voiceName.toLowerCase().split(/\s+/);
@@ -121,38 +122,38 @@
                         return keywords.every(keyword => voiceNameLower.includes(keyword));
                     });
                 }
-                
+
                 // 5. Match by gender preference
                 if (!this.selectedVoice) {
-                    const isFemale = this.voiceName.toLowerCase().includes('female') || 
-                                    this.voiceName.toLowerCase().includes('feminin') ||
-                                    this.voiceName.toLowerCase().includes('zira') ||
-                                    this.voiceName.toLowerCase().includes('hazel') ||
-                                    this.voiceName.toLowerCase().includes('samantha') ||
-                                    this.voiceName.toLowerCase().includes('victoria');
-                    
-                    const isMale = this.voiceName.toLowerCase().includes('male') || 
-                                  this.voiceName.toLowerCase().includes('masculin') ||
-                                  this.voiceName.toLowerCase().includes('david') ||
-                                  this.voiceName.toLowerCase().includes('mark') ||
-                                  this.voiceName.toLowerCase().includes('alex') ||
-                                  this.voiceName.toLowerCase().includes('daniel');
-                    
+                    const isFemale = this.voiceName.toLowerCase().includes('female') ||
+                        this.voiceName.toLowerCase().includes('feminin') ||
+                        this.voiceName.toLowerCase().includes('zira') ||
+                        this.voiceName.toLowerCase().includes('hazel') ||
+                        this.voiceName.toLowerCase().includes('samantha') ||
+                        this.voiceName.toLowerCase().includes('victoria');
+
+                    const isMale = this.voiceName.toLowerCase().includes('male') ||
+                        this.voiceName.toLowerCase().includes('masculin') ||
+                        this.voiceName.toLowerCase().includes('david') ||
+                        this.voiceName.toLowerCase().includes('mark') ||
+                        this.voiceName.toLowerCase().includes('alex') ||
+                        this.voiceName.toLowerCase().includes('daniel');
+
                     if (isFemale) {
-                        this.selectedVoice = this.voices.find(v => 
-                            v.name.toLowerCase().includes('female') || 
+                        this.selectedVoice = this.voices.find(v =>
+                            v.name.toLowerCase().includes('female') ||
                             v.name.toLowerCase().includes('zira') ||
                             v.name.toLowerCase().includes('hazel')
                         );
                     } else if (isMale) {
-                        this.selectedVoice = this.voices.find(v => 
-                            v.name.toLowerCase().includes('male') || 
+                        this.selectedVoice = this.voices.find(v =>
+                            v.name.toLowerCase().includes('male') ||
                             v.name.toLowerCase().includes('david') ||
                             v.name.toLowerCase().includes('mark')
                         );
                     }
                 }
-                
+
                 // Fallback to default if still not found
                 if (!this.selectedVoice) {
                     this.selectedVoice = this.voices.find(v => v.default) || this.voices[0];
@@ -162,7 +163,7 @@
                 }
             }
         }
-        
+
         /**
          * Speak text using text-to-speech
          * @param {string} text - Text to speak
@@ -173,15 +174,25 @@
                 return;
             }
             
+            // Chrome requires user interaction before allowing speech synthesis
+            // Skip speech for initial message if user hasn't interacted yet
+            if (!this.userHasInteracted) {
+                console.log('Speech synthesis skipped - waiting for user interaction (Chrome autoplay policy)');
+                if (onComplete) {
+                    onComplete();
+                }
+                return;
+            }
+            
             // Stop any ongoing speech
             this.synth.cancel();
-            
+
             // Remove markdown formatting and HTML tags for clean speech
             // First, decode HTML entities
             const tempDiv = document.createElement('div');
             tempDiv.innerHTML = text;
             let cleanText = tempDiv.textContent || tempDiv.innerText || text;
-            
+
             // Additional cleanup for markdown and special characters
             cleanText = cleanText
                 .replace(/\*\*(.*?)\*\*/g, '$1') // Remove bold markdown
@@ -192,12 +203,12 @@
                 .replace(/\n+/g, '. ') // Replace newlines with periods
                 .replace(/\s+/g, ' ') // Normalize whitespace
                 .trim();
-            
+
             if (!cleanText) {
                 console.warn('No text to speak after cleaning');
                 return;
             }
-            
+
             // Wait for voices to be loaded if needed
             if (this.voices.length === 0) {
                 setTimeout(() => {
@@ -206,24 +217,24 @@
                 }, 100);
                 return;
             }
-            
+
             // Re-select voice each time to ensure it's current
             this.selectVoice();
-            
+
             if (!this.selectedVoice) {
                 console.warn('No voice selected, cannot speak');
                 return;
             }
-            
+
             // Split long text into chunks if needed (some browsers have limits)
             const maxLength = 20000; // Safe limit for most browsers
             const textChunks = [];
-            
+
             if (cleanText.length > maxLength) {
                 // Split by sentences
                 const sentences = cleanText.match(/[^.!?]+[.!?]+/g) || [cleanText];
                 let currentChunk = '';
-                
+
                 for (const sentence of sentences) {
                     if ((currentChunk + sentence).length > maxLength && currentChunk) {
                         textChunks.push(currentChunk.trim());
@@ -232,17 +243,17 @@
                         currentChunk += sentence;
                     }
                 }
-                
+
                 if (currentChunk.trim()) {
                     textChunks.push(currentChunk.trim());
                 }
             } else {
                 textChunks.push(cleanText);
             }
-            
+
             // Speak all chunks sequentially
             let chunkIndex = 0;
-            
+
             const speakChunk = () => {
                 if (chunkIndex >= textChunks.length) {
                     // All chunks spoken
@@ -251,15 +262,15 @@
                     }
                     return;
                 }
-                
+
                 const utterance = new SpeechSynthesisUtterance(textChunks[chunkIndex]);
                 utterance.voice = this.selectedVoice;
-                
+
                 // Configure speech properties
                 utterance.rate = 1.0; // Normal speed
                 utterance.pitch = 1.0; // Normal pitch
                 utterance.volume = 1.0; // Full volume
-                
+
                 // Handle speech events
                 utterance.onend = () => {
                     chunkIndex++;
@@ -273,7 +284,7 @@
                         }
                     }
                 };
-                
+
                 utterance.onerror = (event) => {
                     console.warn('Speech synthesis error:', event);
                     chunkIndex++;
@@ -287,15 +298,15 @@
                         }
                     }
                 };
-                
+
                 // Speak this chunk
                 this.synth.speak(utterance);
             };
-            
+
             // Start speaking first chunk
             speakChunk();
         }
-        
+
         /**
          * Stop speaking
          */
@@ -345,22 +356,47 @@
         }
 
         setupEventListeners() {
+            // Track user interaction for speech synthesis (Chrome autoplay policy)
+            const markUserInteraction = () => {
+                if (!this.userHasInteracted) {
+                    this.userHasInteracted = true;
+                    // Re-initialize voice after user interaction
+                    if (this.enableVoice) {
+                        this.setupVoice();
+                    }
+                }
+            };
+            
+            // Listen for various user interactions
+            const interactionEvents = ['click', 'touchstart', 'keydown', 'mousedown'];
+            interactionEvents.forEach(eventType => {
+                document.addEventListener(eventType, markUserInteraction, { once: true, passive: true });
+            });
+            
             // Send button
             if (this.sendBtn) {
-                this.sendBtn.addEventListener('click', () => this.sendMessage());
+                this.sendBtn.addEventListener('click', () => {
+                    markUserInteraction();
+                    this.sendMessage();
+                });
             }
 
             // Enter key (Shift+Enter pentru new line)
             if (this.inputEl) {
                 this.inputEl.addEventListener('keydown', (e) => {
+                    markUserInteraction();
                     if (e.key === 'Enter' && !e.shiftKey) {
                         e.preventDefault();
                         this.sendMessage();
                     }
                 });
+                
+                this.inputEl.addEventListener('focus', markUserInteraction, { once: true });
+                this.inputEl.addEventListener('click', markUserInteraction, { once: true });
 
                 // Auto-resize textarea
                 this.inputEl.addEventListener('input', () => {
+                    markUserInteraction();
                     this.inputEl.style.height = 'auto';
                     this.inputEl.style.height = Math.min(this.inputEl.scrollHeight, 50) + 'px';
                 });
@@ -369,12 +405,14 @@
 
         showInitialMessage() {
             setTimeout(() => {
+                // Don't speak initial message automatically (Chrome autoplay policy)
+                // Only display it, speech will work after user interaction
                 this.typeText(this.config.heroMessage, () => {
                     // After initial message, go back to silent
                     setTimeout(() => {
                         this.setSilentState();
                     }, 500);
-                });
+                }, false); // Pass false to skip speech for initial message
             }, 1000);
         }
 
@@ -428,10 +466,10 @@
             return partialText.replace(/\n/g, '<br>');
         }
 
-        typeText(text, callback) {
+        typeText(text, callback, skipSpeech = false) {
             // Switch to speaking state when typing starts
             this.setSpeakingState();
-            
+
             // Stop any ongoing speech
             this.stopSpeaking();
 
@@ -445,9 +483,9 @@
             let index = 0;
             const typingSpeed = 30; // milliseconds per character
             const formattedText = this.formatMessageText(text);
-            
-            // Start speaking if voice is enabled
-            if (this.enableVoice) {
+
+            // Start speaking if voice is enabled and not skipped
+            if (this.enableVoice && !skipSpeech) {
                 this.speakText(text, () => {
                     // When speech is complete, switch to silent state
                     this.setSilentState();
