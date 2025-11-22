@@ -61,6 +61,16 @@
             }
         });
 
+        // Save active tab to localStorage when switching
+        function switchTabWithSave(tabButton) {
+            switchTab(tabButton);
+            const targetId = $(tabButton).attr('data-bs-target') || $(tabButton).data('target');
+            if (targetId) {
+                const hash = targetId.substring(1);
+                localStorage.setItem('aiha_active_tab', hash);
+            }
+        }
+
         // Handle tab switching with URL hash on page load
         function activateTabFromHash() {
             const urlHash = window.location.hash;
@@ -69,13 +79,14 @@
                 const tabButton = $('#' + tabId + '-tab');
                 if (tabButton.length) {
                     switchTab(tabButton[0]);
+                    localStorage.setItem('aiha_active_tab', tabId);
                     return true;
                 }
             }
             return false;
         }
 
-        // Try to activate tab from hash on page load
+        // Try to activate tab from hash on page load, fallback to localStorage
         if (!activateTabFromHash()) {
             // If no hash, try to get from localStorage as fallback
             const savedTab = localStorage.getItem('aiha_active_tab');
@@ -86,16 +97,6 @@
                         switchTab(tabButton[0]);
                     }, 50);
                 }
-            }
-        }
-
-        // Save active tab to localStorage when switching
-        function switchTabWithSave(tabButton) {
-            switchTab(tabButton);
-            const targetId = $(tabButton).attr('data-bs-target') || $(tabButton).data('target');
-            if (targetId) {
-                const hash = targetId.substring(1);
-                localStorage.setItem('aiha_active_tab', hash);
             }
         }
 
