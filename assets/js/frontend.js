@@ -424,28 +424,21 @@
         }
 
         /**
-         * Set video container to silent state (show silence video)
+         * Set video container to silent state (hide speaking video)
          */
         setSilentState() {
-            // Adaugă un delay mic pentru tranziție mai lină
-            setTimeout(() => {
-                if (this.videoContainer) {
-                    this.videoContainer.classList.remove('speaking');
-                    this.videoContainer.classList.add('silent');
-                }
-                this.isSpeaking = false;
-            }, 100); // Delay mic pentru tranziție mai lină
-            // Don't stop speech automatically - let it finish naturally
-            // Speech will be stopped only when explicitly needed (new message, etc.)
+            if (this.videoSpeaking) {
+                this.videoSpeaking.style.opacity = '0';
+            }
+            this.isSpeaking = false;
         }
 
         /**
          * Set video container to speaking state (show speaking video)
          */
         setSpeakingState() {
-            if (this.videoContainer) {
-                this.videoContainer.classList.remove('silent');
-                this.videoContainer.classList.add('speaking');
+            if (this.videoSpeaking) {
+                this.videoSpeaking.style.opacity = '1';
             }
             this.isSpeaking = true;
         }
