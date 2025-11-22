@@ -20,7 +20,7 @@
             this.subtitleEl = document.getElementById(`aiha-subtitle-${instanceId}`);
             this.inputEl = document.getElementById(`aiha-input-${instanceId}`);
             this.sendBtn = document.getElementById(`aiha-send-${instanceId}`);
-            this.loadingEl = document.getElementById(`aiha-loading-${instanceId}`);
+            // Loading element removed - no longer needed
 
             this.isSpeaking = false;
             this.currentText = '';
@@ -631,7 +631,7 @@
 
         async sendMessage() {
             const message = this.inputEl ? this.inputEl.value.trim() : '';
-            if (!message || (this.loadingEl && !this.loadingEl.classList.contains('d-none'))) {
+            if (!message) {
                 return;
             }
 
@@ -663,10 +663,6 @@
         }
 
         async sendToAI(message) {
-            if (this.loadingEl) {
-                this.loadingEl.classList.remove('d-none');
-                this.loadingEl.classList.add('d-flex');
-            }
             if (this.sendBtn) {
                 this.sendBtn.disabled = true;
             }
@@ -702,10 +698,6 @@
                     // typeText will reset video to silent first, then switch to speaking
                     this.typeText(aiResponse, () => {
                         // After typing finishes
-                        if (this.loadingEl) {
-                            this.loadingEl.classList.add('d-none');
-                            this.loadingEl.classList.remove('d-flex');
-                        }
                         if (this.sendBtn) {
                             this.sendBtn.disabled = false;
                         }
@@ -721,10 +713,6 @@
                 console.error('Error:', error);
                 this.typeText('Sorry, an error occurred. Please try again.', () => {
                     this.setSilentState();
-                    if (this.loadingEl) {
-                        this.loadingEl.classList.add('d-none');
-                        this.loadingEl.classList.remove('d-flex');
-                    }
                     if (this.sendBtn) {
                         this.sendBtn.disabled = false;
                     }

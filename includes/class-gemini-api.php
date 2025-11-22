@@ -190,8 +190,10 @@ class AIHA_Gemini_API {
         // Adaugă instrucțiuni pentru lead generation
         if ($language === 'ro') {
             $system_instruction .= "\n\nIMPORTANT: În timpul conversației, încearcă să obții de la utilizator numărul de telefon sau adresa de email pentru a putea fi contactat de echipa noastră. Fă acest lucru într-un mod natural și prietenos, nu agresiv.";
+            $system_instruction .= "\n\nCRITIC - FORMATARE TEXT: NU folosi NICIODATĂ spații de două rânduri între propoziții sau paragrafe. Folosește DOAR un singur rând între paragrafe. Nu adăuga linii goale multiple în răspunsurile tale. Textul trebuie să fie compact și fără spații excesive.";
         } else {
             $system_instruction .= "\n\nIMPORTANT: During the conversation, try to obtain the user's phone number or email address so they can be contacted by our team. Do this in a natural and friendly way, not aggressively.";
+            $system_instruction .= "\n\nCRITICAL - TEXT FORMATTING: NEVER use double line breaks between sentences or paragraphs. Use ONLY a single line break between paragraphs. Do not add multiple empty lines in your responses. Text must be compact without excessive spacing.";
         }
         
         // Construiește mesajele pentru API
