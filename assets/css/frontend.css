@@ -140,7 +140,8 @@
 /* Subtitle - Bootstrap-based */
 .aiha-subtitle {
     color: white;
-    font-size: calc(var(--font-size-base, 16px) * 1.125); /* 18px when base is 16px */
+    font-size: calc(var(--font-size-base, 16px) * 1.125);
+    /* 18px when base is 16px */
     line-height: 1.3;
     text-align: left;
     padding: 15px 25px;
@@ -409,7 +410,8 @@
     }
 
     .aiha-textarea {
-        font-size: calc(var(--font-size-base, 16px) * 0.875); /* 14px when base is 16px */
+        font-size: calc(var(--font-size-base, 16px) * 0.875);
+        /* 14px when base is 16px */
     }
 }
 
@@ -428,7 +430,8 @@
     }
 
     .aiha-subtitle {
-        font-size: calc(var(--font-size-base, 16px) * 0.875); /* 14px when base is 16px */
+        font-size: calc(var(--font-size-base, 16px) * 0.875);
+        /* 14px when base is 16px */
         padding: 10px 15px;
         max-height: 450px;
         line-height: 1.3;
