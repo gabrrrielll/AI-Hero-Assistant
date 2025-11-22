@@ -103,43 +103,20 @@
     will-change: opacity;
 }
 
-/* Video Transitions - Control doar prin opacity și z-index, fără display */
+/* Video Transitions - Simplificat: doar opacity pentru .aiha-video-speaking */
 .aiha-video-silence {
     z-index: 1;
     opacity: 1;
-    /* transition: opacity var(--aiha-video-transition-duration, 1.5s) var(--aiha-video-transition-easing, cubic-bezier(0.4, 0, 0.2, 1));
-    will-change: opacity; */
-    pointer-events: none;
-    /* Previne interacțiunea cu videoclipul ascuns */
+    /* Rămâne neschimbat - tot timpul vizibil */
 }
 
 .aiha-video-speaking {
     z-index: 2;
     opacity: 0;
+    /* Opacity se schimbă doar aici: 0 când tace, 1 când vorbește */
     transition: opacity var(--aiha-video-transition-duration, 1.5s) var(--aiha-video-transition-easing, cubic-bezier(0.4, 0, 0.2, 1));
     will-change: opacity;
     pointer-events: none;
-    /* Previne interacțiunea cu videoclipul ascuns */
-}
-
-.aiha-video-container.speaking .aiha-video-silence {
-    opacity: 0;
-    z-index: 1;
-}
-
-.aiha-video-container.speaking .aiha-video-speaking {
-    opacity: 1;
-    z-index: 2;
-}
-
-.aiha-video-container.silent .aiha-video-silence {
-    opacity: 1;
-    z-index: 2;
-}
-
-.aiha-video-container.silent .aiha-video-speaking {
-    opacity: 0;
-    z-index: 1;
 }
 
 /* Subtitle - Bootstrap-based */
