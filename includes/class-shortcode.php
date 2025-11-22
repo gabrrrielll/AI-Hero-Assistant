@@ -32,6 +32,8 @@ class AIHA_Shortcode
         $animation_duration_base = isset($settings['animation_duration_base']) ? absint($settings['animation_duration_base']) : 15;
         $animation_duration_wave = isset($settings['animation_duration_wave']) ? absint($settings['animation_duration_wave']) : 20;
         $font_family = isset($settings['font_family']) ? $settings['font_family'] : 'Inter, sans-serif';
+        $font_family_code = isset($settings['font_family_code']) ? $settings['font_family_code'] : 'Courier New, Courier, monospace';
+        $font_size_base = isset($settings['font_size_base']) ? absint($settings['font_size_base']) : 16;
 
         // Video URLs from settings
         $video_silence_url = isset($settings['video_silence_url']) ? $settings['video_silence_url'] : '';
@@ -47,7 +49,7 @@ class AIHA_Shortcode
         ob_start();
         ?>
         <div id="<?php echo esc_attr($instance_id); ?>" class="aiha-container" data-instance-id="<?php echo esc_attr($instance_id); ?>">
-            <div class="aiha-hero-section container-fluid d-flex flex-column justify-content-between" style="--gradient-start: <?php echo esc_attr($gradient_start); ?>; --gradient-end: <?php echo esc_attr($gradient_end); ?>; --gradient-color-3: <?php echo esc_attr($gradient_color_3); ?>; --gradient-color-4: <?php echo esc_attr($gradient_color_4); ?>; --animation-duration-base: <?php echo esc_attr($animation_duration_base); ?>s; --animation-duration-wave: <?php echo esc_attr($animation_duration_wave); ?>s; --font-family: <?php echo esc_attr($font_family); ?><?php echo !empty($atts['height']) ? '; height: ' . esc_attr($atts['height']) . '; min-height: ' . esc_attr($atts['height']) : ''; ?>">
+            <div class="aiha-hero-section container-fluid d-flex flex-column justify-content-between" style="--gradient-start: <?php echo esc_attr($gradient_start); ?>; --gradient-end: <?php echo esc_attr($gradient_end); ?>; --gradient-color-3: <?php echo esc_attr($gradient_color_3); ?>; --gradient-color-4: <?php echo esc_attr($gradient_color_4); ?>; --animation-duration-base: <?php echo esc_attr($animation_duration_base); ?>s; --animation-duration-wave: <?php echo esc_attr($animation_duration_wave); ?>s; --font-family: <?php echo esc_attr($font_family); ?>; --font-family-code: <?php echo esc_attr($font_family_code); ?>; --font-size-base: <?php echo esc_attr($font_size_base); ?>px<?php echo !empty($atts['height']) ? '; height: ' . esc_attr($atts['height']) . '; min-height: ' . esc_attr($atts['height']) : ''; ?>">
                 <!-- Video Container - Două videoclipuri suprapuse -->
                 <div class="aiha-video-container d-flex justify-content-center align-items-center flex-shrink-0 my-3">
                     <div class="position-relative" style="width: 300px; height: 300px;">

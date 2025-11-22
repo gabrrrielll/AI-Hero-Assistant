@@ -109,6 +109,8 @@ class AI_Hero_Assistant
             'animation_duration_base' => 15,
             'animation_duration_wave' => 20,
             'font_family' => 'Inter, sans-serif',
+            'font_family_code' => 'Courier New, Courier, monospace',
+            'font_size_base' => 16,
             'hero_message' => 'Bună! Sunt asistentul virtual al {company_name}. Cum vă pot ajuta cu serviciile noastre de programare?',
               'assistant_gender' => 'feminin',
               'enable_voice' => 0,

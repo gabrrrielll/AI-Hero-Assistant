@@ -47,6 +47,8 @@ class AIHA_Admin_Settings
         $sanitized['animation_duration_base'] = absint($input['animation_duration_base'] ?? 15);
         $sanitized['animation_duration_wave'] = absint($input['animation_duration_wave'] ?? 20);
         $sanitized['font_family'] = sanitize_text_field($input['font_family'] ?? 'Inter, sans-serif');
+        $sanitized['font_family_code'] = sanitize_text_field($input['font_family_code'] ?? 'Courier New, Courier, monospace');
+        $sanitized['font_size_base'] = absint($input['font_size_base'] ?? 16);
         $sanitized['hero_message'] = sanitize_textarea_field($input['hero_message'] ?? '');
         $sanitized['video_silence_url'] = esc_url_raw($input['video_silence_url'] ?? '');
         $sanitized['video_speaking_url'] = esc_url_raw($input['video_speaking_url'] ?? '');
@@ -588,6 +590,31 @@ class AIHA_Admin_Settings
                                             <option value="Poppins, sans-serif" <?php selected($settings['font_family'] ?? '', 'Poppins, sans-serif'); ?>>Poppins</option>
                                             <option value="Montserrat, sans-serif" <?php selected($settings['font_family'] ?? '', 'Montserrat, sans-serif'); ?>>Montserrat</option>
                                         </select>
+                                    </div>
+                                    
+                                    <div class="col-md-6">
+                                        <label for="font_family_code" class="form-label fw-bold"><?php _e('Font Family pentru Cod (Monospace)', 'ai-hero-assistant'); ?></label>
+                                        <select id="font_family_code" name="aiha_settings[font_family_code]" class="form-select">
+                                            <option value="Courier New, Courier, monospace" <?php selected($settings['font_family_code'] ?? '', 'Courier New, Courier, monospace'); ?>>Courier New</option>
+                                            <option value="Consolas, monospace" <?php selected($settings['font_family_code'] ?? '', 'Consolas, monospace'); ?>>Consolas</option>
+                                            <option value="Monaco, monospace" <?php selected($settings['font_family_code'] ?? '', 'Monaco, monospace'); ?>>Monaco</option>
+                                            <option value="'Courier New', Courier, monospace" <?php selected($settings['font_family_code'] ?? '', "'Courier New', Courier, monospace"); ?>>Courier New (cu ghilimele)</option>
+                                            <option value="'Lucida Console', Monaco, monospace" <?php selected($settings['font_family_code'] ?? '', "'Lucida Console', Monaco, monospace"); ?>>Lucida Console</option>
+                                        </select>
+                                        <small class="form-text text-muted"><?php _e('Fontul folosit pentru blocuri de cod și cod inline', 'ai-hero-assistant'); ?></small>
+                                    </div>
+                                    
+                                    <div class="col-md-6">
+                                        <label for="font_size_base" class="form-label fw-bold"><?php _e('Dimensiune Font de Bază (px)', 'ai-hero-assistant'); ?></label>
+                                        <input type="number" 
+                                               id="font_size_base" 
+                                               name="aiha_settings[font_size_base]" 
+                                               value="<?php echo esc_attr($settings['font_size_base'] ?? 16); ?>"
+                                               min="10"
+                                               max="24"
+                                               step="1"
+                                               class="form-control">
+                                        <small class="form-text text-muted"><?php _e('Dimensiunea de bază a fontului pentru text (10-24px)', 'ai-hero-assistant'); ?></small>
                                     </div>
                                     
                                     <!-- Assistant Gender -->
