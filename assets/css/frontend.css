@@ -15,10 +15,10 @@
     animation: gradientShift 10s ease infinite;
     overflow: hidden;
     position: relative;
-    /* Responsive heights - default for desktop */
-    height: 100vh;
-    min-height: 600px;
-    max-height: 1000px;
+    /* Responsive heights - default for desktop (90% to account for header) */
+    height: 90vh;
+    min-height: 540px;
+    max-height: 900px;
     padding: 1rem;
 }
 
@@ -350,9 +350,9 @@
 
     /* Tablet */
     .aiha-hero-section {
-        height: 100vh;
-        min-height: 700px;
-        max-height: 900px;
+        height: 90vh;
+        min-height: 630px;
+        max-height: 810px;
     }
 
     .aiha-video-container>div {
@@ -376,9 +376,9 @@
 
     /* Mobile */
     .aiha-hero-section {
-        height: 100vh;
-        min-height: 600px;
-        max-height: 850px;
+        height: 90vh;
+        min-height: 540px;
+        max-height: 765px;
     }
 
     .aiha-video-container>div {
