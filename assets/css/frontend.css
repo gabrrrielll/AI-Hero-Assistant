@@ -11,8 +11,6 @@
 /* Hero Section - Bootstrap Flexbox Layout */
 .aiha-hero-section {
     background: linear-gradient(135deg, var(--gradient-start, #6366f1), var(--gradient-end, #ec4899));
-    background-size: 200% 200%;
-    animation: gradientShift 10s ease infinite;
     overflow: hidden;
     position: relative;
     /* Responsive heights - default for desktop (90% to account for header) */
@@ -22,15 +20,99 @@
     padding: 1rem;
 }
 
-@keyframes gradientShift {
+/* Stripe-inspired animated color waves effect */
+.aiha-hero-section::before {
+    content: '';
+    position: absolute;
+    top: -50%;
+    left: -50%;
+    width: 200%;
+    height: 200%;
+    background: 
+        radial-gradient(circle at 20% 30%, rgba(99, 102, 241, 0.8) 0%, transparent 50%),
+        radial-gradient(circle at 80% 70%, rgba(236, 72, 153, 0.8) 0%, transparent 50%),
+        radial-gradient(circle at 40% 80%, rgba(139, 92, 246, 0.6) 0%, transparent 50%),
+        radial-gradient(circle at 60% 20%, rgba(59, 130, 246, 0.7) 0%, transparent 50%);
+    animation: colorWave1 20s ease-in-out infinite;
+    opacity: 0.9;
+    z-index: 0;
+}
 
-    0%,
-    100% {
-        background-position: 0% 50%;
+.aiha-hero-section::after {
+    content: '';
+    position: absolute;
+    top: -50%;
+    right: -50%;
+    width: 200%;
+    height: 200%;
+    background: 
+        radial-gradient(circle at 70% 40%, rgba(236, 72, 153, 0.7) 0%, transparent 50%),
+        radial-gradient(circle at 30% 60%, rgba(99, 102, 241, 0.6) 0%, transparent 50%),
+        radial-gradient(circle at 80% 80%, rgba(251, 146, 60, 0.6) 0%, transparent 50%),
+        radial-gradient(circle at 20% 20%, rgba(168, 85, 247, 0.7) 0%, transparent 50%);
+    animation: colorWave2 25s ease-in-out infinite;
+    opacity: 0.8;
+    z-index: 0;
+}
+
+/* Additional animated gradient layers for depth */
+.aiha-hero-section {
+    background: 
+        radial-gradient(circle at 0% 0%, rgba(99, 102, 241, 0.4) 0%, transparent 50%),
+        radial-gradient(circle at 100% 100%, rgba(236, 72, 153, 0.4) 0%, transparent 50%),
+        linear-gradient(135deg, var(--gradient-start, #6366f1), var(--gradient-end, #ec4899));
+    background-size: 200% 200%;
+    animation: baseGradientShift 15s ease infinite;
+}
+
+@keyframes baseGradientShift {
+    0%, 100% {
+        background-position: 0% 0%, 100% 100%, 0% 50%;
     }
-
     50% {
-        background-position: 100% 50%;
+        background-position: 100% 100%, 0% 0%, 100% 50%;
+    }
+}
+
+@keyframes colorWave1 {
+    0% {
+        transform: translate(0, 0) scale(1) rotate(0deg);
+        opacity: 0.9;
+    }
+    25% {
+        transform: translate(10%, 15%) scale(1.1) rotate(5deg);
+        opacity: 0.7;
+    }
+    50% {
+        transform: translate(-5%, 10%) scale(1.2) rotate(-3deg);
+        opacity: 0.8;
+    }
+    75% {
+        transform: translate(15%, -5%) scale(1.05) rotate(7deg);
+        opacity: 0.75;
+    }
+    100% {
+        transform: translate(0, 0) scale(1) rotate(0deg);
+        opacity: 0.9;
+    }
+}
+
+@keyframes colorWave2 {
+    0% {
+        transform: translate(0, 0) scale(1) rotate(0deg);
+        opacity: 0.8;
+    }
+    33% {
+        transform: translate(-10%, 20%) scale(1.15) rotate(-8deg);
+        opacity: 0.6;
+    }
+    66% {
+        transform: translate(20%, -10%) scale(1.1) rotate(10deg);
+        opacity: 0.7;
+    }
+    100% {
+        transform: translate(0, 0) scale(1) rotate(0deg);
+        opacity: 0.8;
     }
 }
 
