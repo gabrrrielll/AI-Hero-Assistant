@@ -25,7 +25,7 @@
             this.isSpeaking = false;
             this.currentText = '';
             this.sessionId = this.generateSessionId();
-            
+
             // Voice settings
             this.enableVoice = config.enableVoice || false;
             this.voiceName = config.voiceName || 'default';
@@ -181,7 +181,7 @@
 
             // Mark speech as active
             this.isSpeechActive = true;
-            
+
             // Ensure video is in speaking state
             this.setSpeakingState();
 
@@ -254,7 +254,7 @@
 
             // Speak all chunks sequentially
             let chunkIndex = 0;
-            
+
             const speakChunk = () => {
                 if (chunkIndex >= textChunks.length) {
                     // All chunks spoken
@@ -264,15 +264,15 @@
                     }
                     return;
                 }
-                
+
                 const utterance = new SpeechSynthesisUtterance(textChunks[chunkIndex]);
                 utterance.voice = this.selectedVoice;
-                
+
                 // Configure speech properties
                 utterance.rate = 1.0; // Normal speed
                 utterance.pitch = 1.0; // Normal pitch
                 utterance.volume = 1.0; // Full volume
-                
+
                 // Handle speech events
                 utterance.onend = () => {
                     chunkIndex++;
@@ -288,9 +288,21 @@
                         }
                     }
                 };
-                
+
                 utterance.onerror = (event) => {
                     console.warn('Speech synthesis error:', event);
+                    
+                    // Check if error is "not-allowed" (Chrome autoplay policy or site settings)
+                    if (event.error === 'not-allowed') {
+                        console.error('Speech synthesis blocked by browser. Possible causes:');
+                        console.error('1. Chrome site settings: Click the lock icon in address bar → Site settings → Sound → Allow');
+                        console.error('2. Chrome autoplay policy: Speech must start from user gesture (click/touch)');
+                        console.error('3. System sound settings: Check if sound is muted or blocked');
+                        
+                        // Show user-friendly message
+                        this.showSpeechBlockedMessage();
+                    }
+                    
                     chunkIndex++;
                     if (chunkIndex < textChunks.length) {
                         // Try next chunk even if error - keep video in speaking state
@@ -304,11 +316,11 @@
                         }
                     }
                 };
-                
+
                 // Speak this chunk
                 this.synth.speak(utterance);
             };
-            
+
             // Start speaking first chunk
             speakChunk();
         }
@@ -321,6 +333,40 @@
                 this.synth.cancel();
             }
             this.isSpeechActive = false;
+        }
+        
+        /**
+         * Show message when speech is blocked
+         */
+        showSpeechBlockedMessage() {
+            // Check if message already exists
+            if (document.getElementById('aiha-speech-blocked-message')) {
+                return;
+            }
+            
+            // Create message element
+            const messageEl = document.createElement('div');
+            messageEl.id = 'aiha-speech-blocked-message';
+            messageEl.className = 'alert alert-warning alert-dismissible fade show position-fixed';
+            messageEl.style.cssText = 'top: 20px; right: 20px; z-index: 10000; max-width: 400px; box-shadow: 0 4px 12px rgba(0,0,0,0.15);';
+            messageEl.innerHTML = `
+                <strong>Sunet blocat</strong><br>
+                Pentru a activa vocea, permite sunetul în setările Chrome:<br>
+                <small>1. Click pe iconița de lăcătuș din bara de adresă<br>
+                2. Site settings → Sound → Allow<br>
+                3. Reîncarcă pagina</small>
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            `;
+            
+            // Add to page
+            document.body.appendChild(messageEl);
+            
+            // Auto-dismiss after 10 seconds
+            setTimeout(() => {
+                if (messageEl.parentNode) {
+                    messageEl.remove();
+                }
+            }, 10000);
         }
 
         setupVideos() {
@@ -540,7 +586,7 @@
             // Mark user interaction - this enables speech synthesis in Chrome
             // (sending a message is a valid user gesture)
             this.userHasInteracted = true;
-            
+
             // Re-initialize voice after user interaction if needed
             if (this.enableVoice && this.voices.length === 0) {
                 this.setupVoice();
@@ -589,19 +635,19 @@
                     // Start speech immediately while still in user gesture context (Chrome requirement)
                     // Store the response message for speech
                     const aiResponse = response.data.message;
-                    
+
                     // Start speech synthesis immediately (still in click handler context)
                     if (this.enableVoice && this.userHasInteracted) {
                         // Ensure video is in speaking state
                         this.setSpeakingState();
-                        
+
                         // Start speech synthesis right away
                         this.speakText(aiResponse, () => {
                             // When speech is complete, switch to silent state
                             this.setSilentState();
                         });
                     }
-                    
+
                     // Then start typing animation
                     this.typeText(aiResponse, () => {
                         // After typing finishes
