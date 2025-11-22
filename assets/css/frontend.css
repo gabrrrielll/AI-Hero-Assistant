@@ -103,12 +103,14 @@
     will-change: opacity;
 }
 
-/* Video Transitions */
+/* Video Transitions - Control doar prin opacity și z-index, fără display */
 .aiha-video-silence {
     z-index: 1;
     opacity: 1;
     transition: opacity var(--aiha-video-transition-duration, 1.5s) var(--aiha-video-transition-easing, cubic-bezier(0.4, 0, 0.2, 1));
     will-change: opacity;
+    pointer-events: none;
+    /* Previne interacțiunea cu videoclipul ascuns */
 }
 
 .aiha-video-speaking {
@@ -116,6 +118,8 @@
     opacity: 0;
     transition: opacity var(--aiha-video-transition-duration, 1.5s) var(--aiha-video-transition-easing, cubic-bezier(0.4, 0, 0.2, 1));
     will-change: opacity;
+    pointer-events: none;
+    /* Previne interacțiunea cu videoclipul ascuns */
 }
 
 .aiha-video-container.speaking .aiha-video-silence {
