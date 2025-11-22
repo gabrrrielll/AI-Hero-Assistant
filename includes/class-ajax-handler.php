@@ -390,21 +390,21 @@ class AIHA_Ajax_Handler
             $body .= '<li><strong>' . esc_html__('Telefon', 'ai-hero-assistant') . ':</strong> ' . esc_html($phone) . '</li>';
         }
         $body .= '</ul>';
-        
+
         // Adaugă conversația integrală
         $messages = AIHA_Database::get_conversation_history($conversation_id, 1000);
         if (!empty($messages)) {
             $body .= '<hr style="margin: 20px 0; border: none; border-top: 1px solid #ddd;">';
             $body .= '<h3 style="margin-top: 0;">' . esc_html__('Conversația completă', 'ai-hero-assistant') . '</h3>';
             $body .= '<div style="background: #f5f5f5; padding: 15px; border-radius: 5px; max-height: 600px; overflow-y: auto;">';
-            
+
             foreach ($messages as $msg) {
                 $is_user = $msg->role === 'user';
                 $bg_color = $is_user ? '#0073aa' : '#f0f0f1';
                 $text_color = $is_user ? '#fff' : '#000';
                 $align = $is_user ? 'right' : 'left';
                 $sender = $is_user ? esc_html__('Utilizator', 'ai-hero-assistant') : esc_html__('AI', 'ai-hero-assistant');
-                
+
                 $body .= '<div style="margin-bottom: 15px; text-align: ' . $align . ';">';
                 $body .= '<div style="display: inline-block; max-width: 80%; background: ' . $bg_color . '; color: ' . $text_color . '; padding: 10px 15px; border-radius: 8px; text-align: left;">';
                 $body .= '<div style="font-weight: bold; margin-bottom: 5px; font-size: 12px; opacity: 0.9;">' . esc_html($sender) . '</div>';
@@ -415,10 +415,10 @@ class AIHA_Ajax_Handler
                 $body .= '</div>';
                 $body .= '</div>';
             }
-            
+
             $body .= '</div>';
         }
-        
+
         $body .= '<hr style="margin: 20px 0; border: none; border-top: 1px solid #ddd;">';
         $body .= '<p><a href="' . esc_url($conversation_url) . '" style="display: inline-block; padding: 10px 20px; background: #0073aa; color: #fff; text-decoration: none; border-radius: 3px;">' . esc_html__('Vezi conversația în WordPress', 'ai-hero-assistant') . '</a></p>';
 
