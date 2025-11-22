@@ -67,7 +67,7 @@ class AIHA_Shortcode
                             <?php endif; ?>
                         </video>
                         
-                        <!-- Video pentru vorbire (ascuns inițial) -->
+                        <!-- Video pentru vorbire (ascuns inițial prin opacity) -->
                         <video 
                             id="aiha-video-speaking-<?php echo esc_attr($instance_id); ?>" 
                             class="aiha-video aiha-video-speaking position-absolute top-0 start-0 w-100 h-100" 
@@ -75,7 +75,7 @@ class AIHA_Shortcode
                             loop 
                             muted 
                             playsinline
-                            style="object-fit: cover; border-radius: 50%; display: none;">
+                            style="object-fit: cover; border-radius: 50%;">
                             <?php if ($video_speaking_url): ?>
                                 <source src="<?php echo esc_url($video_speaking_url); ?>" type="video/mp4">
                             <?php endif; ?>
