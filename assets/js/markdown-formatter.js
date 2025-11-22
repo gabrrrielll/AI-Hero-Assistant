@@ -66,9 +66,8 @@
                 }
                 if (trimmed) {
                     result.push('<p class="aiha-message-paragraph">' + trimmed + '</p>');
-                } else {
-                    result.push('<br class="aiha-line-break">');
                 }
+                // Nu adăugăm <br> pentru linii goale - le ignorăm complet pentru a evita spații excesive
             }
         });
 
@@ -193,9 +192,8 @@
                 // Formatează inline markdown
                 let content = formatInlineMarkdown(trimmed);
                 result.push('<p class="aiha-message-paragraph">' + content + '</p>');
-            } else {
-                result.push('<br class="aiha-line-break">');
             }
+            // Nu adăugăm <br> pentru linii goale - le ignorăm complet pentru a evita spații excesive
         });
 
         // Închide liste sau code blocks deschise
