@@ -27,6 +27,8 @@ class AIHA_Shortcode
 
         $gradient_start = isset($settings['gradient_start']) ? $settings['gradient_start'] : '#6366f1';
         $gradient_end = isset($settings['gradient_end']) ? $settings['gradient_end'] : '#ec4899';
+        $gradient_color_3 = isset($settings['gradient_color_3']) ? $settings['gradient_color_3'] : '#8b5cf6';
+        $gradient_color_4 = isset($settings['gradient_color_4']) ? $settings['gradient_color_4'] : '#3b82f6';
         $font_family = isset($settings['font_family']) ? $settings['font_family'] : 'Inter, sans-serif';
 
         // Video URLs from settings
@@ -43,7 +45,7 @@ class AIHA_Shortcode
         ob_start();
         ?>
         <div id="<?php echo esc_attr($instance_id); ?>" class="aiha-container" data-instance-id="<?php echo esc_attr($instance_id); ?>">
-            <div class="aiha-hero-section container-fluid d-flex flex-column justify-content-between" style="--gradient-start: <?php echo esc_attr($gradient_start); ?>; --gradient-end: <?php echo esc_attr($gradient_end); ?>; --font-family: <?php echo esc_attr($font_family); ?><?php echo !empty($atts['height']) ? '; height: ' . esc_attr($atts['height']) . '; min-height: ' . esc_attr($atts['height']) : ''; ?>">
+            <div class="aiha-hero-section container-fluid d-flex flex-column justify-content-between" style="--gradient-start: <?php echo esc_attr($gradient_start); ?>; --gradient-end: <?php echo esc_attr($gradient_end); ?>; --gradient-color-3: <?php echo esc_attr($gradient_color_3); ?>; --gradient-color-4: <?php echo esc_attr($gradient_color_4); ?>; --font-family: <?php echo esc_attr($font_family); ?><?php echo !empty($atts['height']) ? '; height: ' . esc_attr($atts['height']) . '; min-height: ' . esc_attr($atts['height']) : ''; ?>">
                 <!-- Video Container - Două videoclipuri suprapuse -->
                 <div class="aiha-video-container d-flex justify-content-center align-items-center flex-shrink-0 my-3">
                     <div class="position-relative" style="width: 300px; height: 300px;">

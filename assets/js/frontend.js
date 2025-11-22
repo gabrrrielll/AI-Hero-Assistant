@@ -44,12 +44,51 @@
         }
 
         init() {
+            this.setupColorVariables();
             this.setupVideos();
             this.setupEventListeners();
             this.setupVoice();
             this.showInitialMessage();
             // Start with silent state
             this.setSilentState();
+        }
+
+        /**
+         * Convert hex color to rgba and set CSS variables for opacity variations
+         */
+        setupColorVariables() {
+            const heroSection = document.querySelector(`#${this.instanceId} .aiha-hero-section`);
+            if (!heroSection) return;
+
+            // Get color values from CSS variables
+            const gradientStart = getComputedStyle(heroSection).getPropertyValue('--gradient-start').trim();
+            const gradientEnd = getComputedStyle(heroSection).getPropertyValue('--gradient-end').trim();
+            const gradientColor3 = getComputedStyle(heroSection).getPropertyValue('--gradient-color-3').trim();
+            const gradientColor4 = getComputedStyle(heroSection).getPropertyValue('--gradient-color-4').trim();
+
+            // Helper function to convert hex to rgba
+            const hexToRgba = (hex, alpha) => {
+                const r = parseInt(hex.slice(1, 3), 16);
+                const g = parseInt(hex.slice(3, 5), 16);
+                const b = parseInt(hex.slice(5, 7), 16);
+                return `rgba(${r}, ${g}, ${b}, ${alpha})`;
+            };
+
+            // Set rgba variables for different opacity levels
+            if (gradientStart) {
+                heroSection.style.setProperty('--gradient-start-rgba-40', hexToRgba(gradientStart, 0.4));
+                heroSection.style.setProperty('--gradient-start-rgba-80', hexToRgba(gradientStart, 0.8));
+            }
+            if (gradientEnd) {
+                heroSection.style.setProperty('--gradient-end-rgba-40', hexToRgba(gradientEnd, 0.4));
+                heroSection.style.setProperty('--gradient-end-rgba-80', hexToRgba(gradientEnd, 0.8));
+            }
+            if (gradientColor3) {
+                heroSection.style.setProperty('--gradient-color-3-rgba-60', hexToRgba(gradientColor3, 0.6));
+            }
+            if (gradientColor4) {
+                heroSection.style.setProperty('--gradient-color-4-rgba-70', hexToRgba(gradientColor4, 0.7));
+            }
         }
 
         /**

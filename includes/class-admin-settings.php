@@ -42,6 +42,8 @@ class AIHA_Admin_Settings
         $sanitized['ai_instructions'] = wp_kses_post($input['ai_instructions'] ?? '');
         $sanitized['gradient_start'] = sanitize_hex_color($input['gradient_start'] ?? '#6366f1');
         $sanitized['gradient_end'] = sanitize_hex_color($input['gradient_end'] ?? '#ec4899');
+        $sanitized['gradient_color_3'] = sanitize_hex_color($input['gradient_color_3'] ?? '#8b5cf6');
+        $sanitized['gradient_color_4'] = sanitize_hex_color($input['gradient_color_4'] ?? '#3b82f6');
         $sanitized['font_family'] = sanitize_text_field($input['font_family'] ?? 'Inter, sans-serif');
         $sanitized['hero_message'] = sanitize_textarea_field($input['hero_message'] ?? '');
         $sanitized['video_silence_url'] = esc_url_raw($input['video_silence_url'] ?? '');
@@ -525,6 +527,24 @@ class AIHA_Admin_Settings
                                                id="gradient_end" 
                                                name="aiha_settings[gradient_end]" 
                                                value="<?php echo esc_attr($settings['gradient_end'] ?? '#ec4899'); ?>"
+                                               class="form-control form-control-color">
+                                    </div>
+                                    
+                                    <div class="col-md-6">
+                                        <label for="gradient_color_3" class="form-label fw-bold"><?php _e('Culoare Gradient 3', 'ai-hero-assistant'); ?></label>
+                                        <input type="color" 
+                                               id="gradient_color_3" 
+                                               name="aiha_settings[gradient_color_3]" 
+                                               value="<?php echo esc_attr($settings['gradient_color_3'] ?? '#8b5cf6'); ?>"
+                                               class="form-control form-control-color">
+                                    </div>
+                                    
+                                    <div class="col-md-6">
+                                        <label for="gradient_color_4" class="form-label fw-bold"><?php _e('Culoare Gradient 4', 'ai-hero-assistant'); ?></label>
+                                        <input type="color" 
+                                               id="gradient_color_4" 
+                                               name="aiha_settings[gradient_color_4]" 
+                                               value="<?php echo esc_attr($settings['gradient_color_4'] ?? '#3b82f6'); ?>"
                                                class="form-control form-control-color">
                                     </div>
                                     

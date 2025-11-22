@@ -104,6 +104,8 @@ class AI_Hero_Assistant
             'ai_instructions' => 'Ești un asistent virtual prietenos pentru o firmă de programare. Scopul tău este să informați vizitatorii despre serviciile companiei și să îi îndemni să contacteze firma. Răspunde întotdeauna în limba în care primești întrebarea.',
             'gradient_start' => '#6366f1',
             'gradient_end' => '#ec4899',
+            'gradient_color_3' => '#8b5cf6',
+            'gradient_color_4' => '#3b82f6',
             'font_family' => 'Inter, sans-serif',
             'hero_message' => 'Bună! Sunt asistentul virtual al {company_name}. Cum vă pot ajuta cu serviciile noastre de programare?',
               'assistant_gender' => 'feminin',
