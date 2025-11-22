@@ -80,35 +80,95 @@
          */
         selectVoice() {
             if (!this.voices || this.voices.length === 0) {
+                console.warn('No voices available');
                 return;
             }
+            
+            // Log available voices for debugging
+            console.log('Available voices:', this.voices.map(v => ({ name: v.name, lang: v.lang, default: v.default })));
+            console.log('Looking for voice:', this.voiceName);
             
             if (this.voiceName === 'default') {
                 // Use default voice (usually first available)
                 this.selectedVoice = this.voices.find(v => v.default) || this.voices[0];
+                console.log('Using default voice:', this.selectedVoice?.name);
             } else {
-                // Try to find exact match first
+                // Try multiple matching strategies
+                
+                // 1. Exact match
                 this.selectedVoice = this.voices.find(v => v.name === this.voiceName);
                 
-                // If not found, try partial match
+                // 2. Case-insensitive exact match
                 if (!this.selectedVoice) {
                     this.selectedVoice = this.voices.find(v => 
-                        v.name.toLowerCase().includes(this.voiceName.toLowerCase())
+                        v.name.toLowerCase() === this.voiceName.toLowerCase()
                     );
+                }
+                
+                // 3. Contains match (case-insensitive)
+                if (!this.selectedVoice) {
+                    this.selectedVoice = this.voices.find(v => 
+                        v.name.toLowerCase().includes(this.voiceName.toLowerCase()) ||
+                        this.voiceName.toLowerCase().includes(v.name.toLowerCase())
+                    );
+                }
+                
+                // 4. Match by key words (e.g., "Female", "Male", "UK", "US")
+                if (!this.selectedVoice) {
+                    const keywords = this.voiceName.toLowerCase().split(/\s+/);
+                    this.selectedVoice = this.voices.find(v => {
+                        const voiceNameLower = v.name.toLowerCase();
+                        return keywords.every(keyword => voiceNameLower.includes(keyword));
+                    });
+                }
+                
+                // 5. Match by gender preference
+                if (!this.selectedVoice) {
+                    const isFemale = this.voiceName.toLowerCase().includes('female') || 
+                                    this.voiceName.toLowerCase().includes('feminin') ||
+                                    this.voiceName.toLowerCase().includes('zira') ||
+                                    this.voiceName.toLowerCase().includes('hazel') ||
+                                    this.voiceName.toLowerCase().includes('samantha') ||
+                                    this.voiceName.toLowerCase().includes('victoria');
+                    
+                    const isMale = this.voiceName.toLowerCase().includes('male') || 
+                                  this.voiceName.toLowerCase().includes('masculin') ||
+                                  this.voiceName.toLowerCase().includes('david') ||
+                                  this.voiceName.toLowerCase().includes('mark') ||
+                                  this.voiceName.toLowerCase().includes('alex') ||
+                                  this.voiceName.toLowerCase().includes('daniel');
+                    
+                    if (isFemale) {
+                        this.selectedVoice = this.voices.find(v => 
+                            v.name.toLowerCase().includes('female') || 
+                            v.name.toLowerCase().includes('zira') ||
+                            v.name.toLowerCase().includes('hazel')
+                        );
+                    } else if (isMale) {
+                        this.selectedVoice = this.voices.find(v => 
+                            v.name.toLowerCase().includes('male') || 
+                            v.name.toLowerCase().includes('david') ||
+                            v.name.toLowerCase().includes('mark')
+                        );
+                    }
                 }
                 
                 // Fallback to default if still not found
                 if (!this.selectedVoice) {
                     this.selectedVoice = this.voices.find(v => v.default) || this.voices[0];
-                    console.warn(`Voice "${this.voiceName}" not found, using default voice`);
+                    console.warn(`Voice "${this.voiceName}" not found, using default voice:`, this.selectedVoice?.name);
+                } else {
+                    console.log('Found voice:', this.selectedVoice.name);
                 }
             }
         }
         
         /**
          * Speak text using text-to-speech
+         * @param {string} text - Text to speak
+         * @param {Function} onComplete - Callback when speech is complete
          */
-        speakText(text) {
+        speakText(text, onComplete) {
             if (!this.enableVoice || !this.synth || !text) {
                 return;
             }
@@ -117,16 +177,24 @@
             this.synth.cancel();
             
             // Remove markdown formatting and HTML tags for clean speech
-            const cleanText = text
-                .replace(/<[^>]*>/g, '') // Remove HTML tags
+            // First, decode HTML entities
+            const tempDiv = document.createElement('div');
+            tempDiv.innerHTML = text;
+            let cleanText = tempDiv.textContent || tempDiv.innerText || text;
+            
+            // Additional cleanup for markdown and special characters
+            cleanText = cleanText
                 .replace(/\*\*(.*?)\*\*/g, '$1') // Remove bold markdown
                 .replace(/\*(.*?)\*/g, '$1') // Remove italic markdown
                 .replace(/#{1,6}\s/g, '') // Remove headers
                 .replace(/`([^`]*)`/g, '$1') // Remove inline code
                 .replace(/\[([^\]]*)\]\([^\)]*\)/g, '$1') // Remove links
+                .replace(/\n+/g, '. ') // Replace newlines with periods
+                .replace(/\s+/g, ' ') // Normalize whitespace
                 .trim();
             
             if (!cleanText) {
+                console.warn('No text to speak after cleaning');
                 return;
             }
             
@@ -139,33 +207,93 @@
                 return;
             }
             
-            // Ensure voice is selected
+            // Re-select voice each time to ensure it's current
+            this.selectVoice();
+            
             if (!this.selectedVoice) {
-                this.selectVoice();
+                console.warn('No voice selected, cannot speak');
+                return;
             }
             
-            const utterance = new SpeechSynthesisUtterance(cleanText);
+            // Split long text into chunks if needed (some browsers have limits)
+            const maxLength = 20000; // Safe limit for most browsers
+            const textChunks = [];
             
-            if (this.selectedVoice) {
+            if (cleanText.length > maxLength) {
+                // Split by sentences
+                const sentences = cleanText.match(/[^.!?]+[.!?]+/g) || [cleanText];
+                let currentChunk = '';
+                
+                for (const sentence of sentences) {
+                    if ((currentChunk + sentence).length > maxLength && currentChunk) {
+                        textChunks.push(currentChunk.trim());
+                        currentChunk = sentence;
+                    } else {
+                        currentChunk += sentence;
+                    }
+                }
+                
+                if (currentChunk.trim()) {
+                    textChunks.push(currentChunk.trim());
+                }
+            } else {
+                textChunks.push(cleanText);
+            }
+            
+            // Speak all chunks sequentially
+            let chunkIndex = 0;
+            
+            const speakChunk = () => {
+                if (chunkIndex >= textChunks.length) {
+                    // All chunks spoken
+                    if (onComplete) {
+                        onComplete();
+                    }
+                    return;
+                }
+                
+                const utterance = new SpeechSynthesisUtterance(textChunks[chunkIndex]);
                 utterance.voice = this.selectedVoice;
-            }
-            
-            // Configure speech properties
-            utterance.rate = 1.0; // Normal speed
-            utterance.pitch = 1.0; // Normal pitch
-            utterance.volume = 1.0; // Full volume
-            
-            // Handle speech events
-            utterance.onend = () => {
-                // Speech finished
+                
+                // Configure speech properties
+                utterance.rate = 1.0; // Normal speed
+                utterance.pitch = 1.0; // Normal pitch
+                utterance.volume = 1.0; // Full volume
+                
+                // Handle speech events
+                utterance.onend = () => {
+                    chunkIndex++;
+                    if (chunkIndex < textChunks.length) {
+                        // Speak next chunk
+                        speakChunk();
+                    } else {
+                        // All chunks finished
+                        if (onComplete) {
+                            onComplete();
+                        }
+                    }
+                };
+                
+                utterance.onerror = (event) => {
+                    console.warn('Speech synthesis error:', event);
+                    chunkIndex++;
+                    if (chunkIndex < textChunks.length) {
+                        // Try next chunk even if error
+                        speakChunk();
+                    } else {
+                        // All chunks finished (or failed)
+                        if (onComplete) {
+                            onComplete();
+                        }
+                    }
+                };
+                
+                // Speak this chunk
+                this.synth.speak(utterance);
             };
             
-            utterance.onerror = (event) => {
-                console.warn('Speech synthesis error:', event);
-            };
-            
-            // Speak
-            this.synth.speak(utterance);
+            // Start speaking first chunk
+            speakChunk();
         }
         
         /**
@@ -201,8 +329,8 @@
                 this.videoContainer.classList.add('silent');
             }
             this.isSpeaking = false;
-            // Stop any ongoing speech when going silent
-            this.stopSpeaking();
+            // Don't stop speech automatically - let it finish naturally
+            // Speech will be stopped only when explicitly needed (new message, etc.)
         }
 
         /**
@@ -320,7 +448,10 @@
             
             // Start speaking if voice is enabled
             if (this.enableVoice) {
-                this.speakText(text);
+                this.speakText(text, () => {
+                    // When speech is complete, switch to silent state
+                    this.setSilentState();
+                });
             }
 
             const typeChar = () => {
@@ -347,9 +478,11 @@
                         }, 50);
                     }
                     if (callback) callback();
-                    // După ce se termină typing-ul, trec la silent state imediat (fără delay)
-                    // pentru a evita flash-ul
-                    this.setSilentState();
+                    // Nu trecem la silent state imediat dacă vocea este activată
+                    // setSilentState va fi apelat automat când se termină citirea vocală
+                    if (!this.enableVoice) {
+                        this.setSilentState();
+                    }
                 }
             };
 
