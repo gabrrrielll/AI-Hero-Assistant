@@ -126,7 +126,6 @@
 .aiha-video-container.speaking .aiha-video-speaking {
     opacity: 1;
     z-index: 2;
-    display: block !important;
 }
 
 .aiha-video-container.silent .aiha-video-silence {

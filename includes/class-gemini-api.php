@@ -18,7 +18,7 @@ class AIHA_Gemini_API
     {
         $settings = get_option('aiha_settings', array());
         $this->api_key = isset($settings['api_key']) ? $settings['api_key'] : '';
-        $this->model = isset($settings['model']) ? $settings['model'] : 'gemini-1.5-flash';
+        $this->model = isset($settings['model']) ? $settings['model'] : 'gemini-2.5-flash';
     }
 
     /**
