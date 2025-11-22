@@ -599,7 +599,7 @@
                     if (this.subtitleEl) {
                         // Formatează textul parțial cu markdown în timpul typing-ului
                         const partialFormatted = this.formatPartialText(this.currentText);
-                        this.subtitleEl.innerHTML = partialFormatted + '<span class="typing-cursor"></span>';
+                        this.subtitleEl.innerHTML = partialFormatted;
                         // Scroll automat mai frecvent pentru text lung
                         if (index % 5 === 0 || index === text.length - 1) {
                             this.scrollToBottom();

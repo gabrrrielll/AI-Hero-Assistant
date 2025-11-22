@@ -180,15 +180,9 @@
     background: rgba(255, 255, 255, 0.7);
 }
 
-/* Typing Cursor */
+/* Typing Cursor - Hidden */
 .aiha-subtitle .typing-cursor {
-    display: inline-block;
-    width: 2px;
-    height: 20px;
-    background: white;
-    margin-left: 2px;
-    animation: blinkCursor 1s infinite;
-    vertical-align: middle;
+    display: none !important;
 }
 
 @keyframes blinkCursor {
@@ -206,7 +200,9 @@
 
 /* Markdown Formatting */
 .aiha-subtitle .aiha-message-paragraph {
-    margin: 0.5em 0;
+    margin: 0;
+    margin-top: calc(var(--font-size-base, 16px) * 1.3); /* Maxim un rând distanță */
+    margin-bottom: calc(var(--font-size-base, 16px) * 1.3); /* Maxim un rând distanță */
     line-height: 1.3;
 }
 
@@ -216,6 +212,10 @@
 
 .aiha-subtitle .aiha-message-paragraph:last-child {
     margin-bottom: 0;
+}
+
+.aiha-subtitle .aiha-message-paragraph + .aiha-message-paragraph {
+    margin-top: calc(var(--font-size-base, 16px) * 1.3); /* Maxim un rând distanță între paragrafe */
 }
 
 .aiha-subtitle .aiha-message-list {
@@ -342,7 +342,7 @@
     line-height: 1.3;
     color: #ffffff !important;
     background: transparent !important;
-    padding: 8px 0;
+    padding: 6px;
     max-height: 50px;
     overflow-y: auto;
 }
@@ -350,6 +350,7 @@
 .aiha-textarea:focus {
     color: #ffffff !important;
     background: transparent !important;
+    border: transparent !important;
 }
 
 .aiha-textarea::placeholder {
