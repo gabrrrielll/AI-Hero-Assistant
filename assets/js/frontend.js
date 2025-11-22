@@ -291,18 +291,18 @@
 
                 utterance.onerror = (event) => {
                     console.warn('Speech synthesis error:', event);
-                    
+
                     // Check if error is "not-allowed" (Chrome autoplay policy or site settings)
                     if (event.error === 'not-allowed') {
                         console.error('Speech synthesis blocked by browser. Possible causes:');
                         console.error('1. Chrome site settings: Click the lock icon in address bar → Site settings → Sound → Allow');
                         console.error('2. Chrome autoplay policy: Speech must start from user gesture (click/touch)');
                         console.error('3. System sound settings: Check if sound is muted or blocked');
-                        
+
                         // Show user-friendly message
                         this.showSpeechBlockedMessage();
                     }
-                    
+
                     chunkIndex++;
                     if (chunkIndex < textChunks.length) {
                         // Try next chunk even if error - keep video in speaking state
@@ -334,7 +334,7 @@
             }
             this.isSpeechActive = false;
         }
-        
+
         /**
          * Show message when speech is blocked
          */
@@ -343,7 +343,7 @@
             if (document.getElementById('aiha-speech-blocked-message')) {
                 return;
             }
-            
+
             // Create message element
             const messageEl = document.createElement('div');
             messageEl.id = 'aiha-speech-blocked-message';
@@ -357,10 +357,10 @@
                 3. Reîncarcă pagina</small>
                 <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
             `;
-            
+
             // Add to page
             document.body.appendChild(messageEl);
-            
+
             // Auto-dismiss after 10 seconds
             setTimeout(() => {
                 if (messageEl.parentNode) {
@@ -419,13 +419,13 @@
                     }
                 }
             };
-
-            // Listen for various user interactions
+            
+            // Listen for various user interactions (but don't stop speech on these)
             const interactionEvents = ['click', 'touchstart', 'keydown', 'mousedown'];
             interactionEvents.forEach(eventType => {
                 document.addEventListener(eventType, markUserInteraction, { once: true, passive: true });
             });
-
+            
             // Send button
             if (this.sendBtn) {
                 this.sendBtn.addEventListener('click', () => {
@@ -442,16 +442,21 @@
                         e.preventDefault();
                         this.sendMessage();
                     }
+                    // Don't stop speech when user types - only when sending message
                 });
-
+                
                 this.inputEl.addEventListener('focus', markUserInteraction, { once: true });
-                this.inputEl.addEventListener('click', markUserInteraction, { once: true });
+                this.inputEl.addEventListener('click', (e) => {
+                    markUserInteraction();
+                    // Don't stop speech when clicking in textarea - only when sending message
+                });
 
                 // Auto-resize textarea
                 this.inputEl.addEventListener('input', () => {
                     markUserInteraction();
                     this.inputEl.style.height = 'auto';
                     this.inputEl.style.height = Math.min(this.inputEl.scrollHeight, 50) + 'px';
+                    // Don't stop speech when typing - only when sending message
                 });
             }
         }
@@ -520,11 +525,19 @@
         }
 
         typeText(text, callback, skipSpeech = false) {
-            // Switch to speaking state when typing starts
-            this.setSpeakingState();
-
-            // Stop any ongoing speech
+            // Stop any ongoing speech only if this is a new message
+            // (not when user just clicks in textarea)
             this.stopSpeaking();
+            
+            // Reset video to silent first, then switch to speaking when typing starts
+            // This ensures video resets correctly for each new message
+            this.setSilentState();
+            
+            // Small delay to ensure video transition is visible
+            setTimeout(() => {
+                // Switch to speaking state when typing starts
+                this.setSpeakingState();
+            }, 50);
 
             this.currentText = '';
             if (this.subtitleEl) {
@@ -638,10 +651,8 @@
 
                     // Start speech synthesis immediately (still in click handler context)
                     if (this.enableVoice && this.userHasInteracted) {
-                        // Ensure video is in speaking state
-                        this.setSpeakingState();
-
                         // Start speech synthesis right away
+                        // Video will be set to speaking state in speakText
                         this.speakText(aiResponse, () => {
                             // When speech is complete, switch to silent state
                             this.setSilentState();
@@ -649,6 +660,7 @@
                     }
 
                     // Then start typing animation
+                    // typeText will reset video to silent first, then switch to speaking
                     this.typeText(aiResponse, () => {
                         // After typing finishes
                         if (this.loadingEl) {
