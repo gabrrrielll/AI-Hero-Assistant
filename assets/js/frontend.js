@@ -362,6 +362,9 @@
                 return;
             }
 
+            // Stop any ongoing speech
+            this.stopSpeaking();
+
             // Clear subtitle and send to AI
             if (this.subtitleEl) {
                 this.subtitleEl.innerHTML = '';
