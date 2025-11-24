@@ -36,6 +36,10 @@
             this.pendingMessageForSpeech = null; // Store message for speech synthesis
             this.isSpeechActive = false; // Track if speech is currently active
 
+            // Conversation storage
+            this.storageKey = `aiha_conversation_${instanceId}`;
+            this.conversation = this.loadConversation();
+
             this.init();
         }
 
@@ -43,12 +47,69 @@
             return 'aiha_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9);
         }
 
+        /**
+         * Load conversation from localStorage
+         */
+        loadConversation() {
+            try {
+                const stored = localStorage.getItem(this.storageKey);
+                if (stored) {
+                    const parsed = JSON.parse(stored);
+                    // Verify it's a valid conversation structure
+                    if (parsed && Array.isArray(parsed.messages)) {
+                        this.sessionId = parsed.sessionId || this.sessionId;
+                        return parsed;
+                    }
+                }
+            } catch (e) {
+                console.warn('Error loading conversation from localStorage:', e);
+            }
+            // Return empty conversation structure
+            return {
+                sessionId: this.sessionId,
+                messages: []
+            };
+        }
+
+        /**
+         * Save conversation to localStorage
+         */
+        saveConversation() {
+            try {
+                localStorage.setItem(this.storageKey, JSON.stringify(this.conversation));
+            } catch (e) {
+                console.warn('Error saving conversation to localStorage:', e);
+            }
+        }
+
+        /**
+         * Add message to conversation
+         */
+        addMessageToConversation(role, text) {
+            if (!this.conversation.messages) {
+                this.conversation.messages = [];
+            }
+            this.conversation.messages.push({
+                role: role,
+                text: text,
+                timestamp: Date.now()
+            });
+            this.saveConversation();
+        }
+
         init() {
             this.setupColorVariables();
             this.setupVideos();
             this.setupEventListeners();
             this.setupVoice();
-            this.showInitialMessage();
+            
+            // Load existing conversation or show initial message
+            if (this.conversation.messages && this.conversation.messages.length > 0) {
+                this.loadExistingConversation();
+            } else {
+                this.showInitialMessage();
+            }
+            
             // Start with silent state
             this.setSilentState();
         }
@@ -506,7 +567,43 @@
                         this.setSilentState();
                     }, 500);
                 }, false); // Pass false to skip speech for initial message
+                
+                // Save initial message to conversation
+                this.addMessageToConversation('assistant', this.config.heroMessage);
             }, 1000);
+        }
+
+        /**
+         * Load and display existing conversation from localStorage
+         */
+        loadExistingConversation() {
+            if (!this.conversation.messages || this.conversation.messages.length === 0) {
+                return;
+            }
+
+            // Build HTML from all assistant messages (we only display AI responses in subtitle)
+            let conversationHTML = '';
+            
+            this.conversation.messages.forEach((msg) => {
+                if (msg.role === 'assistant') {
+                    // Format assistant message with markdown
+                    const formatted = this.formatMessageText(msg.text);
+                    // Add separator between multiple messages if needed
+                    if (conversationHTML) {
+                        conversationHTML += '<div style="margin: 1em 0;"></div>';
+                    }
+                    conversationHTML += formatted;
+                }
+            });
+
+            // Display the conversation directly (no typing effect for loaded conversation)
+            if (this.subtitleEl && conversationHTML) {
+                this.subtitleEl.innerHTML = conversationHTML;
+                // Scroll to bottom
+                setTimeout(() => {
+                    this.scrollToBottom();
+                }, 100);
+            }
         }
 
         /**
@@ -663,6 +760,9 @@
                 this.sendBtn.disabled = true;
             }
 
+            // Save user message to conversation
+            this.addMessageToConversation('user', message);
+
             try {
                 const response = await $.ajax({
                     url: aihaData.ajaxUrl,
@@ -679,6 +779,9 @@
                     // Start speech immediately while still in user gesture context (Chrome requirement)
                     // Store the response message for speech
                     const aiResponse = response.data.message;
+
+                    // Save AI response to conversation
+                    this.addMessageToConversation('assistant', aiResponse);
 
                     // Start speech synthesis immediately (still in click handler context)
                     if (this.enableVoice && this.userHasInteracted) {
@@ -707,7 +810,9 @@
                 }
             } catch (error) {
                 console.error('Error:', error);
-                this.typeText('Sorry, an error occurred. Please try again.', () => {
+                const errorMessage = 'Sorry, an error occurred. Please try again.';
+                this.addMessageToConversation('assistant', errorMessage);
+                this.typeText(errorMessage, () => {
                     this.setSilentState();
                     if (this.sendBtn) {
                         this.sendBtn.disabled = false;
