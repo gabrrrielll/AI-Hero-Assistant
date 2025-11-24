@@ -61,7 +61,7 @@
             try {
                 const stored = localStorage.getItem(this.storageKey);
                 console.log('Loading conversation from localStorage:', this.storageKey, stored ? 'found' : 'not found');
-                
+
                 if (stored) {
                     const parsed = JSON.parse(stored);
                     console.log('Parsed conversation:', parsed);
@@ -752,30 +752,12 @@
 
             this.currentText = '';
 
-            // Get existing conversation HTML (preserve previous messages)
-            // We'll remove only the last assistant message (if any) and replace it with the new one
+            // Get existing conversation HTML (preserve ALL previous messages)
+            // We'll append the new message at the end, not replace anything
             let baseHTML = '';
-            if (this.subtitleEl) {
-                const tempDiv = document.createElement('div');
-                tempDiv.innerHTML = this.subtitleEl.innerHTML;
-                const existingMessages = Array.from(tempDiv.querySelectorAll('.aiha-message-wrapper'));
-
-                // Find the last assistant message and remove it (it's the one being typed)
-                let lastAssistantIndex = -1;
-                for (let i = existingMessages.length - 1; i >= 0; i--) {
-                    const sender = existingMessages[i].querySelector('.aiha-message-sender');
-                    if (sender && sender.textContent === 'AI') {
-                        lastAssistantIndex = i;
-                        break;
-                    }
-                }
-
-                // Build base HTML without the last assistant message
-                existingMessages.forEach((msg, idx) => {
-                    if (idx !== lastAssistantIndex) {
-                        baseHTML += msg.outerHTML;
-                    }
-                });
+            if (this.subtitleEl && this.subtitleEl.innerHTML) {
+                // Keep all existing messages - don't remove anything
+                baseHTML = this.subtitleEl.innerHTML;
             }
 
             let index = 0;
