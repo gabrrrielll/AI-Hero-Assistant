@@ -24,8 +24,15 @@
 
             this.isSpeaking = false;
             this.currentText = '';
+            
+            // Conversation storage - MUST be initialized BEFORE generating sessionId
+            // so we can load existing sessionId from localStorage
+            this.storageKey = `aiha_conversation_${instanceId}`;
+            
+            // Generate sessionId only if we don't have one from localStorage
+            // loadConversation will set this.sessionId if a conversation exists
             this.sessionId = this.generateSessionId();
-
+            
             // Voice settings
             this.enableVoice = config.enableVoice || false;
             this.voiceName = config.voiceName || 'default';
@@ -36,8 +43,7 @@
             this.pendingMessageForSpeech = null; // Store message for speech synthesis
             this.isSpeechActive = false; // Track if speech is currently active
 
-            // Conversation storage
-            this.storageKey = `aiha_conversation_${instanceId}`;
+            // Load conversation from localStorage (this will update sessionId if conversation exists)
             this.conversation = this.loadConversation();
 
             this.init();
@@ -58,19 +64,31 @@
                     const parsed = JSON.parse(stored);
                     console.log('Parsed conversation:', parsed);
                     // Verify it's a valid conversation structure
-                    if (parsed && Array.isArray(parsed.messages) && parsed.messages.length > 0) {
-                        this.sessionId = parsed.sessionId || this.sessionId;
-                        console.log('Loaded conversation with', parsed.messages.length, 'messages');
+                    if (parsed && Array.isArray(parsed.messages)) {
+                        // Always use the sessionId from localStorage if it exists
+                        if (parsed.sessionId) {
+                            this.sessionId = parsed.sessionId;
+                            console.log('Restored sessionId from localStorage:', this.sessionId);
+                        }
+                        
+                        // Return conversation even if empty (to preserve sessionId)
+                        if (parsed.messages.length > 0) {
+                            console.log('Loaded conversation with', parsed.messages.length, 'messages');
+                        } else {
+                            console.log('Loaded empty conversation, but preserving sessionId');
+                        }
                         return parsed;
                     } else {
-                        console.log('Conversation structure invalid or empty');
+                        console.log('Conversation structure invalid');
                     }
+                } else {
+                    console.log('No conversation found in localStorage for key:', this.storageKey);
                 }
             } catch (e) {
                 console.warn('Error loading conversation from localStorage:', e);
             }
-            // Return empty conversation structure
-            console.log('Returning empty conversation structure');
+            // Return empty conversation structure with new sessionId
+            console.log('Returning empty conversation structure with new sessionId:', this.sessionId);
             return {
                 sessionId: this.sessionId,
                 messages: []
@@ -580,11 +598,11 @@
                 // Don't speak initial message automatically (Chrome autoplay policy)
                 // Only display it, speech will work after user interaction
                 // For initial message, we display it directly without typing effect
-                
+
                 // Check if initial message already exists in conversation
-                const hasInitialMessage = this.conversation && this.conversation.messages && 
+                const hasInitialMessage = this.conversation && this.conversation.messages &&
                     this.conversation.messages.some(msg => msg.role === 'assistant' && msg.text === this.config.heroMessage);
-                
+
                 if (this.subtitleEl) {
                     const initialMessageHTML = '<div class="aiha-message-wrapper aiha-message-assistant">' +
                         '<div class="aiha-message-bubble aiha-message-bubble-assistant">' +
