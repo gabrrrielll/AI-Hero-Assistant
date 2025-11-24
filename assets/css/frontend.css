@@ -395,6 +395,12 @@
     margin: 0.3em 0;
 }
 
+/* Input Container - Bootstrap-based */
+.aiha-input-container {
+    margin-top: 0.5em !important;
+    margin-bottom: 0.5em !important;
+}
+
 /* Input Wrapper - Bootstrap-based */
 .aiha-input-wrapper {
     background: rgba(0, 0, 0, 0.8);
