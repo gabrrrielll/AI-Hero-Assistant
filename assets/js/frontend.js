@@ -33,6 +33,9 @@
             // loadConversation will set this.sessionId if a conversation exists
             this.sessionId = this.generateSessionId();
 
+            // User name storage - will be extracted from conversation
+            this.userName = null;
+
             // Voice settings
             this.enableVoice = config.enableVoice || false;
             this.voiceName = config.voiceName || 'default';
@@ -71,6 +74,18 @@
                         if (parsed.sessionId) {
                             this.sessionId = parsed.sessionId;
                             console.log('Restored sessionId from localStorage:', this.sessionId);
+                        }
+
+                        // Extract user name from conversation if available
+                        if (parsed.userName) {
+                            this.userName = parsed.userName;
+                            console.log('Restored user name from localStorage:', this.userName);
+                        } else {
+                            // Try to extract name from conversation messages
+                            this.userName = this.extractUserNameFromConversation(parsed);
+                            if (this.userName) {
+                                console.log('Extracted user name from conversation:', this.userName);
+                            }
                         }
 
                         // Return conversation even if empty (to preserve sessionId)
@@ -653,7 +668,8 @@
 
                 if (isUser) {
                     // User message - plain text, no markdown
-                    conversationHTML += '<div class="aiha-message-sender">Utilizator</div>';
+                    const displayName = this.getUserDisplayName();
+                    conversationHTML += '<div class="aiha-message-sender">' + this.escapeHtml(displayName) + '</div>';
                     conversationHTML += '<div class="aiha-message-content">' + this.escapeHtml(msg.text) + '</div>';
                 } else {
                     // Assistant message - format with markdown
@@ -858,11 +874,15 @@
             // Save user message to conversation immediately (before displaying)
             this.addMessageToConversation('user', message);
 
+            // Try to extract user name from message
+            this.detectAndSaveUserName(message);
+
             // Add user message to conversation display immediately
             if (this.subtitleEl) {
+                const displayName = this.getUserDisplayName();
                 const userMessageHTML = '<div class="aiha-message-wrapper aiha-message-user">' +
                     '<div class="aiha-message-bubble aiha-message-bubble-user">' +
-                    '<div class="aiha-message-sender">Utilizator</div>' +
+                    '<div class="aiha-message-sender">' + this.escapeHtml(displayName) + '</div>' +
                     '<div class="aiha-message-content">' + this.escapeHtml(message) + '</div>' +
                     '</div></div>';
                 this.subtitleEl.innerHTML += userMessageHTML;
