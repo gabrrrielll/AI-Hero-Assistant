@@ -1032,6 +1032,19 @@
                     // Save AI response to conversation
                     this.addMessageToConversation('assistant', aiResponse);
 
+                    // Try to extract user name from AI response (AI might greet user by name)
+                    if (!this.userName) {
+                        const extractedName = this.extractUserNameFromMessage(aiResponse);
+                        if (extractedName) {
+                            this.userName = extractedName;
+                            console.log('Detected user name from AI response:', this.userName);
+                            // Update all user message senders in the display
+                            this.updateUserDisplayNames();
+                            // Save conversation to persist name
+                            this.saveConversation();
+                        }
+                    }
+
                     // Start speech synthesis immediately (still in click handler context)
                     if (this.enableVoice && this.userHasInteracted) {
                         // Start speech synthesis right away
