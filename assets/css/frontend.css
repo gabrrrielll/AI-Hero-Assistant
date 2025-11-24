@@ -385,8 +385,10 @@
     }
 
     .aiha-video-container>div {
-        width: 250px;
-        height: 250px;
+        width: 50vw;
+        height: 50vw;
+        max-width: 250px;
+        max-height: 250px;
     }
 
     .aiha-subtitle {
@@ -412,8 +414,10 @@
     }
 
     .aiha-video-container>div {
-        width: 200px;
-        height: 200px;
+        width: 50vw;
+        height: 50vw;
+        max-width: 200px;
+        max-height: 200px;
     }
 
     .aiha-subtitle {
