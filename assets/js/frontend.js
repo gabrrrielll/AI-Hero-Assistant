@@ -55,53 +55,12 @@
 
         /**
          * Load conversation from localStorage
-         * Searches for any conversation key starting with "aiha_conversation" and uses the most recent one
+         * Uses fixed key 'aiha_conversation' - only one conversation per browser
          */
         loadConversation() {
             try {
-                // First try the fixed key
-                let stored = localStorage.getItem(this.storageKey);
-                let foundKey = this.storageKey;
-                
-                // If not found, search for any key starting with "aiha_conversation"
-                if (!stored) {
-                    console.log('Fixed key not found, searching for any conversation...');
-                    let latestTimestamp = 0;
-                    let latestKey = null;
-                    
-                    // Iterate through all localStorage keys
-                    for (let i = 0; i < localStorage.length; i++) {
-                        const key = localStorage.key(i);
-                        if (key && key.startsWith('aiha_conversation')) {
-                            try {
-                                const value = localStorage.getItem(key);
-                                if (value) {
-                                    const parsed = JSON.parse(value);
-                                    // Check if it has messages and find the most recent one
-                                    if (parsed && Array.isArray(parsed.messages) && parsed.messages.length > 0) {
-                                        // Get timestamp from last message
-                                        const lastMessage = parsed.messages[parsed.messages.length - 1];
-                                        const timestamp = lastMessage.timestamp || 0;
-                                        if (timestamp > latestTimestamp) {
-                                            latestTimestamp = timestamp;
-                                            latestKey = key;
-                                            stored = value;
-                                        }
-                                    }
-                                }
-                            } catch (e) {
-                                console.warn('Error parsing localStorage key:', key, e);
-                            }
-                        }
-                    }
-                    
-                    if (latestKey) {
-                        foundKey = latestKey;
-                        console.log('Found conversation in key:', foundKey, 'with', JSON.parse(stored).messages.length, 'messages');
-                    }
-                }
-                
-                console.log('Loading conversation from localStorage:', foundKey, stored ? 'found' : 'not found');
+                const stored = localStorage.getItem(this.storageKey);
+                console.log('Loading conversation from localStorage:', this.storageKey, stored ? 'found' : 'not found');
                 
                 if (stored) {
                     const parsed = JSON.parse(stored);
@@ -112,12 +71,6 @@
                         if (parsed.sessionId) {
                             this.sessionId = parsed.sessionId;
                             console.log('Restored sessionId from localStorage:', this.sessionId);
-                        }
-                        
-                        // Update storageKey to use the found key for future saves
-                        if (foundKey !== this.storageKey) {
-                            console.log('Updating storageKey to:', foundKey);
-                            this.storageKey = foundKey;
                         }
 
                         // Return conversation even if empty (to preserve sessionId)
