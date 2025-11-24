@@ -580,6 +580,11 @@
                 // Don't speak initial message automatically (Chrome autoplay policy)
                 // Only display it, speech will work after user interaction
                 // For initial message, we display it directly without typing effect
+                
+                // Check if initial message already exists in conversation
+                const hasInitialMessage = this.conversation && this.conversation.messages && 
+                    this.conversation.messages.some(msg => msg.role === 'assistant' && msg.text === this.config.heroMessage);
+                
                 if (this.subtitleEl) {
                     const initialMessageHTML = '<div class="aiha-message-wrapper aiha-message-assistant">' +
                         '<div class="aiha-message-bubble aiha-message-bubble-assistant">' +
@@ -592,8 +597,13 @@
                     }, 100);
                 }
 
-                // Save initial message to conversation
-                this.addMessageToConversation('assistant', this.config.heroMessage);
+                // Save initial message to conversation only if it doesn't already exist
+                if (!hasInitialMessage) {
+                    console.log('Saving initial message to conversation');
+                    this.addMessageToConversation('assistant', this.config.heroMessage);
+                } else {
+                    console.log('Initial message already exists in conversation, skipping save');
+                }
             }, 1000);
         }
 
