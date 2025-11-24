@@ -752,10 +752,13 @@
 
             this.currentText = '';
 
-            // Get existing conversation HTML (preserve previous messages)
-            // Only remove the last AI message if it's incomplete (being typed)
+            // Get existing conversation HTML (preserve ALL previous messages)
+            // We'll append the new message at the end
+            // Only remove the last AI message if there's an incomplete one being typed
             let baseHTML = '';
             if (this.subtitleEl && this.subtitleEl.innerHTML) {
+                // Check if there's already a typing animation in progress
+                // If currentText was being typed, we need to remove the incomplete message
                 const tempDiv = document.createElement('div');
                 tempDiv.innerHTML = this.subtitleEl.innerHTML;
                 const existingMessages = Array.from(tempDiv.querySelectorAll('.aiha-message-wrapper'));
@@ -770,19 +773,11 @@
                     }
                 }
 
-                // Only remove last AI message if it exists and we're starting a new typing animation
-                // This prevents duplicates when typeText is called multiple times
-                if (lastAssistantIndex >= 0) {
-                    // Build base HTML without the last assistant message (it will be replaced)
-                    existingMessages.forEach((msg, idx) => {
-                        if (idx !== lastAssistantIndex) {
-                            baseHTML += msg.outerHTML;
-                        }
-                    });
-                } else {
-                    // No last AI message, keep all existing messages
-                    baseHTML = this.subtitleEl.innerHTML;
-                }
+                // Only remove last AI message if we're starting a NEW typing animation
+                // (i.e., if there was a previous incomplete message being typed)
+                // Since we reset currentText to '' at the start, we know we're starting fresh
+                // So we should keep all messages - the new one will be appended
+                baseHTML = this.subtitleEl.innerHTML;
             }
 
             let index = 0;
