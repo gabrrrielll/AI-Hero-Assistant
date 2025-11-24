@@ -88,6 +88,11 @@
 
 
 /* Video Container - Bootstrap-based */
+.aiha-video-container {
+    margin-top: 0.5em !important;
+    margin-bottom: 0.5em !important;
+}
+
 .aiha-video-container>div {
     width: 300px;
     height: 300px;
@@ -117,6 +122,12 @@
     transition: opacity var(--aiha-video-transition-duration, 0.75s) var(--aiha-video-transition-easing, cubic-bezier(0.4, 0, 0.2, 1));
     will-change: opacity;
     pointer-events: none;
+}
+
+/* Subtitle Container - Bootstrap-based */
+.aiha-subtitle-container {
+    margin-top: 0.5em !important;
+    margin-bottom: 0.5em !important;
 }
 
 /* Subtitle - Bootstrap-based */
@@ -470,7 +481,7 @@
 
     .aiha-subtitle {
         font-size: var(--font-size-base, 16px);
-        padding: 12px 20px;
+        padding: 8px;
         /* Calculează înălțimea disponibilă: viewport height - video (max 250px) - input (~80px) - padding și spații (~80px) */
         max-height: calc(90vh - 250px - 80px - 80px);
         min-height: 200px;
