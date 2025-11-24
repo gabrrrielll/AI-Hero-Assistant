@@ -117,12 +117,113 @@
          */
         saveConversation() {
             try {
+                // Save user name in conversation object
+                if (this.userName) {
+                    this.conversation.userName = this.userName;
+                }
                 const dataToSave = JSON.stringify(this.conversation);
                 localStorage.setItem(this.storageKey, dataToSave);
                 console.log('Saved conversation to localStorage:', this.storageKey, 'Messages:', this.conversation.messages ? this.conversation.messages.length : 0);
             } catch (e) {
                 console.warn('Error saving conversation to localStorage:', e);
             }
+        }
+
+        /**
+         * Extract user name from conversation messages
+         * Looks for patterns like "Bună, [Name]!" or "Ma numesc [Name]"
+         */
+        extractUserNameFromConversation(conversation) {
+            if (!conversation || !conversation.messages) {
+                return null;
+            }
+
+            // Look for name in AI responses (AI usually greets user by name)
+            for (let i = conversation.messages.length - 1; i >= 0; i--) {
+                const msg = conversation.messages[i];
+                if (msg.role === 'assistant' && msg.text) {
+                    // Pattern: "Bună, [Name]!" or "Salut, [Name]!" or "Hello, [Name]!"
+                    const greetingPattern = /(?:Bună|Salut|Hello|Hi|Buna|Bună ziua)[,\s]+([A-ZĂÂÎȘȚ][a-zăâîșț]+)[!.,]?/i;
+                    const match = msg.text.match(greetingPattern);
+                    if (match && match[1]) {
+                        return match[1];
+                    }
+                }
+            }
+
+            // Look for name in user messages (user introduces themselves)
+            for (let i = conversation.messages.length - 1; i >= 0; i--) {
+                const msg = conversation.messages[i];
+                if (msg.role === 'user' && msg.text) {
+                    // Pattern: "Ma numesc [Name]" or "Numele meu este [Name]" or "Sunt [Name]"
+                    const introPattern = /(?:Ma numesc|Numele meu este|Sunt|I'm|I am)[\s]+([A-ZĂÂÎȘȚ][a-zăâîșț]+)/i;
+                    const match = msg.text.match(introPattern);
+                    if (match && match[1]) {
+                        return match[1];
+                    }
+                }
+            }
+
+            return null;
+        }
+
+        /**
+         * Get display name for user messages
+         */
+        getUserDisplayName() {
+            return this.userName || 'Utilizator';
+        }
+
+        /**
+         * Detect and save user name from message
+         */
+        detectAndSaveUserName(message) {
+            if (!message || this.userName) {
+                return; // Already have a name or no message
+            }
+
+            // Pattern: "Ma numesc [Name]" or "Numele meu este [Name]" or "Sunt [Name]"
+            const introPattern = /(?:Ma numesc|Numele meu este|Sunt|I'm|I am)[\s]+([A-ZĂÂÎȘȚ][a-zăâîșț]+)/i;
+            const match = message.match(introPattern);
+            if (match && match[1]) {
+                this.userName = match[1];
+                console.log('Detected user name:', this.userName);
+                // Update all user message senders in the display
+                this.updateUserDisplayNames();
+                // Save conversation to persist name
+                this.saveConversation();
+            }
+        }
+
+        /**
+         * Extract user name from AI response message
+         */
+        extractUserNameFromMessage(text) {
+            if (!text) return null;
+
+            // Pattern: "Bună, [Name]!" or "Salut, [Name]!" or "Hello, [Name]!"
+            const greetingPattern = /(?:Bună|Salut|Hello|Hi|Buna|Bună ziua)[,\s]+([A-ZĂÂÎȘȚ][a-zăâîșț]+)[!.,]?/i;
+            const match = text.match(greetingPattern);
+            if (match && match[1]) {
+                return match[1];
+            }
+
+            return null;
+        }
+
+        /**
+         * Update all user message sender names in the display
+         */
+        updateUserDisplayNames() {
+            if (!this.subtitleEl || !this.userName) {
+                return;
+            }
+
+            const displayName = this.getUserDisplayName();
+            const userSenders = this.subtitleEl.querySelectorAll('.aiha-message-user .aiha-message-sender');
+            userSenders.forEach(sender => {
+                sender.textContent = displayName;
+            });
         }
 
         /**
