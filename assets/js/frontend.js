@@ -561,12 +561,18 @@
             setTimeout(() => {
                 // Don't speak initial message automatically (Chrome autoplay policy)
                 // Only display it, speech will work after user interaction
-                this.typeText(this.config.heroMessage, () => {
-                    // After initial message, go back to silent
+                // For initial message, we display it directly without typing effect
+                if (this.subtitleEl) {
+                    const initialMessageHTML = '<div class="aiha-message-wrapper aiha-message-assistant">' +
+                        '<div class="aiha-message-bubble aiha-message-bubble-assistant">' +
+                        '<div class="aiha-message-sender">AI</div>' +
+                        '<div class="aiha-message-content">' + this.formatMessageText(this.config.heroMessage) + '</div>' +
+                        '</div></div>';
+                    this.subtitleEl.innerHTML = initialMessageHTML;
                     setTimeout(() => {
-                        this.setSilentState();
-                    }, 500);
-                }, false); // Pass false to skip speech for initial message
+                        this.scrollToBottom();
+                    }, 100);
+                }
                 
                 // Save initial message to conversation
                 this.addMessageToConversation('assistant', this.config.heroMessage);
@@ -581,19 +587,30 @@
                 return;
             }
 
-            // Build HTML from all assistant messages (we only display AI responses in subtitle)
+            // Build HTML from all messages (user + assistant) in chat format
             let conversationHTML = '';
             
             this.conversation.messages.forEach((msg) => {
-                if (msg.role === 'assistant') {
-                    // Format assistant message with markdown
+                const isUser = msg.role === 'user';
+                const alignClass = isUser ? 'aiha-message-user' : 'aiha-message-assistant';
+                const bgClass = isUser ? 'aiha-message-bubble-user' : 'aiha-message-bubble-assistant';
+                
+                conversationHTML += '<div class="aiha-message-wrapper ' + alignClass + '">';
+                conversationHTML += '<div class="aiha-message-bubble ' + bgClass + '">';
+                
+                if (isUser) {
+                    // User message - plain text, no markdown
+                    conversationHTML += '<div class="aiha-message-sender">Utilizator</div>';
+                    conversationHTML += '<div class="aiha-message-content">' + this.escapeHtml(msg.text) + '</div>';
+                } else {
+                    // Assistant message - format with markdown
+                    conversationHTML += '<div class="aiha-message-sender">AI</div>';
                     const formatted = this.formatMessageText(msg.text);
-                    // Add separator between multiple messages if needed
-                    if (conversationHTML) {
-                        conversationHTML += '<div style="margin: 1em 0;"></div>';
-                    }
-                    conversationHTML += formatted;
+                    conversationHTML += '<div class="aiha-message-content">' + formatted + '</div>';
                 }
+                
+                conversationHTML += '</div>';
+                conversationHTML += '</div>';
             });
 
             // Display the conversation directly (no typing effect for loaded conversation)
@@ -604,6 +621,15 @@
                     this.scrollToBottom();
                 }, 100);
             }
+        }
+        
+        /**
+         * Escape HTML to prevent XSS
+         */
+        escapeHtml(text) {
+            const div = document.createElement('div');
+            div.textContent = text;
+            return div.innerHTML;
         }
 
         /**
@@ -672,10 +698,31 @@
             }, 50);
 
             this.currentText = '';
+            
+            // Get existing conversation HTML (preserve previous messages)
+            // We'll remove only the last assistant message (if any) and replace it with the new one
+            let baseHTML = '';
             if (this.subtitleEl) {
-                this.subtitleEl.innerHTML = '';
-                // Reset scroll la început
-                this.subtitleEl.scrollTop = 0;
+                const tempDiv = document.createElement('div');
+                tempDiv.innerHTML = this.subtitleEl.innerHTML;
+                const existingMessages = Array.from(tempDiv.querySelectorAll('.aiha-message-wrapper'));
+                
+                // Find the last assistant message and remove it (it's the one being typed)
+                let lastAssistantIndex = -1;
+                for (let i = existingMessages.length - 1; i >= 0; i--) {
+                    const sender = existingMessages[i].querySelector('.aiha-message-sender');
+                    if (sender && sender.textContent === 'AI') {
+                        lastAssistantIndex = i;
+                        break;
+                    }
+                }
+                
+                // Build base HTML without the last assistant message
+                existingMessages.forEach((msg, idx) => {
+                    if (idx !== lastAssistantIndex) {
+                        baseHTML += msg.outerHTML;
+                    }
+                });
             }
 
             let index = 0;
@@ -692,7 +739,14 @@
                     if (this.subtitleEl) {
                         // Formatează textul parțial cu markdown în timpul typing-ului
                         const partialFormatted = this.formatPartialText(this.currentText);
-                        this.subtitleEl.innerHTML = partialFormatted;
+                        // Append new assistant message bubble to existing conversation
+                        const newMessageHTML = '<div class="aiha-message-wrapper aiha-message-assistant">' +
+                            '<div class="aiha-message-bubble aiha-message-bubble-assistant">' +
+                            '<div class="aiha-message-sender">AI</div>' +
+                            '<div class="aiha-message-content">' + partialFormatted + '</div>' +
+                            '</div></div>';
+                        
+                        this.subtitleEl.innerHTML = baseHTML + newMessageHTML;
                         // Scroll automat mai frecvent pentru text lung
                         if (index % 5 === 0 || index === text.length - 1) {
                             this.scrollToBottom();
@@ -703,7 +757,13 @@
                 } else {
                     if (this.subtitleEl) {
                         // La final, afișează textul complet formatat (pentru a ne asigura că totul este corect)
-                        this.subtitleEl.innerHTML = formattedText;
+                        const finalMessageHTML = '<div class="aiha-message-wrapper aiha-message-assistant">' +
+                            '<div class="aiha-message-bubble aiha-message-bubble-assistant">' +
+                            '<div class="aiha-message-sender">AI</div>' +
+                            '<div class="aiha-message-content">' + formattedText + '</div>' +
+                            '</div></div>';
+                        
+                        this.subtitleEl.innerHTML = baseHTML + finalMessageHTML;
                         // Scroll final cu delay pentru a permite DOM-ului să se actualizeze
                         setTimeout(() => {
                             this.scrollToBottom();
@@ -740,10 +800,24 @@
             // Stop any ongoing speech
             this.stopSpeaking();
 
-            // Clear subtitle and send to AI
+            // Save user message to conversation immediately (before displaying)
+            this.addMessageToConversation('user', message);
+
+            // Add user message to conversation display immediately
             if (this.subtitleEl) {
-                this.subtitleEl.innerHTML = '';
+                const userMessageHTML = '<div class="aiha-message-wrapper aiha-message-user">' +
+                    '<div class="aiha-message-bubble aiha-message-bubble-user">' +
+                    '<div class="aiha-message-sender">Utilizator</div>' +
+                    '<div class="aiha-message-content">' + this.escapeHtml(message) + '</div>' +
+                    '</div></div>';
+                this.subtitleEl.innerHTML += userMessageHTML;
+                // Scroll to show new message
+                setTimeout(() => {
+                    this.scrollToBottom();
+                }, 50);
             }
+            
+            // Clear input
             if (this.inputEl) {
                 this.inputEl.value = '';
                 this.inputEl.style.height = 'auto';
@@ -760,8 +834,7 @@
                 this.sendBtn.disabled = true;
             }
 
-            // Save user message to conversation
-            this.addMessageToConversation('user', message);
+            // User message already saved in sendMessage(), so we don't save it again here
 
             try {
                 const response = await $.ajax({

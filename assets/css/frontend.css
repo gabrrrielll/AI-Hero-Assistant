@@ -143,6 +143,83 @@
     scroll-behavior: smooth;
 }
 
+/* Chat Message Wrapper */
+.aiha-message-wrapper {
+    margin-bottom: 15px;
+    display: flex;
+    flex-direction: column;
+}
+
+.aiha-message-wrapper:last-child {
+    margin-bottom: 0;
+}
+
+/* User messages align right */
+.aiha-message-user {
+    align-items: flex-end;
+}
+
+/* Assistant messages align left */
+.aiha-message-assistant {
+    align-items: flex-start;
+}
+
+/* Message Bubble */
+.aiha-message-bubble {
+    display: inline-block;
+    max-width: 80%;
+    padding: 10px 15px;
+    border-radius: 12px;
+    word-wrap: break-word;
+    text-align: left;
+}
+
+/* User message bubble - blue background, white text */
+.aiha-message-bubble-user {
+    background: rgba(0, 115, 170, 0.9);
+    color: #ffffff;
+    border-bottom-right-radius: 4px;
+}
+
+/* Assistant message bubble - light background, dark text */
+.aiha-message-bubble-assistant {
+    background: rgba(255, 255, 255, 0.25);
+    color: rgba(255, 255, 255, 0.95);
+    border-bottom-left-radius: 4px;
+}
+
+/* Message Sender Label */
+.aiha-message-sender {
+    font-weight: bold;
+    font-size: 0.85em;
+    margin-bottom: 5px;
+    opacity: 0.9;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.aiha-message-bubble-user .aiha-message-sender {
+    color: rgba(255, 255, 255, 0.95);
+}
+
+.aiha-message-bubble-assistant .aiha-message-sender {
+    color: rgba(255, 255, 255, 0.9);
+}
+
+/* Message Content */
+.aiha-message-content {
+    line-height: 1.5;
+    word-wrap: break-word;
+}
+
+.aiha-message-bubble-user .aiha-message-content {
+    color: #ffffff;
+}
+
+.aiha-message-bubble-assistant .aiha-message-content {
+    color: rgba(255, 255, 255, 0.95);
+}
+
 /* Scrollbar Styling */
 .aiha-subtitle::-webkit-scrollbar {
     width: 6px;
