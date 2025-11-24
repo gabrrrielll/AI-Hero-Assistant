@@ -752,12 +752,37 @@
 
             this.currentText = '';
 
-            // Get existing conversation HTML (preserve ALL previous messages)
-            // We'll append the new message at the end, not replace anything
+            // Get existing conversation HTML (preserve previous messages)
+            // Only remove the last AI message if it's incomplete (being typed)
             let baseHTML = '';
             if (this.subtitleEl && this.subtitleEl.innerHTML) {
-                // Keep all existing messages - don't remove anything
-                baseHTML = this.subtitleEl.innerHTML;
+                const tempDiv = document.createElement('div');
+                tempDiv.innerHTML = this.subtitleEl.innerHTML;
+                const existingMessages = Array.from(tempDiv.querySelectorAll('.aiha-message-wrapper'));
+
+                // Find the last assistant message
+                let lastAssistantIndex = -1;
+                for (let i = existingMessages.length - 1; i >= 0; i--) {
+                    const sender = existingMessages[i].querySelector('.aiha-message-sender');
+                    if (sender && sender.textContent === 'AI') {
+                        lastAssistantIndex = i;
+                        break;
+                    }
+                }
+
+                // Only remove last AI message if it exists and we're starting a new typing animation
+                // This prevents duplicates when typeText is called multiple times
+                if (lastAssistantIndex >= 0) {
+                    // Build base HTML without the last assistant message (it will be replaced)
+                    existingMessages.forEach((msg, idx) => {
+                        if (idx !== lastAssistantIndex) {
+                            baseHTML += msg.outerHTML;
+                        }
+                    });
+                } else {
+                    // No last AI message, keep all existing messages
+                    baseHTML = this.subtitleEl.innerHTML;
+                }
             }
 
             let index = 0;
