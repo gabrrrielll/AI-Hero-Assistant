@@ -53,18 +53,24 @@
         loadConversation() {
             try {
                 const stored = localStorage.getItem(this.storageKey);
+                console.log('Loading conversation from localStorage:', this.storageKey, stored ? 'found' : 'not found');
                 if (stored) {
                     const parsed = JSON.parse(stored);
+                    console.log('Parsed conversation:', parsed);
                     // Verify it's a valid conversation structure
-                    if (parsed && Array.isArray(parsed.messages)) {
+                    if (parsed && Array.isArray(parsed.messages) && parsed.messages.length > 0) {
                         this.sessionId = parsed.sessionId || this.sessionId;
+                        console.log('Loaded conversation with', parsed.messages.length, 'messages');
                         return parsed;
+                    } else {
+                        console.log('Conversation structure invalid or empty');
                     }
                 }
             } catch (e) {
                 console.warn('Error loading conversation from localStorage:', e);
             }
             // Return empty conversation structure
+            console.log('Returning empty conversation structure');
             return {
                 sessionId: this.sessionId,
                 messages: []
@@ -76,7 +82,9 @@
          */
         saveConversation() {
             try {
-                localStorage.setItem(this.storageKey, JSON.stringify(this.conversation));
+                const dataToSave = JSON.stringify(this.conversation);
+                localStorage.setItem(this.storageKey, dataToSave);
+                console.log('Saved conversation to localStorage:', this.storageKey, 'Messages:', this.conversation.messages ? this.conversation.messages.length : 0);
             } catch (e) {
                 console.warn('Error saving conversation to localStorage:', e);
             }
@@ -86,6 +94,12 @@
          * Add message to conversation
          */
         addMessageToConversation(role, text) {
+            if (!this.conversation) {
+                this.conversation = {
+                    sessionId: this.sessionId,
+                    messages: []
+                };
+            }
             if (!this.conversation.messages) {
                 this.conversation.messages = [];
             }
@@ -94,6 +108,7 @@
                 text: text,
                 timestamp: Date.now()
             });
+            console.log('Added message to conversation:', role, 'Total messages:', this.conversation.messages.length);
             this.saveConversation();
         }
 
@@ -102,14 +117,17 @@
             this.setupVideos();
             this.setupEventListeners();
             this.setupVoice();
-            
+
             // Load existing conversation or show initial message
-            if (this.conversation.messages && this.conversation.messages.length > 0) {
+            console.log('Checking conversation:', this.conversation);
+            if (this.conversation && this.conversation.messages && this.conversation.messages.length > 0) {
+                console.log('Loading existing conversation with', this.conversation.messages.length, 'messages');
                 this.loadExistingConversation();
             } else {
+                console.log('No existing conversation, showing initial message');
                 this.showInitialMessage();
             }
-            
+
             // Start with silent state
             this.setSilentState();
         }
@@ -573,7 +591,7 @@
                         this.scrollToBottom();
                     }, 100);
                 }
-                
+
                 // Save initial message to conversation
                 this.addMessageToConversation('assistant', this.config.heroMessage);
             }, 1000);
@@ -583,21 +601,26 @@
          * Load and display existing conversation from localStorage
          */
         loadExistingConversation() {
-            if (!this.conversation.messages || this.conversation.messages.length === 0) {
+            console.log('loadExistingConversation called, conversation:', this.conversation);
+            if (!this.conversation || !this.conversation.messages || this.conversation.messages.length === 0) {
+                console.log('No messages to load, showing initial message instead');
+                this.showInitialMessage();
                 return;
             }
 
+            console.log('Loading', this.conversation.messages.length, 'messages from conversation');
+
             // Build HTML from all messages (user + assistant) in chat format
             let conversationHTML = '';
-            
+
             this.conversation.messages.forEach((msg) => {
                 const isUser = msg.role === 'user';
                 const alignClass = isUser ? 'aiha-message-user' : 'aiha-message-assistant';
                 const bgClass = isUser ? 'aiha-message-bubble-user' : 'aiha-message-bubble-assistant';
-                
+
                 conversationHTML += '<div class="aiha-message-wrapper ' + alignClass + '">';
                 conversationHTML += '<div class="aiha-message-bubble ' + bgClass + '">';
-                
+
                 if (isUser) {
                     // User message - plain text, no markdown
                     conversationHTML += '<div class="aiha-message-sender">Utilizator</div>';
@@ -608,7 +631,7 @@
                     const formatted = this.formatMessageText(msg.text);
                     conversationHTML += '<div class="aiha-message-content">' + formatted + '</div>';
                 }
-                
+
                 conversationHTML += '</div>';
                 conversationHTML += '</div>';
             });
@@ -622,7 +645,7 @@
                 }, 100);
             }
         }
-        
+
         /**
          * Escape HTML to prevent XSS
          */
@@ -698,7 +721,7 @@
             }, 50);
 
             this.currentText = '';
-            
+
             // Get existing conversation HTML (preserve previous messages)
             // We'll remove only the last assistant message (if any) and replace it with the new one
             let baseHTML = '';
@@ -706,7 +729,7 @@
                 const tempDiv = document.createElement('div');
                 tempDiv.innerHTML = this.subtitleEl.innerHTML;
                 const existingMessages = Array.from(tempDiv.querySelectorAll('.aiha-message-wrapper'));
-                
+
                 // Find the last assistant message and remove it (it's the one being typed)
                 let lastAssistantIndex = -1;
                 for (let i = existingMessages.length - 1; i >= 0; i--) {
@@ -716,7 +739,7 @@
                         break;
                     }
                 }
-                
+
                 // Build base HTML without the last assistant message
                 existingMessages.forEach((msg, idx) => {
                     if (idx !== lastAssistantIndex) {
@@ -745,7 +768,7 @@
                             '<div class="aiha-message-sender">AI</div>' +
                             '<div class="aiha-message-content">' + partialFormatted + '</div>' +
                             '</div></div>';
-                        
+
                         this.subtitleEl.innerHTML = baseHTML + newMessageHTML;
                         // Scroll automat mai frecvent pentru text lung
                         if (index % 5 === 0 || index === text.length - 1) {
@@ -762,7 +785,7 @@
                             '<div class="aiha-message-sender">AI</div>' +
                             '<div class="aiha-message-content">' + formattedText + '</div>' +
                             '</div></div>';
-                        
+
                         this.subtitleEl.innerHTML = baseHTML + finalMessageHTML;
                         // Scroll final cu delay pentru a permite DOM-ului să se actualizeze
                         setTimeout(() => {
@@ -816,7 +839,7 @@
                     this.scrollToBottom();
                 }, 50);
             }
-            
+
             // Clear input
             if (this.inputEl) {
                 this.inputEl.value = '';
