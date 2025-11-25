@@ -12,9 +12,9 @@
 .aiha-hero-section {
     /* Base gradient background using all 4 colors */
     background:
-        radial-gradient(circle at 0% 0%, var(--gradient-start-rgba-50, rgba(99, 102, 241, 0.5)) 0%, transparent 40%),
-        radial-gradient(circle at 100% 100%, var(--gradient-end-rgba-50, rgba(236, 72, 153, 0.5)) 0%, transparent 40%),
-        linear-gradient(135deg, var(--gradient-start, #6366f1), var(--gradient-end, #ec4899));
+        radial-gradient(circle at 0% 0%, var(--gradient-start-rgba-50) 0%, transparent 40%),
+        radial-gradient(circle at 100% 100%, var(--gradient-end-rgba-50) 0%, transparent 40%),
+        linear-gradient(135deg, var(--gradient-start), var(--gradient-end));
     background-size: 200% 200%;
     animation: baseGradientShift var(--animation-duration-base, 15s) ease infinite;
     overflow: hidden;
@@ -37,31 +37,12 @@
     width: 200%;
     height: 200%;
     background:
-        radial-gradient(circle at 20% 30%, var(--gradient-start-rgba-95, rgba(99, 102, 241, 0.95)) 0%, transparent 35%),
-        radial-gradient(circle at 80% 70%, var(--gradient-end-rgba-95, rgba(236, 72, 153, 0.95)) 0%, transparent 35%),
-        radial-gradient(circle at 40% 80%, var(--gradient-color-3-rgba-90, rgba(139, 92, 246, 0.9)) 0%, transparent 35%),
-        radial-gradient(circle at 60% 20%, var(--gradient-color-4-rgba-90, rgba(59, 130, 246, 0.9)) 0%, transparent 35%);
+        radial-gradient(circle at 20% 30%, var(--gradient-start-rgba-95) 0%, transparent 35%),
+        radial-gradient(circle at 80% 70%, var(--gradient-end-rgba-95) 0%, transparent 35%),
+        radial-gradient(circle at 40% 80%, var(--gradient-color-3-rgba-90) 0%, transparent 35%),
+        radial-gradient(circle at 60% 20%, var(--gradient-color-4-rgba-90) 0%, transparent 35%);
     animation: colorWave1 var(--animation-duration-wave, 20s) ease-in-out infinite;
     opacity: 1;
-    z-index: 0;
-    pointer-events: none;
-}
-
-/* Additional layer for more depth and contrast */
-.aiha-hero-section::after {
-    content: '';
-    position: absolute;
-    top: -50%;
-    left: -50%;
-    width: 200%;
-    height: 200%;
-    background:
-        radial-gradient(circle at 70% 40%, var(--gradient-color-3-rgba-85, rgba(139, 92, 246, 0.85)) 0%, transparent 30%),
-        radial-gradient(circle at 30% 60%, var(--gradient-color-4-rgba-85, rgba(59, 130, 246, 0.85)) 0%, transparent 30%),
-        radial-gradient(circle at 90% 80%, var(--gradient-start-rgba-80, rgba(99, 102, 241, 0.8)) 0%, transparent 30%),
-        radial-gradient(circle at 10% 20%, var(--gradient-end-rgba-80, rgba(236, 72, 153, 0.8)) 0%, transparent 30%);
-    animation: colorWave2 var(--animation-duration-wave, 25s) ease-in-out infinite reverse;
-    opacity: 0.85;
     z-index: 0;
     pointer-events: none;
 }
@@ -479,7 +460,7 @@
 }
 
 .aiha-send-btn {
-    background: linear-gradient(135deg, var(--gradient-start, #6366f1), var(--gradient-end, #ec4899));
+    background: linear-gradient(135deg, var(--gradient-start), var(--gradient-end));
     border: none;
     border-radius: 50%;
     transition: transform 0.2s ease, box-shadow 0.2s ease;
