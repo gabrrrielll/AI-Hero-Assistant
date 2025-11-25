@@ -98,7 +98,7 @@ class AIHA_Shortcode
             <div class="aiha-hero-section container-fluid d-flex flex-column justify-content-between" style="--gradient-start: <?php echo esc_attr($gradient_start); ?>; --gradient-end: <?php echo esc_attr($gradient_end); ?>; --gradient-color-3: <?php echo esc_attr($gradient_color_3); ?>; --gradient-color-4: <?php echo esc_attr($gradient_color_4); ?>; <?php echo $rgba_css_vars; ?>--animation-duration-base: <?php echo esc_attr($animation_duration_base); ?>s; --animation-duration-wave: <?php echo esc_attr($animation_duration_wave); ?>s; --font-family: <?php echo esc_attr($font_family); ?>; --font-family-code: <?php echo esc_attr($font_family_code); ?>; --font-size-base: <?php echo esc_attr($font_size_base); ?>px<?php echo !empty($atts['height']) ? '; height: ' . esc_attr($atts['height']) . '; min-height: ' . esc_attr($atts['height']) : ''; ?>">
                 <!-- Video Container - Două videoclipuri suprapuse -->
                 <div class="aiha-video-container d-flex justify-content-center align-items-center flex-shrink-0 my-3">
-                    <div class="position-relative" style="width: 100%; height: 0; padding-bottom: 100%; aspect-ratio: 1 / 1;">
+                    <div class="position-relative" style="width: 300px; height: 300px;">
                         <!-- Video pentru tăcere (default vizibil) -->
                         <video 
                             id="aiha-video-silence-<?php echo esc_attr($instance_id); ?>" 
