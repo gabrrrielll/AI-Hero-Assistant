@@ -1,9 +1,24 @@
 <?php
-
 /**
  * GitHub Webhook Deploy Script
  * Plasează acest fișier în root-ul proiectului pe server
+ * 
+ * IMPORTANT: Acest fișier trebuie să fie accesibil direct, fără WordPress
+ * Pentru a permite accesul, adaugă în .htaccess din root-ul WordPress:
+ * 
+ * <Files "deploy.php">
+ *     <IfModule mod_authz_core.c>
+ *         Require all granted
+ *     </IfModule>
+ *     <IfModule !mod_authz_core.c>
+ *         Order allow,deny
+ *         Allow from all
+ *     </IfModule>
+ * </Files>
  */
+
+// Permite accesul direct (bypass WordPress)
+define('WP_USE_THEMES', false);
 
 // === CONFIGURARE ===
 $secret = 'BUWhuOIeznVIdkQSQCDMfAFltxc17LAg+TQgLhlfMLs='; // Generează o cheie sigură

@@ -1,0 +1,27 @@
+# Allow direct access to deploy.php for GitHub webhooks
+# Copy this content to your WordPress root .htaccess file
+# OR create a .htaccess file in the plugin directory with this content
+
+<Files "deploy.php">
+    <IfModule mod_authz_core.c>
+        Require all granted
+    </IfModule>
+    <IfModule !mod_authz_core.c>
+        Order allow,deny
+        Allow from all
+    </IfModule>
+</Files>
+
+# Alternative: Allow all PHP files in this directory (less secure)
+# <DirectoryMatch "^.*/wp-content/plugins/ai-hero-assistant">
+#     <Files "deploy.php">
+#         <IfModule mod_authz_core.c>
+#             Require all granted
+#         </IfModule>
+#         <IfModule !mod_authz_core.c>
+#             Order allow,deny
+#             Allow from all
+#         </IfModule>
+#     </Files>
+# </DirectoryMatch>
+
