@@ -16,7 +16,7 @@ class AIHA_Shortcode
 
     /**
      * Convert hex color to rgba string
-     * 
+     *
      * @param string $hex Hex color (e.g., #6366f1 or 6366f1)
      * @param float $alpha Alpha value (0.0 to 1.0)
      * @return string rgba() string
@@ -25,17 +25,17 @@ class AIHA_Shortcode
     {
         // Remove # if present
         $hex = ltrim($hex, '#');
-        
+
         // Handle 3-digit hex
         if (strlen($hex) == 3) {
             $hex = $hex[0] . $hex[0] . $hex[1] . $hex[1] . $hex[2] . $hex[2];
         }
-        
+
         // Convert to RGB
         $r = hexdec(substr($hex, 0, 2));
         $g = hexdec(substr($hex, 2, 2));
         $b = hexdec(substr($hex, 4, 2));
-        
+
         return sprintf('rgba(%d, %d, %d, %.2f)', $r, $g, $b, $alpha);
     }
 
@@ -69,7 +69,7 @@ class AIHA_Shortcode
             '--gradient-color-3-rgba-90' => $this->hex_to_rgba($gradient_color_3, 0.9),
             '--gradient-color-4-rgba-90' => $this->hex_to_rgba($gradient_color_4, 0.9),
         );
-        
+
         // Build CSS variables string
         $rgba_css_vars = '';
         foreach ($rgba_vars as $var_name => $rgba_value) {

@@ -118,6 +118,7 @@
 .aiha-video-container>div {
     width: 300px;
     height: 300px;
+    aspect-ratio: 1 / 1;
     border-radius: 50%;
     overflow: hidden;
     box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
@@ -503,8 +504,12 @@
     .aiha-video-container>div {
         width: 50vw;
         height: 50vw;
+        aspect-ratio: 1 / 1;
         max-width: 250px;
         max-height: 250px;
+        /* Asigură că dacă max-width este atins, height se ajustează automat */
+        min-width: 0;
+        min-height: 0;
     }
 
     .aiha-subtitle {
@@ -534,8 +539,12 @@
     .aiha-video-container>div {
         width: 50vw;
         height: 50vw;
+        aspect-ratio: 1 / 1;
         max-width: 200px;
         max-height: 200px;
+        /* Asigură că dacă max-width este atins, height se ajustează automat */
+        min-width: 0;
+        min-height: 0;
     }
 
     .aiha-subtitle {

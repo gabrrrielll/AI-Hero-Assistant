@@ -1,4 +1,5 @@
 <?php
+
 /**
  * GitHub Webhook Deploy Script
  * Plasează acest fișier în root-ul proiectului pe server
@@ -12,7 +13,8 @@ $log_file = $repository_path . '/deploy.log';
 
 // === FUNCȚII ===
 
-function log_message($message) {
+function log_message($message)
+{
     global $log_file;
     $timestamp = date('Y-m-d H:i:s');
     $log_entry = "[$timestamp] $message\n";
@@ -20,7 +22,8 @@ function log_message($message) {
     echo $log_entry;
 }
 
-function verify_github_signature($payload, $signature, $secret) {
+function verify_github_signature($payload, $signature, $secret)
+{
     $expected_signature = 'sha256=' . hash_hmac('sha256', $payload, $secret);
     return hash_equals($expected_signature, $signature);
 }
@@ -139,16 +142,16 @@ log_message('📊 Output git pull:');
 log_message($output);
 
 // Verifică dacă pull-ul a fost successful
-if (strpos(strtolower($output), 'error') !== false || 
+if (strpos(strtolower($output), 'error') !== false ||
     strpos(strtolower($output), 'fatal') !== false ||
     strpos(strtolower($output), 'conflict') !== false) {
-    
+
     // Încearcă reset hard dacă există conflicte
     log_message('⚠️  Detectat eroare/conflict, încerc reset hard...');
     $reset_output = shell_exec('git reset --hard origin/' . escapeshellarg($branch) . ' 2>&1');
     log_message($reset_output);
-    
-    if (strpos(strtolower($reset_output), 'error') !== false || 
+
+    if (strpos(strtolower($reset_output), 'error') !== false ||
         strpos(strtolower($reset_output), 'fatal') !== false) {
         http_response_code(500);
         log_message('❌ Deploy EȘUAT - Nu s-a putut rezolva');
@@ -174,4 +177,3 @@ echo json_encode([
     'commit' => trim($current_commit),
     'timestamp' => date('Y-m-d H:i:s')
 ], JSON_PRETTY_PRINT);
-?>
