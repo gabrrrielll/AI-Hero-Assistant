@@ -36,6 +36,9 @@
             // User name storage - will be extracted from conversation
             this.userName = null;
 
+            // Video settings
+            this.videoPlaybackRate = config.videoPlaybackRate || 1.0;
+
             // Voice settings
             this.enableVoice = config.enableVoice || false;
             this.voiceName = config.voiceName || 'default';
@@ -624,15 +627,22 @@
         }
 
         setupVideos() {
+            // Set playback rate for both videos
+            const playbackRate = this.videoPlaybackRate || 1.0;
+            
             // Ensure videos are loaded and playing
             if (this.videoSilence) {
+                this.videoSilence.playbackRate = playbackRate;
                 this.videoSilence.addEventListener('loadeddata', () => {
+                    this.videoSilence.playbackRate = playbackRate;
                     this.videoSilence.play().catch(e => console.log('Video play error:', e));
                 });
             }
 
             if (this.videoSpeaking) {
+                this.videoSpeaking.playbackRate = playbackRate;
                 this.videoSpeaking.addEventListener('loadeddata', () => {
+                    this.videoSpeaking.playbackRate = playbackRate;
                     this.videoSpeaking.play().catch(e => console.log('Video play error:', e));
                 });
             }

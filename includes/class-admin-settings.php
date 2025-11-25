@@ -52,6 +52,9 @@ class AIHA_Admin_Settings
         $sanitized['hero_message'] = sanitize_textarea_field($input['hero_message'] ?? '');
         $sanitized['video_silence_url'] = esc_url_raw($input['video_silence_url'] ?? '');
         $sanitized['video_speaking_url'] = esc_url_raw($input['video_speaking_url'] ?? '');
+        // Video playback rate: between 0.25 and 4.0, default 1.0
+        $video_playback_rate = floatval($input['video_playback_rate'] ?? 1.0);
+        $sanitized['video_playback_rate'] = max(0.25, min(4.0, $video_playback_rate));
         $sanitized['assistant_gender'] = sanitize_text_field($input['assistant_gender'] ?? 'feminin');
         $sanitized['enable_voice'] = isset($input['enable_voice']) ? 1 : 0;
         $sanitized['voice_name'] = sanitize_text_field($input['voice_name'] ?? 'default');
@@ -648,6 +651,20 @@ class AIHA_Admin_Settings
                                                class="form-control"
                                                placeholder="https://example.com/videos/vorbire.mp4">
                                         <div class="form-text"><?php _e('URL-ul videoclipului cu persoana care vorbește. Acest video va fi afișat când AI răspunde.', 'ai-hero-assistant'); ?></div>
+                                    </div>
+                                    
+                                    <!-- Video Playback Rate -->
+                                    <div class="col-12">
+                                        <label for="video_playback_rate" class="form-label fw-bold"><?php _e('Viteză Redare Video', 'ai-hero-assistant'); ?></label>
+                                        <input type="number" 
+                                               id="video_playback_rate" 
+                                               name="aiha_settings[video_playback_rate]" 
+                                               value="<?php echo esc_attr($settings['video_playback_rate'] ?? '1.0'); ?>"
+                                               class="form-control"
+                                               min="0.25"
+                                               max="4.0"
+                                               step="0.1">
+                                        <div class="form-text"><?php _e('Viteza de redare a videoclipurilor (0.25 = 25% viteza normală, 1.0 = viteza normală, 2.0 = dublă viteză, maxim 4.0)', 'ai-hero-assistant'); ?></div>
                                     </div>
                                     
                                     <!-- Voice Settings -->
