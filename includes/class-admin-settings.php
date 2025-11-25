@@ -655,18 +655,31 @@ class AIHA_Admin_Settings
                                         <div class="form-text"><?php _e('URL-ul videoclipului cu persoana care vorbește. Acest video va fi afișat când AI răspunde.', 'ai-hero-assistant'); ?></div>
                                     </div>
                                     
-                                    <!-- Video Playback Rate -->
-                                    <div class="col-12">
-                                        <label for="video_playback_rate" class="form-label fw-bold"><?php _e('Viteză Redare Video', 'ai-hero-assistant'); ?></label>
+                                    <!-- Video Playback Rates -->
+                                    <div class="col-md-6">
+                                        <label for="video_silence_playback_rate" class="form-label fw-bold"><?php _e('Viteză Redare Video (Silence)', 'ai-hero-assistant'); ?></label>
                                         <input type="number" 
-                                               id="video_playback_rate" 
-                                               name="aiha_settings[video_playback_rate]" 
-                                               value="<?php echo esc_attr($settings['video_playback_rate'] ?? '1.0'); ?>"
+                                               id="video_silence_playback_rate" 
+                                               name="aiha_settings[video_silence_playback_rate]" 
+                                               value="<?php echo esc_attr($settings['video_silence_playback_rate'] ?? '1.0'); ?>"
                                                class="form-control"
                                                min="0.25"
                                                max="4.0"
                                                step="0.1">
-                                        <div class="form-text"><?php _e('Viteza de redare a videoclipurilor (0.25 = 25% viteza normală, 1.0 = viteza normală, 2.0 = dublă viteză, maxim 4.0)', 'ai-hero-assistant'); ?></div>
+                                        <div class="form-text"><?php _e('Viteza de redare pentru videoclipul când AI tace (0.25 = 25% viteza normală, 1.0 = viteza normală, 2.0 = dublă viteză, maxim 4.0)', 'ai-hero-assistant'); ?></div>
+                                    </div>
+                                    
+                                    <div class="col-md-6">
+                                        <label for="video_speaking_playback_rate" class="form-label fw-bold"><?php _e('Viteză Redare Video (Speaking)', 'ai-hero-assistant'); ?></label>
+                                        <input type="number" 
+                                               id="video_speaking_playback_rate" 
+                                               name="aiha_settings[video_speaking_playback_rate]" 
+                                               value="<?php echo esc_attr($settings['video_speaking_playback_rate'] ?? '1.0'); ?>"
+                                               class="form-control"
+                                               min="0.25"
+                                               max="4.0"
+                                               step="0.1">
+                                        <div class="form-text"><?php _e('Viteza de redare pentru videoclipul când AI vorbește (0.25 = 25% viteza normală, 1.0 = viteza normală, 2.0 = dublă viteză, maxim 4.0)', 'ai-hero-assistant'); ?></div>
                                     </div>
                                     
                                     <!-- Voice Settings -->
