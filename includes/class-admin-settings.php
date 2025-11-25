@@ -52,9 +52,11 @@ class AIHA_Admin_Settings
         $sanitized['hero_message'] = sanitize_textarea_field($input['hero_message'] ?? '');
         $sanitized['video_silence_url'] = esc_url_raw($input['video_silence_url'] ?? '');
         $sanitized['video_speaking_url'] = esc_url_raw($input['video_speaking_url'] ?? '');
-        // Video playback rate: between 0.25 and 4.0, default 1.0
-        $video_playback_rate = floatval($input['video_playback_rate'] ?? 1.0);
-        $sanitized['video_playback_rate'] = max(0.25, min(4.0, $video_playback_rate));
+        // Video playback rates: between 0.25 and 4.0, default 1.0
+        $video_silence_playback_rate = floatval($input['video_silence_playback_rate'] ?? 1.0);
+        $sanitized['video_silence_playback_rate'] = max(0.25, min(4.0, $video_silence_playback_rate));
+        $video_speaking_playback_rate = floatval($input['video_speaking_playback_rate'] ?? 1.0);
+        $sanitized['video_speaking_playback_rate'] = max(0.25, min(4.0, $video_speaking_playback_rate));
         $sanitized['assistant_gender'] = sanitize_text_field($input['assistant_gender'] ?? 'feminin');
         $sanitized['enable_voice'] = isset($input['enable_voice']) ? 1 : 0;
         $sanitized['voice_name'] = sanitize_text_field($input['voice_name'] ?? 'default');

@@ -79,9 +79,11 @@ class AIHA_Shortcode
         // Video URLs from settings
         $video_silence_url = isset($settings['video_silence_url']) ? $settings['video_silence_url'] : '';
         $video_speaking_url = isset($settings['video_speaking_url']) ? $settings['video_speaking_url'] : '';
-        $video_playback_rate = isset($settings['video_playback_rate']) ? floatval($settings['video_playback_rate']) : 1.0;
-        // Ensure playback rate is within valid range
-        $video_playback_rate = max(0.25, min(4.0, $video_playback_rate));
+        // Video playback rates: separate for each video
+        $video_silence_playback_rate = isset($settings['video_silence_playback_rate']) ? floatval($settings['video_silence_playback_rate']) : 1.0;
+        $video_silence_playback_rate = max(0.25, min(4.0, $video_silence_playback_rate));
+        $video_speaking_playback_rate = isset($settings['video_speaking_playback_rate']) ? floatval($settings['video_speaking_playback_rate']) : 1.0;
+        $video_speaking_playback_rate = max(0.25, min(4.0, $video_speaking_playback_rate));
 
         // Voice settings
         $enable_voice = isset($settings['enable_voice']) ? (int)$settings['enable_voice'] : 0;
@@ -170,7 +172,8 @@ class AIHA_Shortcode
             "gradientEnd": "<?php echo esc_js($gradient_end); ?>",
             "videoSilenceUrl": "<?php echo esc_js($video_silence_url); ?>",
             "videoSpeakingUrl": "<?php echo esc_js($video_speaking_url); ?>",
-            "videoPlaybackRate": <?php echo esc_js($video_playback_rate); ?>,
+            "videoSilencePlaybackRate": <?php echo esc_js($video_silence_playback_rate); ?>,
+            "videoSpeakingPlaybackRate": <?php echo esc_js($video_speaking_playback_rate); ?>,
             "enableVoice": <?php echo $enable_voice ? 'true' : 'false'; ?>,
             "voiceName": "<?php echo esc_js($voice_name); ?>"
         }

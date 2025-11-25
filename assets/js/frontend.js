@@ -36,8 +36,9 @@
             // User name storage - will be extracted from conversation
             this.userName = null;
 
-            // Video settings
-            this.videoPlaybackRate = config.videoPlaybackRate || 1.0;
+            // Video settings - separate playback rates for each video
+            this.videoSilencePlaybackRate = config.videoSilencePlaybackRate || 1.0;
+            this.videoSpeakingPlaybackRate = config.videoSpeakingPlaybackRate || 1.0;
 
             // Voice settings
             this.enableVoice = config.enableVoice || false;
@@ -627,22 +628,23 @@
         }
 
         setupVideos() {
-            // Set playback rate for both videos
-            const playbackRate = this.videoPlaybackRate || 1.0;
+            // Set playback rates for each video independently
+            const silencePlaybackRate = this.videoSilencePlaybackRate || 1.0;
+            const speakingPlaybackRate = this.videoSpeakingPlaybackRate || 1.0;
             
             // Ensure videos are loaded and playing
             if (this.videoSilence) {
-                this.videoSilence.playbackRate = playbackRate;
+                this.videoSilence.playbackRate = silencePlaybackRate;
                 this.videoSilence.addEventListener('loadeddata', () => {
-                    this.videoSilence.playbackRate = playbackRate;
+                    this.videoSilence.playbackRate = silencePlaybackRate;
                     this.videoSilence.play().catch(e => console.log('Video play error:', e));
                 });
             }
 
             if (this.videoSpeaking) {
-                this.videoSpeaking.playbackRate = playbackRate;
+                this.videoSpeaking.playbackRate = speakingPlaybackRate;
                 this.videoSpeaking.addEventListener('loadeddata', () => {
-                    this.videoSpeaking.playbackRate = playbackRate;
+                    this.videoSpeaking.playbackRate = speakingPlaybackRate;
                     this.videoSpeaking.play().catch(e => console.log('Video play error:', e));
                 });
             }
