@@ -157,7 +157,8 @@ class AIHA_Database
     }
 
     /**
-     * Migration: update message_count for existing conversations
+     * Migration: migrate existing messages from messages table to conversation_json
+     * This method migrates old conversations to the new JSON format
      */
     public static function migrate_message_counts()
     {
@@ -165,25 +166,41 @@ class AIHA_Database
         $table_conv = $wpdb->prefix . 'aiha_conversations';
         $table_messages = $wpdb->prefix . 'aiha_messages';
 
-        // Get conversations that have message_count = 0 or NULL
+        // Check if messages table exists
+        $table_exists = $wpdb->get_var("SHOW TABLES LIKE '$table_messages'") === $table_messages;
+        if (!$table_exists) {
+            return; // No messages table, nothing to migrate
+        }
+
+        // Get conversations that don't have conversation_json or have empty JSON
         $conversations = $wpdb->get_results(
-            "SELECT id FROM $table_conv WHERE message_count = 0 OR message_count IS NULL LIMIT 100"
+            "SELECT id FROM $table_conv WHERE conversation_json IS NULL OR conversation_json = '' LIMIT 100"
         );
 
         foreach ($conversations as $conv) {
-            $count = $wpdb->get_var($wpdb->prepare(
-                "SELECT COUNT(*) FROM $table_messages WHERE conversation_id = %d",
+            // Migrate messages to JSON
+            self::update_conversation_json($conv->id);
+            
+            // Also update message_count from JSON
+            $conversation = $wpdb->get_row($wpdb->prepare(
+                "SELECT conversation_json FROM $table_conv WHERE id = %d",
                 $conv->id
             ));
-
-            if ($count > 0) {
-                $wpdb->update(
-                    $table_conv,
-                    array('message_count' => intval($count)),
-                    array('id' => $conv->id),
-                    array('%d'),
-                    array('%d')
-                );
+            
+            if ($conversation && !empty($conversation->conversation_json)) {
+                $messages = json_decode($conversation->conversation_json, true);
+                if (is_array($messages)) {
+                    $count = count($messages);
+                    if ($count > 0) {
+                        $wpdb->update(
+                            $table_conv,
+                            array('message_count' => intval($count)),
+                            array('id' => $conv->id),
+                            array('%d'),
+                            array('%d')
+                        );
+                    }
+                }
             }
         }
     }
@@ -252,12 +269,11 @@ class AIHA_Database
     }
 
     /**
-     * Save a message in conversation
+     * Save a message in conversation (saves directly to conversation_json)
      */
     public static function save_message($conversation_id, $role, $content)
     {
         global $wpdb;
-        $table_messages = $wpdb->prefix . 'aiha_messages';
         $table_conversations = $wpdb->prefix . 'aiha_conversations';
 
         // Validation
@@ -268,50 +284,89 @@ class AIHA_Database
             return false;
         }
 
-        // Save message in messages table
-        $result = $wpdb->insert(
-            $table_messages,
+        // Get current conversation JSON
+        $conversation = $wpdb->get_row($wpdb->prepare(
+            "SELECT conversation_json, message_count FROM $table_conversations WHERE id = %d",
+            $conversation_id
+        ));
+
+        if (!$conversation) {
+            if (defined('WP_DEBUG') && WP_DEBUG) {
+                error_log('AIHA save_message: Conversation not found - conversation_id=' . $conversation_id);
+            }
+            return false;
+        }
+
+        // Parse existing JSON or initialize empty array
+        $messages = array();
+        if (!empty($conversation->conversation_json)) {
+            $decoded = json_decode($conversation->conversation_json, true);
+            if (is_array($decoded)) {
+                $messages = $decoded;
+            }
+        }
+
+        // Add new message
+        $messages[] = array(
+            'role' => $role,
+            'content' => $content,
+            'created_at' => current_time('mysql')
+        );
+
+        // Encode back to JSON
+        $json_data = json_encode($messages, JSON_UNESCAPED_UNICODE | JSON_PRETTY_PRINT);
+        $message_count = count($messages);
+
+        // Update conversation with new JSON and message count
+        $result = $wpdb->update(
+            $table_conversations,
             array(
-                'conversation_id' => $conversation_id,
-                'role' => $role,
-                'content' => $content
+                'conversation_json' => $json_data,
+                'message_count' => $message_count
             ),
-            array('%d', '%s', '%s')
+            array('id' => $conversation_id),
+            array('%s', '%d'),
+            array('%d')
         );
 
         // Log for debugging
         if (defined('WP_DEBUG') && WP_DEBUG) {
             if ($result === false) {
-                error_log('AIHA save_message: Failed to insert message - ' . $wpdb->last_error);
+                error_log('AIHA save_message: Failed to update conversation - ' . $wpdb->last_error);
             } else {
-                error_log('AIHA save_message: Success - conversation_id=' . $conversation_id . ', role=' . $role . ', message_id=' . $wpdb->insert_id);
+                error_log('AIHA save_message: Success - conversation_id=' . $conversation_id . ', role=' . $role . ', message_count=' . $message_count);
             }
         }
 
-        // Update message counter (optimized for performance)
-        if ($result) {
-            self::update_message_count($conversation_id);
-            // Update JSON only if necessary (lazy update - only when conversation is requested)
-            // For optimal performance, JSON is updated on demand, not on every message
-        }
-
-        return $result;
+        return $result !== false;
     }
 
     /**
-     * Update message counter (fast, without JSON)
+     * Update message counter from JSON (for migration/compatibility)
      */
     public static function update_message_count($conversation_id)
     {
         global $wpdb;
-        $table_messages = $wpdb->prefix . 'aiha_messages';
         $table_conversations = $wpdb->prefix . 'aiha_conversations';
 
-        // Count messages quickly
-        $count = $wpdb->get_var($wpdb->prepare(
-            "SELECT COUNT(*) FROM $table_messages WHERE conversation_id = %d",
+        // Get conversation JSON
+        $conversation = $wpdb->get_row($wpdb->prepare(
+            "SELECT conversation_json FROM $table_conversations WHERE id = %d",
             $conversation_id
         ));
+
+        if (!$conversation) {
+            return false;
+        }
+
+        // Count messages from JSON
+        $count = 0;
+        if (!empty($conversation->conversation_json)) {
+            $messages = json_decode($conversation->conversation_json, true);
+            if (is_array($messages)) {
+                $count = count($messages);
+            }
+        }
 
         // Update counter
         $update_result = $wpdb->update(
@@ -330,11 +385,13 @@ class AIHA_Database
                 error_log('AIHA update_message_count: Success - conversation_id=' . $conversation_id . ', count=' . $count);
             }
         }
+
+        return $update_result !== false;
     }
 
     /**
-     * Update conversation JSON with all messages (only when necessary)
-     * This function is called only when full conversation is requested
+     * Migrate messages from messages table to conversation_json (for backwards compatibility)
+     * This function migrates old data from the messages table to JSON format
      */
     public static function update_conversation_json($conversation_id)
     {
@@ -342,7 +399,13 @@ class AIHA_Database
         $table_messages = $wpdb->prefix . 'aiha_messages';
         $table_conversations = $wpdb->prefix . 'aiha_conversations';
 
-        // Get all messages
+        // Check if messages table exists and has data
+        $table_exists = $wpdb->get_var("SHOW TABLES LIKE '$table_messages'") === $table_messages;
+        if (!$table_exists) {
+            return true; // Table doesn't exist, nothing to migrate
+        }
+
+        // Get all messages from old table
         $messages = $wpdb->get_results($wpdb->prepare(
             "SELECT role, content, created_at 
             FROM $table_messages 
@@ -363,33 +426,62 @@ class AIHA_Database
 
         // Save as JSON
         $json_data = json_encode($conversation_data, JSON_UNESCAPED_UNICODE | JSON_PRETTY_PRINT);
+        $message_count = count($conversation_data);
 
         // Update in database
-        $wpdb->update(
+        $result = $wpdb->update(
             $table_conversations,
-            array('conversation_json' => $json_data),
+            array(
+                'conversation_json' => $json_data,
+                'message_count' => $message_count
+            ),
             array('id' => $conversation_id),
-            array('%s'),
+            array('%s', '%d'),
             array('%d')
         );
+
+        return $result !== false;
     }
 
     /**
-     * Get conversation history
+     * Get conversation history from JSON
      */
     public static function get_conversation_history($conversation_id, $limit = 20)
     {
         global $wpdb;
-        $table = $wpdb->prefix . 'aiha_messages';
+        $table_conversations = $wpdb->prefix . 'aiha_conversations';
 
-        return $wpdb->get_results($wpdb->prepare(
-            "SELECT role, content FROM $table 
-            WHERE conversation_id = %d 
-            ORDER BY created_at ASC 
-            LIMIT %d",
-            $conversation_id,
-            $limit
+        // Get conversation JSON
+        $conversation = $wpdb->get_row($wpdb->prepare(
+            "SELECT conversation_json FROM $table_conversations WHERE id = %d",
+            $conversation_id
         ));
+
+        if (!$conversation || empty($conversation->conversation_json)) {
+            return array();
+        }
+
+        // Parse JSON
+        $messages = json_decode($conversation->conversation_json, true);
+        if (!is_array($messages)) {
+            return array();
+        }
+
+        // Apply limit
+        if ($limit > 0 && count($messages) > $limit) {
+            $messages = array_slice($messages, -$limit);
+        }
+
+        // Convert to format expected by Gemini API (role, content)
+        $history = array();
+        foreach ($messages as $message) {
+            $history[] = (object) array(
+                'role' => $message['role'] ?? '',
+                'content' => $message['content'] ?? ''
+            );
+        }
+
+        return $history;
     }
 
     /**
@@ -547,7 +639,6 @@ class AIHA_Database
     {
         global $wpdb;
         $table_conv = $wpdb->prefix . 'aiha_conversations';
-        $table_messages = $wpdb->prefix . 'aiha_messages';
 
         $where = array('1=1');
         $where_values = array();
@@ -590,24 +681,12 @@ class AIHA_Database
             }
         }
 
-        // Filter by text in messages (optimized with JOIN instead of EXISTS for performance)
+        // Filter by text in conversation JSON
         if (!empty($filters['search'])) {
-            // Use FULLTEXT search if available, otherwise LIKE
+            // Search in conversation_json field using LIKE (JSON is stored as text)
             $search_term = '%' . $wpdb->esc_like($filters['search']) . '%';
-
-            // Check if FULLTEXT is available
-            $has_fulltext = $wpdb->get_var("SHOW INDEX FROM $table_messages WHERE Key_name = 'content_search'");
-
-            if ($has_fulltext && strlen($filters['search']) > 3) {
-                // Use FULLTEXT for fast search
-                $joins[] = "INNER JOIN $table_messages m ON m.conversation_id = c.id";
-                $where[] = "MATCH(m.content) AGAINST(%s IN BOOLEAN MODE)";
-                $where_values[] = $filters['search'];
-            } else {
-                // Use LIKE with JOIN for better performance than EXISTS
-                $joins[] = "INNER JOIN $table_messages m ON m.conversation_id = c.id AND m.content LIKE %s";
-                $where_values[] = $search_term;
-            }
+            $where[] = "c.conversation_json LIKE %s";
+            $where_values[] = $search_term;
         }
 
         $where_clause = implode(' AND ', $where);
@@ -631,15 +710,13 @@ class AIHA_Database
 
         $results = $wpdb->get_results($query) ?: array();
 
-        // Update message_count for conversations that don't have updated counter
+        // Update message_count from JSON if needed (for backwards compatibility)
         foreach ($results as $conv) {
-            if ($conv->message_count == 0) {
-                // Check if messages exist
-                $actual_count = $wpdb->get_var($wpdb->prepare(
-                    "SELECT COUNT(*) FROM $table_messages WHERE conversation_id = %d",
-                    $conv->id
-                ));
-                if ($actual_count > 0) {
+            if ($conv->message_count == 0 && !empty($conv->conversation_json)) {
+                // Count messages from JSON
+                $messages = json_decode($conv->conversation_json, true);
+                if (is_array($messages) && count($messages) > 0) {
+                    $actual_count = count($messages);
                     // Update counter
                     $wpdb->update(
                         $table_conv,
@@ -669,10 +746,10 @@ class AIHA_Database
             $conversation_id
         ));
 
-        // If JSON doesn't exist or is old, update it (lazy update)
-        if ($conversation && (empty($conversation->conversation_json) || $conversation->message_count != substr_count($conversation->conversation_json, '"role"'))) {
+        // If JSON doesn't exist, try to migrate from messages table (backwards compatibility)
+        if ($conversation && empty($conversation->conversation_json)) {
             self::update_conversation_json($conversation_id);
-            // Reload conversation with updated JSON
+            // Reload conversation with migrated JSON
             $conversation = $wpdb->get_row($wpdb->prepare(
                 "SELECT * FROM $table WHERE id = %d",
                 $conversation_id
@@ -727,7 +804,6 @@ class AIHA_Database
     {
         global $wpdb;
         $table_conv = $wpdb->prefix . 'aiha_conversations';
-        $table_messages = $wpdb->prefix . 'aiha_messages';
 
         $where = array('1=1');
         $where_values = array();
@@ -767,18 +843,12 @@ class AIHA_Database
             }
         }
 
+        // Filter by text in conversation JSON
         if (!empty($filters['search'])) {
+            // Search in conversation_json field using LIKE (JSON is stored as text)
             $search_term = '%' . $wpdb->esc_like($filters['search']) . '%';
-            $has_fulltext = $wpdb->get_var("SHOW INDEX FROM $table_messages WHERE Key_name = 'content_search'");
-
-            if ($has_fulltext && strlen($filters['search']) > 3) {
-                $joins[] = "INNER JOIN $table_messages m ON m.conversation_id = c.id";
-                $where[] = "MATCH(m.content) AGAINST(%s IN BOOLEAN MODE)";
-                $where_values[] = $filters['search'];
-            } else {
-                $joins[] = "INNER JOIN $table_messages m ON m.conversation_id = c.id AND m.content LIKE %s";
-                $where_values[] = $search_term;
-            }
+            $where[] = "c.conversation_json LIKE %s";
+            $where_values[] = $search_term;
         }
 
         $where_clause = implode(' AND ', $where);

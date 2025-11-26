@@ -544,22 +544,20 @@ class AIHA_Ajax_Handler
             wp_send_json_error(array('message' => 'Conversation not found'));
         }
 
-        // Parse JSON if it exists
+        // Parse JSON (should always exist now, but handle backwards compatibility)
         $messages = array();
         if (!empty($conversation->conversation_json)) {
             $messages = json_decode($conversation->conversation_json, true);
             if (!is_array($messages)) {
                 $messages = array();
             }
-        }
-
-        // If JSON doesn't exist, load from messages table
-        if (empty($messages)) {
+        } else {
+            // Fallback: try to get from history (for backwards compatibility)
             $messages_raw = AIHA_Database::get_conversation_history($conversation_id, 1000);
             foreach ($messages_raw as $msg) {
                 $messages[] = array(
-                    'role' => $msg->role,
-                    'content' => $msg->content,
+                    'role' => $msg->role ?? '',
+                    'content' => $msg->content ?? '',
                     'created_at' => $msg->created_at ?? ''
                 );
             }
