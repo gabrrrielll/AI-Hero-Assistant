@@ -1,47 +1,47 @@
 /**
- * Formatare Markdown pentru mesaje AI Hero Assistant
- * Convertește markdown simplu în HTML formatat
+ * Markdown formatting for AI Hero Assistant messages
+ * Converts simple markdown to formatted HTML
  */
 
 (function () {
     'use strict';
 
     /**
-     * Formatează textul markdown parțial rapid (pentru typing effect)
-     * @param {string} text - Textul markdown parțial de formatat
-     * @returns {string} - HTML formatat
+     * Format partial markdown text quickly (for typing effect)
+     * @param {string} text - Partial markdown text to format
+     * @returns {string} - Formatted HTML
      */
     window.formatMarkdownPartial = function (text) {
         if (!text) return '';
 
-        // Normalizează textul: elimină linii goale multiple consecutive
+        // Normalize text: remove multiple consecutive empty lines
         text = text.replace(/\r\n/g, '\n').replace(/\r/g, '\n');
-        text = text.replace(/\n{2,}/g, '\n'); // Elimină 2+ newlines consecutive (păstrează doar 1)
-        text = text.replace(/[ \t]+/g, ' '); // Elimină spații multiple
+        text = text.replace(/\n{2,}/g, '\n'); // Remove 2+ consecutive newlines (keep only 1)
+        text = text.replace(/[ \t]+/g, ' '); // Remove multiple spaces
 
         let formatted = text;
 
-        // Escapă HTML-ul existent pentru siguranță
+        // Escape existing HTML for safety
         const div = document.createElement('div');
         div.textContent = formatted;
         formatted = div.innerHTML;
 
-        // Procesează rapid doar elementele inline și simple
-        // Bold (**text** sau __text__)
+        // Quickly process only inline and simple elements
+        // Bold (**text** or __text__)
         formatted = formatted.replace(/\*\*([^*\n]+?)\*\*/g, '<strong class="aiha-bold">$1</strong>');
         formatted = formatted.replace(/__(.+?)__/g, '<strong class="aiha-bold">$1</strong>');
 
-        // Italic (*text* sau _text_) - doar dacă nu este la început de linie
+        // Italic (*text* or _text_) - only if not at start of line
         formatted = formatted.replace(/(?<!^|\n|\*)\*([^*\n]+?)\*(?!\*)/g, '<em class="aiha-italic">$1</em>');
         formatted = formatted.replace(/(?<!^|\n|_)_(?!_)([^_\n]+?)_(?!_)/g, '<em class="aiha-italic">$1</em>');
 
-        // Headers (### H3, #### H4, etc.) - doar dacă sunt complete
+        // Headers (### H3, #### H4, etc.) - only if complete
         formatted = formatted.replace(/^###\s+(.+)$/gm, '<h3 class="aiha-header aiha-h1">$1</h3>');
         formatted = formatted.replace(/^####\s+(.+)$/gm, '<h4 class="aiha-header aiha-h2">$1</h4>');
         formatted = formatted.replace(/^##\s+(.+)$/gm, '<h2 class="aiha-header aiha-h1">$1</h2>');
         formatted = formatted.replace(/^#\s+(.+)$/gm, '<h1 class="aiha-header aiha-h1">$1</h1>');
 
-        // Liste cu bullet points (* sau -) - doar dacă sunt complete
+        // Bullet point lists (* or -) - only if complete
         const lines = formatted.split('\n');
         let result = [];
         let inList = false;
@@ -56,7 +56,7 @@
                     inList = true;
                 }
                 let content = listMatch[1];
-                // Formatează conținutul listei (bold, italic)
+                // Format list content (bold, italic)
                 content = content.replace(/\*\*([^*\n]+?)\*\*/g, '<strong class="aiha-bold">$1</strong>');
                 result.push('<li class="aiha-list-item">' + content + '</li>');
             } else {
@@ -67,7 +67,7 @@
                 if (trimmed) {
                     result.push('<p class="aiha-message-paragraph">' + trimmed + '</p>');
                 }
-                // Nu adăugăm <br> pentru linii goale - le ignorăm complet pentru a evita spații excesive
+                // Don't add <br> for empty lines - ignore them completely to avoid excessive spacing
             }
         });
 
@@ -77,33 +77,33 @@
 
         formatted = result.join('');
 
-        // Nu convertim newlines rămase în <br> - le ignorăm pentru a evita spații excesive
-        // Spațierea este controlată de CSS prin margin-ul paragrafelor
+        // Don't convert remaining newlines to <br> - ignore them to avoid excessive spacing
+        // Spacing is controlled by CSS through paragraph margins
 
         return formatted;
     };
 
     /**
-     * Formatează textul markdown în HTML (versiune completă)
-     * @param {string} text - Textul markdown de formatat
-     * @returns {string} - HTML formatat
+     * Format markdown text to HTML (full version)
+     * @param {string} text - Markdown text to format
+     * @returns {string} - Formatted HTML
      */
     window.formatMarkdownMessage = function (text) {
         if (!text) return '';
 
-        // Normalizează textul: elimină linii goale multiple consecutive
+        // Normalize text: remove multiple consecutive empty lines
         text = text.replace(/\r\n/g, '\n').replace(/\r/g, '\n');
-        text = text.replace(/\n{2,}/g, '\n'); // Elimină 2+ newlines consecutive (păstrează doar 1)
-        text = text.replace(/[ \t]+/g, ' '); // Elimină spații multiple
+        text = text.replace(/\n{2,}/g, '\n'); // Remove 2+ consecutive newlines (keep only 1)
+        text = text.replace(/[ \t]+/g, ' '); // Remove multiple spaces
 
         let formatted = text;
 
-        // Escapă HTML-ul existent pentru siguranță
+        // Escape existing HTML for safety
         const div = document.createElement('div');
         div.textContent = formatted;
         formatted = div.innerHTML;
 
-        // Procesează linie cu linie pentru a detecta structura
+        // Process line by line to detect structure
         const lines = formatted.split('\n');
         let result = [];
         let inList = false;
@@ -117,7 +117,7 @@
             // Code blocks (```)
             if (trimmed.startsWith('```')) {
                 if (inCodeBlock) {
-                    // Închide code block
+                    // Close code block
                     result.push('<pre class="aiha-code-block"><code>' + codeBlockContent.join('\n') + '</code></pre>');
                     codeBlockContent = [];
                     inCodeBlock = false;
@@ -163,7 +163,7 @@
                     inList = true;
                 }
                 let content = listMatch[1];
-                // Formatează conținutul listei (bold, italic, etc.)
+                // Format list content (bold, italic, etc.)
                 content = formatInlineMarkdown(content);
                 result.push('<li class="aiha-list-item">' + content + '</li>');
                 return;
@@ -182,21 +182,21 @@
                 return;
             }
 
-            // Linie goală sau text normal
+            // Empty line or normal text
             if (inList) {
                 result.push('</ul>');
                 inList = false;
             }
 
             if (trimmed) {
-                // Formatează inline markdown
+                // Format inline markdown
                 let content = formatInlineMarkdown(trimmed);
                 result.push('<p class="aiha-message-paragraph">' + content + '</p>');
             }
-            // Nu adăugăm <br> pentru linii goale - le ignorăm complet pentru a evita spații excesive
+            // Don't add <br> for empty lines - ignore them completely to avoid excessive spacing
         });
 
-        // Închide liste sau code blocks deschise
+        // Close open lists or code blocks
         if (inList) {
             result.push('</ul>');
         }
@@ -208,9 +208,9 @@
     };
 
     /**
-     * Formatează markdown inline (bold, italic, links, etc.)
-     * @param {string} text - Textul de formatat
-     * @returns {string} - HTML formatat
+     * Format inline markdown (bold, italic, links, etc.)
+     * @param {string} text - Text to format
+     * @returns {string} - Formatted HTML
      */
     function formatInlineMarkdown(text) {
         if (!text) return '';

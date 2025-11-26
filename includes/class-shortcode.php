@@ -1,6 +1,6 @@
 <?php
 /**
- * Clasă pentru shortcode-ul principal
+ * Class for main shortcode
  */
 
 if (!defined('ABSPATH')) {

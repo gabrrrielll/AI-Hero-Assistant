@@ -158,7 +158,7 @@
         const gradientEnd = $('#gradient_end');
 
         function updatePreview() {
-            // Poți adăuga preview live dacă e necesar
+            // You can add live preview if needed
         }
 
         if (gradientStart.length) {
@@ -180,11 +180,11 @@
         // CONVERSATIONS MANAGEMENT
         // ============================================
 
-        // Filtrare conversații
+        // Filter conversations
         $('#aiha-conversations-filter').on('submit', function (e) {
             e.preventDefault();
             const formData = $(this).serialize();
-            // Construiește URL-ul corect cu pagina și tab-ul
+            // Build correct URL with page and tab
             const baseUrl = window.aihaAdminData && window.aihaAdminData.settingsPageUrl 
                 ? window.aihaAdminData.settingsPageUrl 
                 : window.location.href.split('?')[0].replace(/&tab=[^&]*/, '').replace(/tab=[^&]*&?/, '') + '&tab=conversations';
@@ -267,7 +267,7 @@
                                 html += '<div class="message mb-3 ' + alignClass + '">';
                                 html += '<div class="d-inline-block p-3 rounded ' + bgClass + '" style="max-width: 80%;">';
                                 html += '<div class="fw-bold mb-1">' + (isUser ? 'Utilizator' : 'AI') + '</div>';
-                                // Folosește formatare markdown
+                                // Use markdown formatting
                                 const formattedContent = typeof formatMarkdownMessage !== 'undefined' 
                                     ? formatMarkdownMessage(msg.content) 
                                     : msg.content.replace(/\n/g, '<br>');

@@ -1,6 +1,6 @@
 <?php
 /**
- * Clasă pentru pagina de setări din admin
+ * Class for admin settings page
  */
 
 if (!defined('ABSPATH')) {
@@ -64,7 +64,7 @@ class AIHA_Admin_Settings
           $sanitized['send_lead_email'] = isset($input['send_lead_email']) ? 1 : 0;
           $sanitized['lead_notification_email'] = sanitize_email($input['lead_notification_email'] ?? '');
 
-        // Păstrează fișierele existente
+        // Preserve existing files
         $current_settings = get_option('aiha_settings', array());
         $sanitized['documentation_files'] = $current_settings['documentation_files'] ?? array();
 
@@ -72,7 +72,7 @@ class AIHA_Admin_Settings
     }
 
     /**
-     * Procesează upload-urile de fișiere separat
+     * Process file uploads separately
      */
     public function handle_file_uploads()
     {
@@ -234,10 +234,10 @@ class AIHA_Admin_Settings
                         <div class="card-body">
                             <div id="conversations-list-container">
                                 <?php
-                                // Obține filtrele din URL sau POST (toate criteriile)
+                                // Get filters from URL or POST (all criteria)
                                 $filters = array();
 
-        // Filtre text
+        // Text filters
         if (isset($_GET['ip']) && $_GET['ip'] !== '') {
             $filters['ip'] = sanitize_text_field($_GET['ip']);
         }
@@ -254,7 +254,7 @@ class AIHA_Admin_Settings
             $filters['has_leads'] = sanitize_text_field($_GET['has_leads']);
         }
 
-        // Filtre numerice - păstrează și 0
+        // Numeric filters - preserve 0 as well
         if (isset($_GET['message_count_min']) && $_GET['message_count_min'] !== '') {
             $filters['message_count_min'] = intval($_GET['message_count_min']);
         }
@@ -293,14 +293,14 @@ class AIHA_Admin_Settings
             $table_leads = $wpdb->prefix . 'aiha_leads';
 
             foreach ($conversations as $conv):
-                // Obține lead-urile pentru această conversație
+                // Get leads for this conversation
                 $leads = $wpdb->get_results($wpdb->prepare(
                     "SELECT email, phone, name FROM $table_leads WHERE conversation_id = %d LIMIT 5",
                     $conv->id
                 ));
                 $has_lead = !empty($leads);
 
-                // Verifică și actualizează message_count dacă este 0 dar există mesaje
+                // Check and update message_count if it's 0 but messages exist
                 if (($conv->message_count ?? 0) == 0) {
                     $actual_count = $wpdb->get_var($wpdb->prepare(
                         "SELECT COUNT(*) FROM {$wpdb->prefix}aiha_messages WHERE conversation_id = %d",

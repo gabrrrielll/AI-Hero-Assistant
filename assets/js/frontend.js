@@ -815,13 +815,13 @@
         }
 
         /**
-         * Scroll automat la finalul subtitle-ului
+         * Auto-scroll to bottom of subtitle
          */
         scrollToBottom() {
             if (this.subtitleEl) {
-                // Folosește requestAnimationFrame pentru scroll smooth și corect
+                // Use requestAnimationFrame for smooth and correct scroll
                 requestAnimationFrame(() => {
-                    // Scroll la final cu un mic delay pentru a permite DOM-ului să se actualizeze
+                    // Scroll to bottom with small delay to allow DOM to update
                     setTimeout(() => {
                         if (this.subtitleEl) {
                             this.subtitleEl.scrollTop = this.subtitleEl.scrollHeight;
@@ -832,25 +832,25 @@
         }
 
         /**
-         * Formatează textul pentru afișare (folosește formatare markdown comună)
+         * Format text for display (uses common markdown formatting)
          */
         formatMessageText(text) {
             if (!text) return '';
-            // Folosește funcția globală de formatare markdown dacă există
+            // Use global markdown formatting function if available
             if (typeof formatMarkdownMessage !== 'undefined') {
                 return formatMarkdownMessage(text);
             }
-            // Fallback la formatare simplă
+            // Fallback to simple formatting
             return text.replace(/\n/g, '<br>');
         }
 
         /**
-         * Formatează textul parțial pentru typing effect (versiune optimizată rapidă)
+         * Format partial text for typing effect (optimized fast version)
          */
         formatPartialText(partialText) {
             if (!partialText) return '';
 
-            // Folosește funcția rapidă de formatare parțială dacă există
+            // Use fast partial formatting function if available
             if (typeof formatMarkdownPartial !== 'undefined') {
                 try {
                     return formatMarkdownPartial(partialText);
@@ -860,7 +860,7 @@
                 }
             }
 
-            // Fallback la formatare simplă
+            // Fallback to simple formatting
             return partialText.replace(/\n/g, '<br>');
         }
 
@@ -921,7 +921,7 @@
                 if (index < text.length) {
                     this.currentText += text[index];
                     if (this.subtitleEl) {
-                        // Formatează textul parțial cu markdown în timpul typing-ului
+                        // Format partial text with markdown during typing
                         const partialFormatted = this.formatPartialText(this.currentText);
                         // Append new assistant message bubble to existing conversation
                         const newMessageHTML = '<div class="aiha-message-wrapper aiha-message-assistant">' +
@@ -931,7 +931,7 @@
                             '</div></div>';
 
                         this.subtitleEl.innerHTML = baseHTML + newMessageHTML;
-                        // Scroll automat mai frecvent pentru text lung
+                        // Auto-scroll more frequently for long text
                         if (index % 5 === 0 || index === text.length - 1) {
                             this.scrollToBottom();
                         }
@@ -940,7 +940,7 @@
                     setTimeout(typeChar, typingSpeed);
                 } else {
                     if (this.subtitleEl) {
-                        // La final, afișează textul complet formatat (pentru a ne asigura că totul este corect)
+                        // At the end, display fully formatted text (to ensure everything is correct)
                         const finalMessageHTML = '<div class="aiha-message-wrapper aiha-message-assistant">' +
                             '<div class="aiha-message-bubble aiha-message-bubble-assistant">' +
                             '<div class="aiha-message-sender">AI</div>' +
@@ -948,15 +948,15 @@
                             '</div></div>';
 
                         this.subtitleEl.innerHTML = baseHTML + finalMessageHTML;
-                        // Scroll final cu delay pentru a permite DOM-ului să se actualizeze
+                        // Final scroll with delay to allow DOM to update
                         setTimeout(() => {
                             this.scrollToBottom();
                         }, 50);
                     }
                     if (callback) callback();
-                    // Nu trecem la silent state imediat dacă vocea este activată
-                    // setSilentState va fi apelat automat când se termină citirea vocală
-                    // Menținem video-ul în starea speaking cât timp speech-ul este activ
+                    // Don't switch to silent state immediately if voice is enabled
+                    // setSilentState will be called automatically when voice reading ends
+                    // Keep video in speaking state while speech is active
                     if (!this.enableVoice || !this.isSpeechActive) {
                         this.setSilentState();
                     }

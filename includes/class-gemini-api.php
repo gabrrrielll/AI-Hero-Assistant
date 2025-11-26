@@ -1,7 +1,7 @@
 <?php
 
 /**
- * Clasă pentru integrarea cu Google Gemini API
+ * Class for Google Gemini API integration
  */
 
 if (!defined('ABSPATH')) {
@@ -22,13 +22,13 @@ class AIHA_Gemini_API
     }
 
     /**
-     * Detectează limba textului (îmbunătățită)
+     * Detect text language (improved)
      */
     private function detect_language($text, $conversation_history = array(), $accept_language = '')
     {
-        // 1. Verifică header-ul Accept-Language din browser
+        // 1. Check Accept-Language header from browser
         if (!empty($accept_language)) {
-            // Parsează Accept-Language header (ex: "ro-RO,ro;q=0.9,en-US;q=0.8,en;q=0.7")
+            // Parse Accept-Language header (ex: "ro-RO,ro;q=0.9,en-US;q=0.8,en;q=0.7")
             $languages = explode(',', $accept_language);
             foreach ($languages as $lang) {
                 $lang = trim(explode(';', $lang)[0]);
@@ -39,7 +39,7 @@ class AIHA_Gemini_API
             }
         }
 
-        // 2. Verifică istoricul conversației pentru consistență
+        // 2. Check conversation history for consistency
         if (!empty($conversation_history)) {
             $history_text = '';
             foreach ($conversation_history as $msg) {
@@ -50,7 +50,7 @@ class AIHA_Gemini_API
             }
         }
 
-        // 3. Analizează textul curent
+        // 3. Analyze current text
         if ($this->is_romanian_text($text)) {
             return 'ro';
         }
@@ -60,13 +60,13 @@ class AIHA_Gemini_API
     }
 
     /**
-     * Verifică dacă textul este în română
+     * Check if text is in Romanian
      */
     private function is_romanian_text($text)
     {
         $text_lower = mb_strtolower($text);
 
-        // Caractere speciale românești (ă, â, î, ș, ț)
+        // Romanian special characters (ă, â, î, ș, ț)
         $romanian_chars = array('ă', 'â', 'î', 'ș', 'ț', 'Ă', 'Â', 'Î', 'Ș', 'Ț');
         $has_romanian_chars = false;
         foreach ($romanian_chars as $char) {
@@ -76,7 +76,7 @@ class AIHA_Gemini_API
             }
         }
 
-        // Cuvinte cheie românești (extinse)
+        // Romanian keywords (extended)
         $romanian_keywords = array(
             'bună', 'salut', 'bună ziua', 'buna ziua', 'bună seara', 'buna seara',
             'mulțumesc', 'multumesc', 'vă rog', 'va rog', 'te rog',
@@ -94,12 +94,12 @@ class AIHA_Gemini_API
             }
         }
 
-        // Dacă are caractere românești SAU cel puțin 2 cuvinte cheie, consideră română
+        // If it has Romanian characters OR at least 2 keywords, consider it Romanian
         if ($has_romanian_chars || $keyword_count >= 2) {
             return true;
         }
 
-        // Verifică pattern-uri comune românești
+        // Check common Romanian patterns
         $romanian_patterns = array(
             '/\b(ce|care|unde|cum|când|de ce)\b/ui',
             '/\b(vă|te|mă|ne|vă|le)\b/ui',
@@ -113,7 +113,7 @@ class AIHA_Gemini_API
             }
         }
 
-        // Dacă are cel puțin 2 pattern-uri, consideră română
+        // If it has at least 2 patterns, consider it Romanian
         if ($pattern_matches >= 2) {
             return true;
         }
@@ -122,7 +122,7 @@ class AIHA_Gemini_API
     }
 
     /**
-     * Procesează documentația încărcată și extrage textul
+     * Process uploaded documentation and extract text
      */
     private function process_documentation()
     {
@@ -136,8 +136,8 @@ class AIHA_Gemini_API
         $documentation_text = "\n\nDOCUMENTAȚIE DESPRE SERVICII:\n";
         $documentation_text .= "Următoarele informații sunt disponibile despre serviciile companiei:\n";
 
-        // Pentru simplitate, vom include doar URL-urile fișierelor
-        // În producție, poți adăuga procesare reală a PDF/DOC/TXT
+        // For simplicity, we'll only include file URLs
+        // In production, you can add real PDF/DOC/TXT processing
         foreach ($docs as $doc_url) {
             $documentation_text .= "- Document: " . basename($doc_url) . "\n";
         }
@@ -148,7 +148,7 @@ class AIHA_Gemini_API
     }
 
     /**
-     * Construiește contextul pentru AI
+     * Build context for AI
      */
     private function build_context($conversation_history, $user_message, $accept_language = '')
     {
@@ -157,26 +157,26 @@ class AIHA_Gemini_API
         $ai_name = isset($settings['ai_name']) ? trim($settings['ai_name']) : '';
         $ai_instructions = isset($settings['ai_instructions']) ? $settings['ai_instructions'] : '';
 
-        // Detectează limba mesajului utilizatorului (îmbunătățită)
+        // Detect user message language (improved)
         $language = $this->detect_language($user_message, $conversation_history, $accept_language);
 
-        // Obține genul asistentului
+        // Get assistant gender
         $assistant_gender = isset($settings['assistant_gender']) ? $settings['assistant_gender'] : 'feminin';
 
-        // Construiește sistemul de prompt
+        // Build prompt system
         $system_instruction = $ai_instructions;
         if ($company_name) {
             $system_instruction = str_replace('{company_name}', $company_name, $system_instruction);
         }
 
-        // Adaugă instrucțiuni pentru LIMBĂ (CRITIC)
+        // Add LANGUAGE instructions (CRITICAL)
         if ($language === 'ro') {
             $system_instruction .= "\n\nCRITIC - LIMBĂ: Utilizatorul vorbește în ROMÂNĂ. TREBUIE să răspunzi EXCLUSIV în ROMÂNĂ. Folosește diacriticele corecte (ă, â, î, ș, ț). Adaptează-ți exprimarea pentru a fi naturală și corectă în română.";
         } else {
             $system_instruction .= "\n\nCRITICAL - LANGUAGE: The user is speaking in ENGLISH. You MUST respond EXCLUSIVELY in ENGLISH. Adapt your expression to be natural and correct in English.";
         }
 
-        // Adaugă instrucțiuni pentru nume AI (dacă este setat)
+        // Add AI name instructions (if set)
         if (!empty($ai_name)) {
             if ($language === 'ro') {
                 $system_instruction .= "\n\nIMPORTANT - NUME AI: Numele tău este " . $ai_name . ". Când utilizatorul te întreabă cum te numești sau cum să te numească, răspunde că te numești " . $ai_name . ". Folosește acest nume când te recomanzi sau când te referi la tine în conversație.";
@@ -185,7 +185,7 @@ class AIHA_Gemini_API
             }
         }
 
-        // Adaugă instrucțiuni pentru gen
+        // Add gender instructions
         if ($assistant_gender === 'masculin') {
             if ($language === 'ro') {
                 $system_instruction .= "\n\nIMPORTANT - GEN ASISTENT: Ești un asistent virtual MASCULIN. Folosește formele masculine în răspunsurile tale (ex: 'Sunt bucuros', 'Mulțumit', 'Încântat', etc.). Adaptează-ți exprimarea pentru a reflecta genul masculin.";
@@ -200,10 +200,10 @@ class AIHA_Gemini_API
             }
         }
 
-        // Adaugă documentația
+        // Add documentation
         $system_instruction .= $this->process_documentation();
 
-        // Adaugă instrucțiuni pentru lead generation
+        // Add lead generation instructions
         if ($language === 'ro') {
             $system_instruction .= "\n\nIMPORTANT: În timpul conversației, încearcă să obții de la utilizator numărul de telefon sau adresa de email pentru a putea fi contactat de echipa noastră. Fă acest lucru într-un mod natural și prietenos, nu agresiv.";
             $system_instruction .= "\n\nCRITIC - FORMATARE TEXT: NU folosi NICIODATĂ spații de două rânduri între propoziții sau paragrafe. Folosește DOAR un singur rând între paragrafe. Nu adăuga linii goale multiple în răspunsurile tale. Textul trebuie să fie compact și fără spații excesive.";
@@ -216,10 +216,10 @@ class AIHA_Gemini_API
             $system_instruction .= "\n\nCORRECT EXAMPLE:\nIntroductory text.\n* Item 1\n* Item 2\n* Item 3\nContinuation text.\n\nWRONG EXAMPLE (DO NOT do this):\nIntroductory text.\n\n* Item 1\n\n* Item 2\n\n* Item 3\n\nContinuation text.";
         }
 
-        // Construiește mesajele pentru API
+        // Build messages for API
         $messages = array();
 
-        // Adaugă sistem instruction ca prim mesaj
+        // Add system instruction as first message
         $messages[] = array(
             'role' => 'user',
             'parts' => array(array('text' => $system_instruction))
@@ -229,7 +229,7 @@ class AIHA_Gemini_API
             'parts' => array(array('text' => 'Înțeles. Voi ajuta utilizatorii să înțeleagă serviciile companiei și voi încerca să obțin date de contact într-un mod natural.'))
         );
 
-        // Adaugă istoricul conversației
+        // Add conversation history
         foreach ($conversation_history as $msg) {
             $role = $msg->role === 'user' ? 'user' : 'model';
             $messages[] = array(
@@ -238,7 +238,7 @@ class AIHA_Gemini_API
             );
         }
 
-        // Adaugă mesajul curent
+        // Add current message
         $messages[] = array(
             'role' => 'user',
             'parts' => array(array('text' => $user_message))
@@ -248,7 +248,7 @@ class AIHA_Gemini_API
     }
 
     /**
-     * Trimite request către Gemini API
+     * Send request to Gemini API
      */
     public function chat($user_message, $conversation_history = array(), $accept_language = '')
     {
@@ -302,7 +302,7 @@ class AIHA_Gemini_API
             );
         }
 
-        // Extrage textul din răspuns
+        // Extract text from response
         $text = '';
         if (isset($response_body['candidates'][0]['content']['parts'][0]['text'])) {
             $text = $response_body['candidates'][0]['content']['parts'][0]['text'];
@@ -315,7 +315,7 @@ class AIHA_Gemini_API
     }
 
     /**
-     * Streaming chat (pentru typing effect în timp real)
+     * Streaming chat (for real-time typing effect)
      */
     public function chat_stream($user_message, $conversation_history = array(), $accept_language = '')
     {
@@ -356,8 +356,8 @@ class AIHA_Gemini_API
             );
         }
 
-        // Pentru streaming, returnăm response-ul direct
-        // Frontend-ul va procesa stream-ul
+        // For streaming, return response directly
+        // Frontend will process the stream
         return array(
             'success' => true,
             'stream' => $response

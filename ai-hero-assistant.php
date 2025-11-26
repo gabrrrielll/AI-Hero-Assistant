@@ -24,7 +24,7 @@ define('AIHA_PLUGIN_DIR', plugin_dir_path(__FILE__));
 define('AIHA_PLUGIN_URL', plugin_dir_url(__FILE__));
 define('AIHA_PLUGIN_BASENAME', plugin_basename(__FILE__));
 
-// Autoloader pentru clase
+// Autoloader for classes
 spl_autoload_register(function ($class) {
     $prefix = 'AIHA_';
     $base_dir = AIHA_PLUGIN_DIR . 'includes/';
@@ -42,7 +42,7 @@ spl_autoload_register(function ($class) {
     }
 });
 
-// Include fișierele necesare
+// Include necessary files
 require_once AIHA_PLUGIN_DIR . 'includes/class-gemini-api.php';
 require_once AIHA_PLUGIN_DIR . 'includes/class-database.php';
 require_once AIHA_PLUGIN_DIR . 'includes/class-shortcode.php';
@@ -50,7 +50,7 @@ require_once AIHA_PLUGIN_DIR . 'includes/class-admin-settings.php';
 require_once AIHA_PLUGIN_DIR . 'includes/class-ajax-handler.php';
 
 /**
- * Clasa principală a plugin-ului
+ * Main plugin class
  */
 class AI_Hero_Assistant
 {
@@ -90,13 +90,13 @@ class AI_Hero_Assistant
 
     public function activate()
     {
-        // Creează tabelele în baza de date
+        // Create database tables
         AIHA_Database::create_tables();
 
-        // Verifică și actualizează schema (pentru upgrade-uri)
+        // Check and update schema (for upgrades)
         AIHA_Database::ensure_schema_up_to_date();
 
-        // Setează opțiuni default
+        // Set default options
         $default_options = array(
             'api_key' => '',
             'model' => 'gemini-1.5-flash',
@@ -127,16 +127,16 @@ class AI_Hero_Assistant
 
     public function deactivate()
     {
-        // Cleanup dacă e necesar
+        // Cleanup if necessary
         flush_rewrite_rules();
     }
 
     public function init()
     {
-        // Load text domain pentru traduceri
+        // Load text domain for translations
         load_plugin_textdomain('ai-hero-assistant', false, dirname(AIHA_PLUGIN_BASENAME) . '/languages');
 
-        // Asigură că schema este actualizată (pentru upgrade-uri)
+        // Ensure schema is up to date (for upgrades)
         AIHA_Database::ensure_schema_up_to_date();
 
         // Initialize components
@@ -150,7 +150,7 @@ class AI_Hero_Assistant
      */
     public function inline_frontend_css()
     {
-        // Verifică dacă există shortcode-ul pe pagină sau în widget-uri
+        // Check if shortcode exists on page or in widgets
         global $post;
         $has_shortcode = false;
 
@@ -158,11 +158,11 @@ class AI_Hero_Assistant
             $has_shortcode = has_shortcode($post->post_content, 'ai_hero_assistant');
         }
 
-        // Verifică și în widget-uri (do_action pentru widget-uri)
+        // Also check in widgets (do_action for widgets)
         if (!$has_shortcode) {
-            // Verifică dacă există container-ul în output (pentru widget-uri sau alte locații)
-            // Dacă nu există shortcode, încărcăm CSS oricum pentru flexibilitate
-            // Poți comenta următoarea linie dacă vrei să încarci doar când există shortcode
+            // Check if container exists in output (for widgets or other locations)
+            // If shortcode doesn't exist, we still load CSS for flexibility
+            // You can comment the following line if you want to load only when shortcode exists
             // return;
         }
 
@@ -201,9 +201,9 @@ class AI_Hero_Assistant
         // Include Bootstrap JS inline
         echo '<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-C6RzsynM9kWDrMNeT87bh95OGNyZPhcTNXj1NW7RuBCsyN/o0jlpcV8Qyq46cDfL" crossorigin="anonymous"></script>';
 
-        // Verifică dacă jQuery este disponibil și îl încarcă dacă nu este
+        // Check if jQuery is available and load it if not
         if (!wp_script_is('jquery', 'enqueued') && !wp_script_is('jquery', 'done')) {
-            // jQuery va fi încărcat de WordPress automat, dar îl includem pentru siguranță
+            // jQuery will be loaded by WordPress automatically, but we include it for safety
             echo '<script src="' . includes_url('js/jquery/jquery.min.js') . '"></script>';
         }
 
@@ -218,7 +218,7 @@ class AI_Hero_Assistant
         $js_path = AIHA_PLUGIN_DIR . 'assets/js/frontend.js';
 
         if (file_exists($js_path)) {
-            // AJAX data pentru JavaScript
+            // AJAX data for JavaScript
             $ajax_data = array(
                 'ajaxUrl' => admin_url('admin-ajax.php'),
                 'nonce' => wp_create_nonce('aiha_nonce'),
@@ -278,7 +278,7 @@ class AI_Hero_Assistant
             return;
         }
 
-        // Enqueue jQuery și media pentru upload
+        // Enqueue jQuery and media for upload
         if (!wp_script_is('jquery', 'enqueued')) {
             wp_enqueue_script('jquery');
         }
@@ -295,7 +295,7 @@ class AI_Hero_Assistant
             echo '</script>';
         }
 
-        // Localize script pentru AJAX și URL-uri
+        // Localize script for AJAX and URLs
         $admin_data = array(
             'ajaxUrl' => admin_url('admin-ajax.php'),
             'nonce' => wp_create_nonce('aiha_admin_nonce'),

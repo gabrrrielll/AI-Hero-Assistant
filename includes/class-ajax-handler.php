@@ -1,7 +1,7 @@
 <?php
 
 /**
- * Clasă pentru gestionarea request-urilor AJAX
+ * Class for handling AJAX requests
  */
 
 if (!defined('ABSPATH')) {
@@ -17,14 +17,14 @@ class AIHA_Ajax_Handler
         add_action('wp_ajax_aiha_save_lead', array($this, 'handle_save_lead'));
         add_action('wp_ajax_nopriv_aiha_save_lead', array($this, 'handle_save_lead'));
 
-        // Admin AJAX handlers pentru conversații
+        // Admin AJAX handlers for conversations
         add_action('wp_ajax_aiha_get_conversation', array($this, 'handle_get_conversation'));
         add_action('wp_ajax_aiha_delete_conversation', array($this, 'handle_delete_conversation'));
         add_action('wp_ajax_aiha_delete_conversations_bulk', array($this, 'handle_delete_conversations_bulk'));
     }
 
     /**
-     * Gestionează trimiterea mesajului
+     * Handle message sending
      */
     public function handle_send_message()
     {
@@ -34,47 +34,47 @@ class AIHA_Ajax_Handler
         $session_id = sanitize_text_field($_POST['session_id'] ?? '');
 
         if (empty($user_message)) {
-            wp_send_json_error(array('message' => 'Mesajul nu poate fi gol'));
+            wp_send_json_error(array('message' => 'Message cannot be empty'));
         }
 
-        // Obține IP-ul utilizatorului
+        // Get user IP
         $user_ip = $this->get_user_ip();
         $user_agent = $_SERVER['HTTP_USER_AGENT'] ?? '';
 
-        // Creează sau obține conversația
+        // Create or get conversation
         $conversation_id = AIHA_Database::get_or_create_conversation($session_id, $user_ip, $user_agent);
 
-        // Salvează mesajul utilizatorului
+        // Save user message
         AIHA_Database::save_message($conversation_id, 'user', $user_message);
 
-        // Obține istoricul conversației
+        // Get conversation history
         $history = AIHA_Database::get_conversation_history($conversation_id);
 
-        // Obține header-ul Accept-Language din browser
+        // Get Accept-Language header from browser
         $accept_language = isset($_SERVER['HTTP_ACCEPT_LANGUAGE']) ? $_SERVER['HTTP_ACCEPT_LANGUAGE'] : '';
 
-        // Trimite request către Gemini
+        // Send request to Gemini
         $gemini = new AIHA_Gemini_API();
         $response = $gemini->chat($user_message, $history, $accept_language);
 
         if (!$response['success']) {
-            wp_send_json_error(array('message' => $response['error'] ?? 'Eroare la comunicarea cu AI'));
+            wp_send_json_error(array('message' => $response['error'] ?? 'Error communicating with AI'));
         }
 
         $ai_response = $response['text'];
         
-        // Normalizează textul: elimină linii goale multiple consecutive (maxim 1 linie goală între paragrafe)
+        // Normalize text: remove multiple consecutive empty lines (max 1 empty line between paragraphs)
         $ai_response = $this->normalize_text_spacing($ai_response);
 
-        // Salvează răspunsul AI
+        // Save AI response
         AIHA_Database::save_message($conversation_id, 'assistant', $ai_response);
 
-        // Detectează email/telefon în toată conversația (mesaj utilizator + răspuns AI)
+        // Detect email/phone in entire conversation (user message + AI response)
         $full_conversation_text = $user_message . ' ' . $ai_response;
         $this->extract_and_save_lead($conversation_id, $full_conversation_text);
 
-        // Verifică și în toată conversația existentă pentru leads pierdute (doar dacă nu s-a găsit deja)
-        // Obține lead-ul existent pentru a verifica dacă trebuie să scanăm din nou
+        // Check entire existing conversation for missed leads (only if not already found)
+        // Get existing lead to check if we need to scan again
         global $wpdb;
         $table_leads = $wpdb->prefix . 'aiha_leads';
         $existing_lead = $wpdb->get_row($wpdb->prepare(
@@ -82,7 +82,7 @@ class AIHA_Ajax_Handler
             $conversation_id
         ));
 
-        // Dacă nu există lead sau nu are email/telefon, scanează toată conversația
+        // If no lead exists or it doesn't have email/phone, scan entire conversation
         if (!$existing_lead || (empty($existing_lead->email) && empty($existing_lead->phone))) {
             $this->check_conversation_for_leads($conversation_id);
         }
@@ -94,7 +94,7 @@ class AIHA_Ajax_Handler
     }
 
     /**
-     * Gestionează salvarea unui lead explicit
+     * Handle explicit lead saving
      */
     public function handle_save_lead()
     {
@@ -116,7 +116,7 @@ class AIHA_Ajax_Handler
     }
 
     /**
-     * Extrage email/telefon din text și salvează lead
+     * Extract email/phone from text and save lead
      */
     private function extract_and_save_lead($conversation_id, $text)
     {
@@ -124,17 +124,17 @@ class AIHA_Ajax_Handler
         $phone = '';
         $name = '';
 
-        // Extrage email - regex îmbunătățit
+        // Extract email - improved regex
         if (preg_match('/\b[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Z|a-z]{2,}\b/i', $text, $matches)) {
             $email = strtolower(trim($matches[0]));
-            // Validare suplimentară
+            // Additional validation
             if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
                 $email = '';
             }
         }
 
-        // Extrage telefon - regex îmbunătățit pentru formate românești și internaționale
-        // Formate: +40..., 07..., 0040..., etc.
+        // Extract phone - improved regex for Romanian and international formats
+        // Formats: +40..., 07..., 0040..., etc.
         $phone_patterns = array(
             '/\+40[\s\-]?[0-9]{2}[\s\-]?[0-9]{3}[\s\-]?[0-9]{4}/', // +40 format
             '/0040[\s\-]?[0-9]{2}[\s\-]?[0-9]{3}[\s\-]?[0-9]{4}/', // 0040 format
@@ -145,7 +145,7 @@ class AIHA_Ajax_Handler
         foreach ($phone_patterns as $pattern) {
             if (preg_match($pattern, $text, $matches)) {
                 $phone = preg_replace('/[\s\-\(\)\.]/', '', $matches[0]);
-                // Normalizează formatul
+                // Normalize format
                 if (strpos($phone, '0040') === 0) {
                     $phone = '+' . substr($phone, 2);
                 } elseif (strpos($phone, '0') === 0 && strlen($phone) == 10) {
@@ -153,27 +153,27 @@ class AIHA_Ajax_Handler
                 } elseif (strpos($phone, '40') === 0 && strlen($phone) >= 10) {
                     $phone = '+' . $phone;
                 }
-                // Verifică că are cel puțin 10 cifre
+                // Verify it has at least 10 digits
                 $digits_only = preg_replace('/[^0-9]/', '', $phone);
                 if (strlen($digits_only) >= 10) {
-                    break; // Găsit un telefon valid
+                    break; // Found a valid phone
                 } else {
-                    $phone = ''; // Reset dacă nu e valid
+                    $phone = ''; // Reset if not valid
                 }
             }
         }
 
-        // Încearcă să extragă nume din context (simplificat)
-        // Caută pattern-uri comune: "numele meu este", "mă numesc", etc.
+        // Try to extract name from context (simplified)
+        // Look for common patterns: "numele meu este", "mă numesc", etc.
         if (preg_match('/(?:numele\s+meu\s+este|mă\s+numesc|sunt|eu\s+sunt)\s+([A-ZĂÂÎȘȚ][a-zăâîșț]+\s+[A-ZĂÂÎȘȚ][a-zăâîșț]+)/ui', $text, $matches)) {
             $extracted_name = trim($matches[1]);
-            // Validează numele înainte de a-l folosi
+            // Validate name before using it
             if ($this->is_valid_name($extracted_name)) {
                 $name = $extracted_name;
             }
         }
 
-        // Log pentru debugging - verifică ce s-a găsit
+        // Log for debugging - check what was found
         if (defined('WP_DEBUG') && WP_DEBUG) {
             error_log('AIHA Lead extraction - Text length: ' . strlen($text));
             error_log('AIHA Lead extraction - Found email: ' . ($email ?: 'none'));
@@ -181,16 +181,16 @@ class AIHA_Ajax_Handler
             error_log('AIHA Lead extraction - Found name: ' . ($name ?: 'none'));
         }
 
-        // Salvează lead dacă există email sau telefon
+        // Save lead if email or phone exists
         if ($email || $phone) {
             $result = $this->save_lead_and_notify($conversation_id, $email, $phone, $name);
 
-            // Log pentru debugging
+            // Log for debugging
             if (defined('WP_DEBUG') && WP_DEBUG) {
                 error_log('AIHA Lead saved: Email=' . $email . ', Phone=' . $phone . ', Name=' . $name . ', Conversation=' . $conversation_id . ', Result=' . ($result ? 'success' : 'failed'));
             }
         } else {
-            // Log când nu se găsește nimic
+            // Log when nothing is found
             if (defined('WP_DEBUG') && WP_DEBUG) {
                 error_log('AIHA Lead extraction - No email or phone found in text');
             }
@@ -198,33 +198,33 @@ class AIHA_Ajax_Handler
     }
 
     /**
-     * Verifică toată conversația pentru leads
+     * Check entire conversation for leads
      */
     private function check_conversation_for_leads($conversation_id)
     {
-        // Obține toate mesajele din conversație
+        // Get all messages from conversation
         $messages = AIHA_Database::get_conversation_history($conversation_id, 50);
 
         if (empty($messages)) {
             return;
         }
 
-        // Construiește textul complet al conversației
+        // Build complete conversation text
         $full_text = '';
         foreach ($messages as $msg) {
             $full_text .= $msg->content . ' ';
         }
 
-        // Extrage leads din toată conversația
+        // Extract leads from entire conversation
         $this->extract_and_save_lead($conversation_id, $full_text);
     }
 
     /**
-     * Salvează lead-ul și trimite notificare dacă este cazul
+     * Save lead and send notification if applicable
      */
     private function save_lead_and_notify($conversation_id, $email, $phone, $name = '')
     {
-        // Log pentru debugging
+        // Log for debugging
         if (defined('WP_DEBUG') && WP_DEBUG) {
             error_log('AIHA save_lead_and_notify: Called - conversation_id=' . $conversation_id . ', email=' . ($email ?: 'empty') . ', phone=' . ($phone ?: 'empty') . ', name=' . ($name ?: 'empty'));
         }
@@ -250,7 +250,7 @@ class AIHA_Ajax_Handler
         $has_new_email = $normalized_new_email && $normalized_new_email !== $normalized_existing_email;
         $has_new_phone = $phone && (!$existing_lead || $existing_lead->phone !== $phone);
 
-        // Log pentru debugging
+        // Log for debugging
         if (defined('WP_DEBUG') && WP_DEBUG) {
             error_log('AIHA save_lead_and_notify: Existing lead=' . ($existing_lead ? 'yes' : 'no') . ', has_new_email=' . ($has_new_email ? 'yes' : 'no') . ', has_new_phone=' . ($has_new_phone ? 'yes' : 'no'));
         }
@@ -281,7 +281,7 @@ class AIHA_Ajax_Handler
     }
 
     /**
-     * Validează dacă un nume este valid (nu este o frază sau cuvinte comune)
+     * Validate if a name is valid (not a phrase or common words)
      */
     private function is_valid_name($name)
     {
@@ -289,21 +289,21 @@ class AIHA_Ajax_Handler
             return false;
         }
 
-        // Elimină spațiile multiple și normalizează
+        // Remove multiple spaces and normalize
         $name = trim(preg_replace('/\s+/', ' ', $name));
 
-        // Verifică lungimea minimă (cel puțin 4 caractere)
+        // Check minimum length (at least 4 characters)
         if (strlen($name) < 4) {
             return false;
         }
 
-        // Verifică dacă are cel puțin 2 cuvinte (prenume + nume)
+        // Check if it has at least 2 words (first name + last name)
         $words = explode(' ', $name);
         if (count($words) < 2) {
             return false;
         }
 
-        // Listă de cuvinte comune care nu sunt nume
+        // List of common words that are not names
         $invalid_words = array(
             'sunt', 'suntem', 'sunteți', 'este', 'să', 'sau', 'și', 'cu', 'de', 'la', 'în', 'pe',
             'încântată', 'încântat', 'bucuroasă', 'bucuros', 'mulțumită', 'mulțumit',
@@ -313,7 +313,7 @@ class AIHA_Ajax_Handler
             'voastră', 'voștri', 'voastre', 'lor', 'lui', 'ei'
         );
 
-        // Verifică dacă conține cuvinte invalide
+        // Check if it contains invalid words
         $name_lower = mb_strtolower($name);
         foreach ($invalid_words as $invalid_word) {
             if (strpos($name_lower, $invalid_word) !== false) {
@@ -321,13 +321,13 @@ class AIHA_Ajax_Handler
             }
         }
 
-        // Verifică dacă fiecare cuvânt începe cu literă mare
+        // Check if each word starts with uppercase letter
         foreach ($words as $word) {
             $word = trim($word);
             if (empty($word)) {
                 continue;
             }
-            // Verifică dacă prima literă este majusculă
+            // Check if first letter is uppercase
             $first_char = mb_substr($word, 0, 1);
             if (!preg_match('/[A-ZĂÂÎȘȚ]/u', $first_char)) {
                 return false;
@@ -338,18 +338,18 @@ class AIHA_Ajax_Handler
     }
 
     /**
-     * Trimite email de notificare dacă opțiunea este activă
+     * Send notification email if option is enabled
      */
     private function maybe_send_lead_notification_email($conversation_id, $email, $phone, $name)
     {
-        // Log pentru debugging
+        // Log for debugging
         if (defined('WP_DEBUG') && WP_DEBUG) {
             error_log('AIHA maybe_send_lead_notification_email: Called - conversation_id=' . $conversation_id . ', email=' . ($email ?: 'empty') . ', phone=' . ($phone ?: 'empty') . ', name=' . ($name ?: 'empty'));
         }
 
         $settings = get_option('aiha_settings', array());
 
-        // Log setările
+        // Log settings
         if (defined('WP_DEBUG') && WP_DEBUG) {
             error_log('AIHA maybe_send_lead_notification_email: Settings - send_lead_email=' . (isset($settings['send_lead_email']) ? $settings['send_lead_email'] : 'not set') . ', lead_notification_email=' . (isset($settings['lead_notification_email']) ? $settings['lead_notification_email'] : 'not set'));
         }
@@ -377,24 +377,24 @@ class AIHA_Ajax_Handler
             return;
         }
 
-        $subject = sprintf(__('Lead nou AI Hero Assistant (#%d)', 'ai-hero-assistant'), $conversation_id);
+        $subject = sprintf(__('New Lead AI Hero Assistant (#%d)', 'ai-hero-assistant'), $conversation_id);
         $conversation_url = admin_url('options-general.php?page=aiha-settings&tab=conversations&conversation_id=' . $conversation_id);
 
-        $body = '<p>' . esc_html__('A fost capturat un lead nou în AI Hero Assistant.', 'ai-hero-assistant') . '</p>';
+        $body = '<p>' . esc_html__('A new lead has been captured in AI Hero Assistant.', 'ai-hero-assistant') . '</p>';
         $body .= '<ul>';
-        // Afișează numele doar dacă este valid
+        // Display name only if valid
         if (!empty($name) && $this->is_valid_name($name)) {
-            $body .= '<li><strong>' . esc_html__('Nume', 'ai-hero-assistant') . ':</strong> ' . esc_html($name) . '</li>';
+            $body .= '<li><strong>' . esc_html__('Name', 'ai-hero-assistant') . ':</strong> ' . esc_html($name) . '</li>';
         }
         if (!empty($email)) {
             $body .= '<li><strong>' . esc_html__('Email', 'ai-hero-assistant') . ':</strong> ' . esc_html($email) . '</li>';
         }
         if (!empty($phone)) {
-            $body .= '<li><strong>' . esc_html__('Telefon', 'ai-hero-assistant') . ':</strong> ' . esc_html($phone) . '</li>';
+            $body .= '<li><strong>' . esc_html__('Phone', 'ai-hero-assistant') . ':</strong> ' . esc_html($phone) . '</li>';
         }
         $body .= '</ul>';
 
-        // Adaugă conversația integrală
+        // Add full conversation
         $messages = AIHA_Database::get_conversation_history($conversation_id, 1000);
         if (!empty($messages)) {
             $body .= '<hr style="margin: 20px 0; border: none; border-top: 1px solid #ddd;">';
@@ -427,13 +427,13 @@ class AIHA_Ajax_Handler
 
         $headers = array('Content-Type: text/html; charset=UTF-8');
 
-        // Log înainte de trimitere
+        // Log before sending
         if (defined('WP_DEBUG') && WP_DEBUG) {
             error_log('AIHA maybe_send_lead_notification_email: Attempting to send email - recipient=' . $recipient . ', subject=' . $subject);
             error_log('AIHA maybe_send_lead_notification_email: Body length=' . strlen($body) . ' chars');
         }
 
-        // Hook pentru a captura erorile PHPMailer
+        // Hook to capture PHPMailer errors
         add_action('wp_mail_failed', function ($wp_error) {
             if (defined('WP_DEBUG') && WP_DEBUG) {
                 error_log('AIHA maybe_send_lead_notification_email: wp_mail_failed hook triggered');
@@ -447,7 +447,7 @@ class AIHA_Ajax_Handler
 
         $mail_result = wp_mail($recipient, $subject, $body, $headers);
 
-        // Verifică PHPMailer pentru erori suplimentare
+        // Check PHPMailer for additional errors
         global $phpmailer;
         if (isset($phpmailer) && is_object($phpmailer)) {
             if (defined('WP_DEBUG') && WP_DEBUG) {
@@ -479,7 +479,7 @@ class AIHA_Ajax_Handler
             }
         }
 
-        // Log rezultatul
+        // Log result
         if (defined('WP_DEBUG') && WP_DEBUG) {
             if ($mail_result) {
                 error_log('AIHA maybe_send_lead_notification_email: SUCCESS - wp_mail returned true for ' . $recipient);
@@ -494,7 +494,7 @@ class AIHA_Ajax_Handler
     }
 
     /**
-     * Obține IP-ul utilizatorului
+     * Get user IP address
      */
     private function get_user_ip()
     {
@@ -522,29 +522,29 @@ class AIHA_Ajax_Handler
     }
 
     /**
-     * Obține o conversație pentru afișare în modal
+     * Get a conversation for display in modal
      */
     public function handle_get_conversation()
     {
         check_ajax_referer('aiha_admin_nonce', 'nonce');
 
         if (!current_user_can('manage_options')) {
-            wp_send_json_error(array('message' => 'Nu ai permisiunea necesară'));
+            wp_send_json_error(array('message' => 'You do not have the required permission'));
         }
 
         $conversation_id = intval($_POST['conversation_id'] ?? 0);
 
         if (!$conversation_id) {
-            wp_send_json_error(array('message' => 'ID conversație invalid'));
+            wp_send_json_error(array('message' => 'Invalid conversation ID'));
         }
 
         $conversation = AIHA_Database::get_conversation_by_id($conversation_id);
 
         if (!$conversation) {
-            wp_send_json_error(array('message' => 'Conversația nu a fost găsită'));
+            wp_send_json_error(array('message' => 'Conversation not found'));
         }
 
-        // Parsează JSON-ul dacă există
+        // Parse JSON if it exists
         $messages = array();
         if (!empty($conversation->conversation_json)) {
             $messages = json_decode($conversation->conversation_json, true);
@@ -553,7 +553,7 @@ class AIHA_Ajax_Handler
             }
         }
 
-        // Dacă nu există JSON, încarcă din tabelul messages
+        // If JSON doesn't exist, load from messages table
         if (empty($messages)) {
             $messages_raw = AIHA_Database::get_conversation_history($conversation_id, 1000);
             foreach ($messages_raw as $msg) {
@@ -572,95 +572,95 @@ class AIHA_Ajax_Handler
     }
 
     /**
-     * Șterge o conversație
+     * Delete a conversation
      */
     public function handle_delete_conversation()
     {
         check_ajax_referer('aiha_admin_nonce', 'nonce');
 
         if (!current_user_can('manage_options')) {
-            wp_send_json_error(array('message' => 'Nu ai permisiunea necesară'));
+            wp_send_json_error(array('message' => 'You do not have the required permission'));
         }
 
         $conversation_id = intval($_POST['conversation_id'] ?? 0);
 
         if (!$conversation_id) {
-            wp_send_json_error(array('message' => 'ID conversație invalid'));
+            wp_send_json_error(array('message' => 'Invalid conversation ID'));
         }
 
         $result = AIHA_Database::delete_conversation($conversation_id);
 
         if ($result) {
-            wp_send_json_success(array('message' => 'Conversația a fost ștearsă cu succes'));
+            wp_send_json_success(array('message' => 'Conversation deleted successfully'));
         } else {
-            wp_send_json_error(array('message' => 'Eroare la ștergerea conversației'));
+            wp_send_json_error(array('message' => 'Error deleting conversation'));
         }
     }
 
     /**
-     * Șterge multiple conversații (bulk)
+     * Delete multiple conversations (bulk)
      */
     public function handle_delete_conversations_bulk()
     {
         check_ajax_referer('aiha_admin_nonce', 'nonce');
 
         if (!current_user_can('manage_options')) {
-            wp_send_json_error(array('message' => 'Nu ai permisiunea necesară'));
+            wp_send_json_error(array('message' => 'You do not have the required permission'));
         }
 
         $conversation_ids = isset($_POST['conversation_ids']) ? $_POST['conversation_ids'] : array();
 
         if (empty($conversation_ids) || !is_array($conversation_ids)) {
-            wp_send_json_error(array('message' => 'Nu au fost selectate conversații'));
+            wp_send_json_error(array('message' => 'No conversations selected'));
         }
 
         $conversation_ids = array_map('intval', $conversation_ids);
         $conversation_ids = array_filter($conversation_ids);
 
         if (empty($conversation_ids)) {
-            wp_send_json_error(array('message' => 'ID-uri invalide'));
+            wp_send_json_error(array('message' => 'Invalid IDs'));
         }
 
         $result = AIHA_Database::delete_conversations($conversation_ids);
 
         if ($result !== false) {
             wp_send_json_success(array(
-                'message' => sprintf('Au fost șterse %d conversații', count($conversation_ids)),
+                'message' => sprintf('%d conversations deleted', count($conversation_ids)),
                 'deleted_count' => count($conversation_ids)
             ));
         } else {
-            wp_send_json_error(array('message' => 'Eroare la ștergerea conversațiilor'));
+            wp_send_json_error(array('message' => 'Error deleting conversations'));
         }
     }
     
     /**
-     * Normalizează spațierea textului: elimină linii goale multiple consecutive
-     * Păstrează maxim o linie goală între paragrafe
-     * @param string $text - Textul de normalizat
-     * @return string - Textul normalizat
+     * Normalize text spacing: remove multiple consecutive empty lines
+     * Keep maximum one empty line between paragraphs
+     * @param string $text - Text to normalize
+     * @return string - Normalized text
      */
     private function normalize_text_spacing($text) {
         if (empty($text)) {
             return $text;
         }
         
-        // Elimină toate caracterele de tip carriage return
+        // Remove all carriage return characters
         $text = str_replace("\r\n", "\n", $text);
         $text = str_replace("\r", "\n", $text);
         
-        // Elimină linii goale multiple consecutive (2+ linii goale devin maxim 1)
-        // Folosim regex pentru a înlocui 2+ newlines consecutive cu maxim 1 newline (fără linie goală)
+        // Remove multiple consecutive empty lines (2+ empty lines become max 1)
+        // Use regex to replace 2+ consecutive newlines with max 1 newline (without empty line)
         $text = preg_replace('/\n{2,}/', "\n", $text);
         
-        // Elimină spații multiple consecutive (păstrează maxim 1 spațiu)
+        // Remove multiple consecutive spaces (keep max 1 space)
         $text = preg_replace('/[ \t]+/', ' ', $text);
         
-        // Elimină spații de la începutul și sfârșitul fiecărei linii
+        // Remove spaces from start and end of each line
         $lines = explode("\n", $text);
         $lines = array_map('trim', $lines);
         $text = implode("\n", $lines);
         
-        // Elimină linii goale de la început și sfârșit
+        // Remove empty lines from start and end
         $text = trim($text);
         
         return $text;
