@@ -39,6 +39,7 @@ class AIHA_Admin_Settings
         $sanitized['api_key'] = sanitize_text_field($input['api_key'] ?? '');
         $sanitized['model'] = sanitize_text_field($input['model'] ?? 'gemini-1.5-flash');
         $sanitized['company_name'] = sanitize_text_field($input['company_name'] ?? '');
+        $sanitized['ai_name'] = sanitize_text_field($input['ai_name'] ?? '');
         $sanitized['ai_instructions'] = wp_kses_post($input['ai_instructions'] ?? '');
         $sanitized['gradient_start'] = sanitize_hex_color($input['gradient_start'] ?? '#6366f1');
         $sanitized['gradient_end'] = sanitize_hex_color($input['gradient_end'] ?? '#ec4899');
@@ -469,6 +470,17 @@ class AIHA_Admin_Settings
                                                value="<?php echo esc_attr($settings['company_name'] ?? ''); ?>" 
                                                class="form-control">
                                         <div class="form-text"><?php _e('Numele firmei tale care va apărea în mesajele chatbot-ului', 'ai-hero-assistant'); ?></div>
+                                    </div>
+                                    
+                                    <div class="col-md-6">
+                                        <label for="ai_name" class="form-label fw-bold"><?php _e('Nume AI (Opțional)', 'ai-hero-assistant'); ?></label>
+                                        <input type="text" 
+                                               id="ai_name" 
+                                               name="aiha_settings[ai_name]" 
+                                               value="<?php echo esc_attr($settings['ai_name'] ?? ''); ?>" 
+                                               class="form-control"
+                                               placeholder="<?php esc_attr_e('Ex: Alex, Maria, etc.', 'ai-hero-assistant'); ?>">
+                                        <div class="form-text"><?php _e('Numele personalizat pentru AI. Dacă este completat, AI se va recomanda cu acest nume când este întrebat cum se numește. Dacă rămâne gol, va funcționa ca până acum.', 'ai-hero-assistant'); ?></div>
                                     </div>
                                     
                                     <!-- Hero Message -->

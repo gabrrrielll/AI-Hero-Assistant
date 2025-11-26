@@ -154,6 +154,7 @@ class AIHA_Gemini_API
     {
         $settings = get_option('aiha_settings', array());
         $company_name = isset($settings['company_name']) ? $settings['company_name'] : '';
+        $ai_name = isset($settings['ai_name']) ? trim($settings['ai_name']) : '';
         $ai_instructions = isset($settings['ai_instructions']) ? $settings['ai_instructions'] : '';
 
         // Detectează limba mesajului utilizatorului (îmbunătățită)
@@ -173,6 +174,15 @@ class AIHA_Gemini_API
             $system_instruction .= "\n\nCRITIC - LIMBĂ: Utilizatorul vorbește în ROMÂNĂ. TREBUIE să răspunzi EXCLUSIV în ROMÂNĂ. Folosește diacriticele corecte (ă, â, î, ș, ț). Adaptează-ți exprimarea pentru a fi naturală și corectă în română.";
         } else {
             $system_instruction .= "\n\nCRITICAL - LANGUAGE: The user is speaking in ENGLISH. You MUST respond EXCLUSIVELY in ENGLISH. Adapt your expression to be natural and correct in English.";
+        }
+
+        // Adaugă instrucțiuni pentru nume AI (dacă este setat)
+        if (!empty($ai_name)) {
+            if ($language === 'ro') {
+                $system_instruction .= "\n\nIMPORTANT - NUME AI: Numele tău este " . $ai_name . ". Când utilizatorul te întreabă cum te numești sau cum să te numească, răspunde că te numești " . $ai_name . ". Folosește acest nume când te recomanzi sau când te referi la tine în conversație.";
+            } else {
+                $system_instruction .= "\n\nIMPORTANT - AI NAME: Your name is " . $ai_name . ". When the user asks what your name is or what to call you, respond that your name is " . $ai_name . ". Use this name when introducing yourself or referring to yourself in conversation.";
+            }
         }
 
         // Adaugă instrucțiuni pentru gen
