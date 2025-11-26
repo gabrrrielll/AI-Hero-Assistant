@@ -147,7 +147,7 @@ class AIHA_Admin_Settings
                             role="tab" 
                             aria-controls="conversations" 
                             aria-selected="<?php echo $active_tab === 'conversations' ? 'true' : 'false'; ?>">
-                        <?php _e('Conversații', 'ai-hero-assistant'); ?>
+                        <?php _e('Conversations', 'ai-hero-assistant'); ?>
                     </button>
                 </li>
                 <li class="nav-item" role="presentation">
@@ -159,7 +159,7 @@ class AIHA_Admin_Settings
                             role="tab" 
                             aria-controls="settings" 
                             aria-selected="<?php echo $active_tab === 'settings' ? 'true' : 'false'; ?>">
-                        <?php _e('Setări', 'ai-hero-assistant'); ?>
+                        <?php _e('Settings', 'ai-hero-assistant'); ?>
                     </button>
                 </li>
             </ul>
@@ -174,47 +174,47 @@ class AIHA_Admin_Settings
                     <!-- Filtrare Conversații -->
                     <div class="card shadow-sm mb-4">
                         <div class="card-header bg-white">
-                            <h2 class="h4 mb-0"><?php _e('Filtrare Conversații', 'ai-hero-assistant'); ?></h2>
+                            <h2 class="h4 mb-0"><?php _e('Filter Conversations', 'ai-hero-assistant'); ?></h2>
                         </div>
                         <div class="card-body">
                             <form id="aiha-conversations-filter" method="get" action="<?php echo esc_url(admin_url('options-general.php?page=aiha-settings&tab=conversations')); ?>" class="row g-3">
                                 <div class="col-md-2">
                                     <label for="filter_ip" class="form-label"><?php _e('IP', 'ai-hero-assistant'); ?></label>
-                                    <input type="text" id="filter_ip" name="ip" class="form-control" value="<?php echo esc_attr($filters['ip'] ?? ''); ?>" placeholder="<?php esc_attr_e('Filtrează după IP', 'ai-hero-assistant'); ?>">
+                                    <input type="text" id="filter_ip" name="ip" class="form-control" value="<?php echo esc_attr($filters['ip'] ?? ''); ?>" placeholder="<?php esc_attr_e('Filter by IP', 'ai-hero-assistant'); ?>">
                                 </div>
                                 <div class="col-md-2">
-                                    <label for="filter_date_from" class="form-label"><?php _e('De la dată', 'ai-hero-assistant'); ?></label>
+                                    <label for="filter_date_from" class="form-label"><?php _e('From Date', 'ai-hero-assistant'); ?></label>
                                     <input type="date" id="filter_date_from" name="date_from" class="form-control" value="<?php echo esc_attr($filters['date_from'] ?? ''); ?>">
                                 </div>
                                 <div class="col-md-2">
-                                    <label for="filter_date_to" class="form-label"><?php _e('Până la dată', 'ai-hero-assistant'); ?></label>
+                                    <label for="filter_date_to" class="form-label"><?php _e('To Date', 'ai-hero-assistant'); ?></label>
                                     <input type="date" id="filter_date_to" name="date_to" class="form-control" value="<?php echo esc_attr($filters['date_to'] ?? ''); ?>">
                                 </div>
                                 <div class="col-md-2">
-                                    <label for="filter_message_count_min" class="form-label"><?php _e('Min. mesaje', 'ai-hero-assistant'); ?></label>
+                                    <label for="filter_message_count_min" class="form-label"><?php _e('Min. Messages', 'ai-hero-assistant'); ?></label>
                                     <input type="number" id="filter_message_count_min" name="message_count_min" class="form-control" value="<?php echo esc_attr($filters['message_count_min'] ?? ''); ?>" min="0" placeholder="0">
                                 </div>
                                 <div class="col-md-2">
-                                    <label for="filter_message_count_max" class="form-label"><?php _e('Max. mesaje', 'ai-hero-assistant'); ?></label>
+                                    <label for="filter_message_count_max" class="form-label"><?php _e('Max. Messages', 'ai-hero-assistant'); ?></label>
                                     <input type="number" id="filter_message_count_max" name="message_count_max" class="form-control" value="<?php echo esc_attr($filters['message_count_max'] ?? ''); ?>" min="0" placeholder="∞">
                                 </div>
                                 <div class="col-md-2">
-                                    <label for="filter_search" class="form-label"><?php _e('Caută în mesaje', 'ai-hero-assistant'); ?></label>
-                                    <input type="text" id="filter_search" name="search" class="form-control" value="<?php echo esc_attr($filters['search'] ?? ''); ?>" placeholder="<?php esc_attr_e('Caută text...', 'ai-hero-assistant'); ?>">
+                                    <label for="filter_search" class="form-label"><?php _e('Search in Messages', 'ai-hero-assistant'); ?></label>
+                                    <input type="text" id="filter_search" name="search" class="form-control" value="<?php echo esc_attr($filters['search'] ?? ''); ?>" placeholder="<?php esc_attr_e('Search text...', 'ai-hero-assistant'); ?>">
                                 </div>
                                 <div class="col-md-2">
-                                    <label for="filter_has_leads" class="form-label"><?php _e('Are Lead-uri', 'ai-hero-assistant'); ?></label>
+                                    <label for="filter_has_leads" class="form-label"><?php _e('Has Leads', 'ai-hero-assistant'); ?></label>
                                     <select id="filter_has_leads" name="has_leads" class="form-select">
-                                        <option value=""><?php _e('Toate', 'ai-hero-assistant'); ?></option>
-                                        <option value="yes" <?php selected($filters['has_leads'] ?? '', 'yes'); ?>><?php _e('Da', 'ai-hero-assistant'); ?></option>
-                                        <option value="no" <?php selected($filters['has_leads'] ?? '', 'no'); ?>><?php _e('Nu', 'ai-hero-assistant'); ?></option>
+                                        <option value=""><?php _e('All', 'ai-hero-assistant'); ?></option>
+                                        <option value="yes" <?php selected($filters['has_leads'] ?? '', 'yes'); ?>><?php _e('Yes', 'ai-hero-assistant'); ?></option>
+                                        <option value="no" <?php selected($filters['has_leads'] ?? '', 'no'); ?>><?php _e('No', 'ai-hero-assistant'); ?></option>
                                     </select>
                                 </div>
                                 <div class="col-12">
-                                    <button type="submit" class="btn btn-primary"><?php _e('Filtrează', 'ai-hero-assistant'); ?></button>
-                                    <button type="button" id="reset-filters" class="btn btn-secondary"><?php _e('Resetează', 'ai-hero-assistant'); ?></button>
+                                    <button type="submit" class="btn btn-primary"><?php _e('Filter', 'ai-hero-assistant'); ?></button>
+                                    <button type="button" id="reset-filters" class="btn btn-secondary"><?php _e('Reset', 'ai-hero-assistant'); ?></button>
                                     <span class="ms-3 text-muted">
-                                        <strong><?php echo number_format($total_conversations); ?></strong> <?php _e('conversații găsite', 'ai-hero-assistant'); ?>
+                                        <strong><?php echo number_format($total_conversations); ?></strong> <?php _e('conversations found', 'ai-hero-assistant'); ?>
                                     </span>
                                 </div>
                             </form>
@@ -224,10 +224,10 @@ class AIHA_Admin_Settings
                     <!-- Lista Conversații -->
                     <div class="card shadow-sm">
                         <div class="card-header bg-white d-flex justify-content-between align-items-center">
-                            <h2 class="h4 mb-0"><?php _e('Conversații', 'ai-hero-assistant'); ?></h2>
+                            <h2 class="h4 mb-0"><?php _e('Conversations', 'ai-hero-assistant'); ?></h2>
                             <div>
                                 <button type="button" id="bulk-delete-btn" class="btn btn-danger btn-sm" disabled>
-                                    <i class="dashicons dashicons-trash"></i> <?php _e('Șterge selectate', 'ai-hero-assistant'); ?>
+                                    <i class="dashicons dashicons-trash"></i> <?php _e('Delete Selected', 'ai-hero-assistant'); ?>
                                 </button>
                             </div>
                         </div>
@@ -281,10 +281,10 @@ class AIHA_Admin_Settings
                                                     </th>
                                                     <th><?php _e('ID', 'ai-hero-assistant'); ?></th>
                                                     <th><?php _e('IP', 'ai-hero-assistant'); ?></th>
-                                                    <th><?php _e('Mesaje', 'ai-hero-assistant'); ?></th>
-                                                    <th><?php _e('Lead-uri', 'ai-hero-assistant'); ?></th>
-                                                    <th><?php _e('Data', 'ai-hero-assistant'); ?></th>
-                                                    <th width="150"><?php _e('Acțiuni', 'ai-hero-assistant'); ?></th>
+                                                    <th><?php _e('Messages', 'ai-hero-assistant'); ?></th>
+                                                    <th><?php _e('Leads', 'ai-hero-assistant'); ?></th>
+                                                    <th><?php _e('Date', 'ai-hero-assistant'); ?></th>
+                                                    <th width="150"><?php _e('Actions', 'ai-hero-assistant'); ?></th>
                                                 </tr>
                                             </thead>
                                             <tbody>
@@ -323,7 +323,7 @@ class AIHA_Admin_Settings
                                                         </td>
                                                         <td>
                                                             <?php if ($has_lead): ?>
-                                                                <span class="badge bg-success" title="<?php esc_attr_e('Are lead-uri capturate', 'ai-hero-assistant'); ?>">
+                                                                <span class="badge bg-success" title="<?php esc_attr_e('Has captured leads', 'ai-hero-assistant'); ?>">
                                                                     <i class="dashicons dashicons-yes"></i> <?php echo count($leads); ?>
                                                                 </span>
                                                                 <?php if (count($leads) > 0): ?>
@@ -339,13 +339,13 @@ class AIHA_Admin_Settings
                                                                     </div>
                                                                 <?php endif; ?>
                                                             <?php else: ?>
-                                                                <span class="badge bg-secondary"><?php _e('Nu', 'ai-hero-assistant'); ?></span>
+                                                                <span class="badge bg-secondary"><?php _e('No', 'ai-hero-assistant'); ?></span>
                                                             <?php endif; ?>
                                                         </td>
                                                         <td><?php echo esc_html(date_i18n(get_option('date_format') . ' ' . get_option('time_format'), strtotime($conv->created_at))); ?></td>
                                                         <td>
                                                             <button type="button" class="btn btn-sm btn-info view-conversation" data-conversation-id="<?php echo esc_attr($conv->id); ?>">
-                                                                <i class="dashicons dashicons-visibility"></i> <?php _e('Vezi', 'ai-hero-assistant'); ?>
+                                                                <i class="dashicons dashicons-visibility"></i> <?php _e('View', 'ai-hero-assistant'); ?>
                                                             </button>
                                                             <button type="button" class="btn btn-sm btn-danger delete-conversation" data-conversation-id="<?php echo esc_attr($conv->id); ?>">
                                                                 <i class="dashicons dashicons-trash"></i>
@@ -358,7 +358,7 @@ class AIHA_Admin_Settings
                                     </div>
                                     
                                     <?php if ($total_pages > 1): ?>
-                                        <nav aria-label="Paginare conversații">
+                                        <nav aria-label="<?php esc_attr_e('Conversation pagination', 'ai-hero-assistant'); ?>">
                                             <ul class="pagination justify-content-center">
                                                 <?php
                             $base_url = remove_query_arg('paged');
@@ -375,7 +375,7 @@ class AIHA_Admin_Settings
                                     
                                 <?php else: ?>
                                     <div class="alert alert-info" role="alert">
-                                        <i class="dashicons dashicons-info"></i> <?php _e('Nu există conversații.', 'ai-hero-assistant'); ?>
+                                        <i class="dashicons dashicons-info"></i> <?php _e('No conversations found.', 'ai-hero-assistant'); ?>
                                     </div>
                                 <?php endif; ?>
                             </div>
@@ -387,19 +387,19 @@ class AIHA_Admin_Settings
                         <div class="modal-dialog modal-lg modal-dialog-scrollable">
                             <div class="modal-content">
                                 <div class="modal-header">
-                                    <h5 class="modal-title" id="conversationModalLabel"><?php _e('Conversație', 'ai-hero-assistant'); ?></h5>
-                                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                    <h5 class="modal-title" id="conversationModalLabel"><?php _e('Conversation', 'ai-hero-assistant'); ?></h5>
+                                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="<?php esc_attr_e('Close', 'ai-hero-assistant'); ?>"></button>
                                 </div>
                                 <div class="modal-body" id="conversation-modal-body">
                                     <div class="text-center">
                                         <div class="spinner-border" role="status">
-                                            <span class="visually-hidden"><?php _e('Se încarcă...', 'ai-hero-assistant'); ?></span>
+                                            <span class="visually-hidden"><?php _e('Loading...', 'ai-hero-assistant'); ?></span>
                                         </div>
                                     </div>
                                 </div>
                                 <div class="modal-footer">
                                     <button type="button" class="btn btn-danger" id="delete-conversation-from-modal">
-                                        <i class="dashicons dashicons-trash"></i> <?php _e('Șterge Conversația', 'ai-hero-assistant'); ?>
+                                        <i class="dashicons dashicons-trash"></i> <?php _e('Delete Conversation', 'ai-hero-assistant'); ?>
                                     </button>
                                 </div>
                             </div>
@@ -417,7 +417,7 @@ class AIHA_Admin_Settings
                         
                         <div class="card shadow-sm">
                             <div class="card-header bg-white">
-                                <h2 class="h4 mb-0"><?php _e('Configurare Generală', 'ai-hero-assistant'); ?></h2>
+                                <h2 class="h4 mb-0"><?php _e('General Configuration', 'ai-hero-assistant'); ?></h2>
                             </div>
                             <div class="card-body">
                                 <div class="row g-4">
@@ -430,7 +430,7 @@ class AIHA_Admin_Settings
                                                value="<?php echo esc_attr($settings['api_key'] ?? ''); ?>" 
                                                class="form-control" 
                                                placeholder="AIza...">
-                                        <div class="form-text"><?php _e('Obține cheia API de la <a href="https://makersuite.google.com/app/apikey" target="_blank">Google AI Studio</a>', 'ai-hero-assistant'); ?></div>
+                                        <div class="form-text"><?php _e('Get API key from <a href="https://makersuite.google.com/app/apikey" target="_blank">Google AI Studio</a>', 'ai-hero-assistant'); ?></div>
                                     </div>
                     
                                     <!-- Model & Company Name -->
@@ -459,60 +459,60 @@ class AIHA_Admin_Settings
                                                 <option value="gemini-pro" <?php selected($settings['model'] ?? '', 'gemini-pro'); ?>>Gemini Pro (Legacy)</option>
                                             </optgroup>
                                         </select>
-                                        <div class="form-text"><?php _e('Selectează modelul Gemini. Modelele Flash sunt mai rapide și mai eficiente, iar modelele Pro oferă performanță superioară pentru sarcini complexe.', 'ai-hero-assistant'); ?></div>
+                                        <div class="form-text"><?php _e('Select Gemini model. Flash models are faster and more efficient, while Pro models offer superior performance for complex tasks.', 'ai-hero-assistant'); ?></div>
                                     </div>
                                     
                                     <div class="col-md-6">
-                                        <label for="company_name" class="form-label fw-bold"><?php _e('Nume Firmă', 'ai-hero-assistant'); ?></label>
+                                        <label for="company_name" class="form-label fw-bold"><?php _e('Company Name', 'ai-hero-assistant'); ?></label>
                                         <input type="text" 
                                                id="company_name" 
                                                name="aiha_settings[company_name]" 
                                                value="<?php echo esc_attr($settings['company_name'] ?? ''); ?>" 
                                                class="form-control">
-                                        <div class="form-text"><?php _e('Numele firmei tale care va apărea în mesajele chatbot-ului', 'ai-hero-assistant'); ?></div>
+                                        <div class="form-text"><?php _e('Your company name that will appear in chatbot messages', 'ai-hero-assistant'); ?></div>
                                     </div>
                                     
                                     <div class="col-md-6">
-                                        <label for="ai_name" class="form-label fw-bold"><?php _e('Nume AI (Opțional)', 'ai-hero-assistant'); ?></label>
+                                        <label for="ai_name" class="form-label fw-bold"><?php _e('AI Name (Optional)', 'ai-hero-assistant'); ?></label>
                                         <input type="text" 
                                                id="ai_name" 
                                                name="aiha_settings[ai_name]" 
                                                value="<?php echo esc_attr($settings['ai_name'] ?? ''); ?>" 
                                                class="form-control"
                                                placeholder="<?php esc_attr_e('Ex: Alex, Maria, etc.', 'ai-hero-assistant'); ?>">
-                                        <div class="form-text"><?php _e('Numele personalizat pentru AI. Dacă este completat, AI se va recomanda cu acest nume când este întrebat cum se numește. Dacă rămâne gol, va funcționa ca până acum.', 'ai-hero-assistant'); ?></div>
+                                        <div class="form-text"><?php _e('Custom name for AI. If filled, AI will introduce itself with this name when asked. If left empty, it will work as before.', 'ai-hero-assistant'); ?></div>
                                     </div>
                                     
                                     <!-- Hero Message -->
                                     <div class="col-12">
-                                        <label for="hero_message" class="form-label fw-bold"><?php _e('Mesaj Inițial Hero', 'ai-hero-assistant'); ?></label>
+                                        <label for="hero_message" class="form-label fw-bold"><?php _e('Initial Hero Message', 'ai-hero-assistant'); ?></label>
                                         <textarea id="hero_message" 
                                                   name="aiha_settings[hero_message]" 
                                                   rows="3" 
-                                                  class="form-control"><?php echo esc_textarea($settings['hero_message'] ?? 'Bună! Sunt asistentul virtual al {company_name}. Cum vă pot ajuta cu serviciile noastre de programare?'); ?></textarea>
-                                        <div class="form-text"><?php _e('Folosește {company_name} pentru a insera numele firmei', 'ai-hero-assistant'); ?></div>
+                                                  class="form-control"><?php echo esc_textarea($settings['hero_message'] ?? 'Hello! I am the virtual assistant of {company_name}. How can I help you with our booking services?'); ?></textarea>
+                                        <div class="form-text"><?php _e('Use {company_name} to insert the company name', 'ai-hero-assistant'); ?></div>
                                     </div>
                                     
                                     <!-- AI Instructions -->
                                     <div class="col-12">
-                                        <label for="ai_instructions" class="form-label fw-bold"><?php _e('Instrucțiuni AI', 'ai-hero-assistant'); ?></label>
+                                        <label for="ai_instructions" class="form-label fw-bold"><?php _e('AI Instructions', 'ai-hero-assistant'); ?></label>
                                         <textarea id="ai_instructions" 
                                                   name="aiha_settings[ai_instructions]" 
                                                   rows="8" 
                                                   class="form-control"><?php echo esc_textarea($settings['ai_instructions'] ?? ''); ?></textarea>
-                                        <div class="form-text"><?php _e('Instrucțiuni detaliate pentru comportamentul AI. Poți include informații despre servicii, prețuri, procese, etc.', 'ai-hero-assistant'); ?></div>
+                                        <div class="form-text"><?php _e('Detailed instructions for AI behavior. You can include information about services, prices, processes, etc.', 'ai-hero-assistant'); ?></div>
                                     </div>
                                     
                                     <!-- Documentation Files -->
                                     <div class="col-12">
-                                        <label for="documentation_files" class="form-label fw-bold"><?php _e('Documentație (Fișiere)', 'ai-hero-assistant'); ?></label>
+                                        <label for="documentation_files" class="form-label fw-bold"><?php _e('Documentation (Files)', 'ai-hero-assistant'); ?></label>
                                         <input type="file" 
                                                id="documentation_files" 
                                                name="aiha_documentation[]" 
                                                multiple 
                                                accept=".pdf,.doc,.docx,.txt"
                                                class="form-control">
-                                        <div class="form-text"><?php _e('Încarcă documente PDF, DOC sau TXT care conțin informații despre serviciile firmei. Acestea vor fi folosite pentru a instrui AI-ul.', 'ai-hero-assistant'); ?></div>
+                                        <div class="form-text"><?php _e('Upload PDF, DOC or TXT files containing information about company services. These will be used to instruct the AI.', 'ai-hero-assistant'); ?></div>
                                         <?php if (!empty($settings['documentation_files'])): ?>
                                             <div class="mt-3">
                                                 <ul class="list-group">
@@ -523,7 +523,7 @@ class AIHA_Admin_Settings
                                                             </a>
                                                             <a href="<?php echo esc_url(add_query_arg(array('aiha_remove_file' => $index, 'aiha_nonce' => wp_create_nonce('aiha_remove_file')))); ?>" 
                                                                class="btn btn-sm btn-outline-danger">
-                                                                <i class="dashicons dashicons-trash"></i> Șterge
+                                                                <i class="dashicons dashicons-trash"></i> <?php _e('Delete', 'ai-hero-assistant'); ?>
                                                             </a>
                                                         </li>
                                                     <?php endforeach; ?>
@@ -534,7 +534,7 @@ class AIHA_Admin_Settings
                                     
                                     <!-- Gradient Colors -->
                                     <div class="col-md-6">
-                                        <label for="gradient_start" class="form-label fw-bold"><?php _e('Culoare Gradient Start', 'ai-hero-assistant'); ?></label>
+                                        <label for="gradient_start" class="form-label fw-bold"><?php _e('Gradient Start Color', 'ai-hero-assistant'); ?></label>
                                         <input type="color" 
                                                id="gradient_start" 
                                                name="aiha_settings[gradient_start]" 
@@ -543,7 +543,7 @@ class AIHA_Admin_Settings
                                     </div>
                                     
                                     <div class="col-md-6">
-                                        <label for="gradient_end" class="form-label fw-bold"><?php _e('Culoare Gradient End', 'ai-hero-assistant'); ?></label>
+                                        <label for="gradient_end" class="form-label fw-bold"><?php _e('Gradient End Color', 'ai-hero-assistant'); ?></label>
                                         <input type="color" 
                                                id="gradient_end" 
                                                name="aiha_settings[gradient_end]" 
@@ -552,7 +552,7 @@ class AIHA_Admin_Settings
                                     </div>
                                     
                                     <div class="col-md-6">
-                                        <label for="gradient_color_3" class="form-label fw-bold"><?php _e('Culoare Gradient 3', 'ai-hero-assistant'); ?></label>
+                                        <label for="gradient_color_3" class="form-label fw-bold"><?php _e('Gradient Color 3', 'ai-hero-assistant'); ?></label>
                                         <input type="color" 
                                                id="gradient_color_3" 
                                                name="aiha_settings[gradient_color_3]" 
@@ -561,7 +561,7 @@ class AIHA_Admin_Settings
                                     </div>
                                     
                                     <div class="col-md-6">
-                                        <label for="gradient_color_4" class="form-label fw-bold"><?php _e('Culoare Gradient 4', 'ai-hero-assistant'); ?></label>
+                                        <label for="gradient_color_4" class="form-label fw-bold"><?php _e('Gradient Color 4', 'ai-hero-assistant'); ?></label>
                                         <input type="color" 
                                                id="gradient_color_4" 
                                                name="aiha_settings[gradient_color_4]" 
@@ -571,7 +571,7 @@ class AIHA_Admin_Settings
                                     
                                     <!-- Animation Durations -->
                                     <div class="col-md-6">
-                                        <label for="animation_duration_base" class="form-label fw-bold"><?php _e('Durata Animație Gradient Base (secunde)', 'ai-hero-assistant'); ?></label>
+                                        <label for="animation_duration_base" class="form-label fw-bold"><?php _e('Base Gradient Animation Duration (seconds)', 'ai-hero-assistant'); ?></label>
                                         <input type="number" 
                                                id="animation_duration_base" 
                                                name="aiha_settings[animation_duration_base]" 
@@ -580,11 +580,11 @@ class AIHA_Admin_Settings
                                                max="60"
                                                step="1"
                                                class="form-control">
-                                        <small class="form-text text-muted"><?php _e('Durata animației pentru gradientul de bază (1-60 secunde)', 'ai-hero-assistant'); ?></small>
+                                        <small class="form-text text-muted"><?php _e('Animation duration for base gradient (1-60 seconds)', 'ai-hero-assistant'); ?></small>
                                     </div>
                                     
                                     <div class="col-md-6">
-                                        <label for="animation_duration_wave" class="form-label fw-bold"><?php _e('Durata Animație Valuri (secunde)', 'ai-hero-assistant'); ?></label>
+                                        <label for="animation_duration_wave" class="form-label fw-bold"><?php _e('Wave Animation Duration (seconds)', 'ai-hero-assistant'); ?></label>
                                         <input type="number" 
                                                id="animation_duration_wave" 
                                                name="aiha_settings[animation_duration_wave]" 
@@ -593,7 +593,7 @@ class AIHA_Admin_Settings
                                                max="60"
                                                step="1"
                                                class="form-control">
-                                        <small class="form-text text-muted"><?php _e('Durata animației pentru valurile de culori (1-60 secunde)', 'ai-hero-assistant'); ?></small>
+                                        <small class="form-text text-muted"><?php _e('Animation duration for color waves (1-60 seconds)', 'ai-hero-assistant'); ?></small>
                                     </div>
                                     
                                     <!-- Font Family -->
@@ -610,7 +610,7 @@ class AIHA_Admin_Settings
                                     </div>
                                     
                                     <div class="col-md-6">
-                                        <label for="font_family_code" class="form-label fw-bold"><?php _e('Font Family pentru Cod (Monospace)', 'ai-hero-assistant'); ?></label>
+                                        <label for="font_family_code" class="form-label fw-bold"><?php _e('Code Font Family (Monospace)', 'ai-hero-assistant'); ?></label>
                                         <select id="font_family_code" name="aiha_settings[font_family_code]" class="form-select">
                                             <option value="Courier New, Courier, monospace" <?php selected($settings['font_family_code'] ?? '', 'Courier New, Courier, monospace'); ?>>Courier New</option>
                                             <option value="Consolas, monospace" <?php selected($settings['font_family_code'] ?? '', 'Consolas, monospace'); ?>>Consolas</option>
@@ -618,11 +618,11 @@ class AIHA_Admin_Settings
                                             <option value="'Courier New', Courier, monospace" <?php selected($settings['font_family_code'] ?? '', "'Courier New', Courier, monospace"); ?>>Courier New (cu ghilimele)</option>
                                             <option value="'Lucida Console', Monaco, monospace" <?php selected($settings['font_family_code'] ?? '', "'Lucida Console', Monaco, monospace"); ?>>Lucida Console</option>
                                         </select>
-                                        <small class="form-text text-muted"><?php _e('Fontul folosit pentru blocuri de cod și cod inline', 'ai-hero-assistant'); ?></small>
+                                        <small class="form-text text-muted"><?php _e('Font used for code blocks and inline code', 'ai-hero-assistant'); ?></small>
                                     </div>
                                     
                                     <div class="col-md-6">
-                                        <label for="font_size_base" class="form-label fw-bold"><?php _e('Dimensiune Font de Bază (px)', 'ai-hero-assistant'); ?></label>
+                                        <label for="font_size_base" class="form-label fw-bold"><?php _e('Base Font Size (px)', 'ai-hero-assistant'); ?></label>
                                         <input type="number" 
                                                id="font_size_base" 
                                                name="aiha_settings[font_size_base]" 
@@ -631,17 +631,17 @@ class AIHA_Admin_Settings
                                                max="24"
                                                step="1"
                                                class="form-control">
-                                        <small class="form-text text-muted"><?php _e('Dimensiunea de bază a fontului pentru text (10-24px)', 'ai-hero-assistant'); ?></small>
+                                        <small class="form-text text-muted"><?php _e('Base font size for text (10-24px)', 'ai-hero-assistant'); ?></small>
                                     </div>
                                     
                                     <!-- Assistant Gender -->
                                     <div class="col-md-6">
-                                        <label for="assistant_gender" class="form-label fw-bold"><?php _e('Gen Asistent Virtual', 'ai-hero-assistant'); ?></label>
+                                        <label for="assistant_gender" class="form-label fw-bold"><?php _e('Virtual Assistant Gender', 'ai-hero-assistant'); ?></label>
                                         <select id="assistant_gender" name="aiha_settings[assistant_gender]" class="form-select">
-                                            <option value="feminin" <?php selected($settings['assistant_gender'] ?? 'feminin', 'feminin'); ?>><?php _e('Feminin', 'ai-hero-assistant'); ?></option>
-                                            <option value="masculin" <?php selected($settings['assistant_gender'] ?? 'feminin', 'masculin'); ?>><?php _e('Masculin', 'ai-hero-assistant'); ?></option>
+                                            <option value="feminin" <?php selected($settings['assistant_gender'] ?? 'feminin', 'feminin'); ?>><?php _e('Feminine', 'ai-hero-assistant'); ?></option>
+                                            <option value="masculin" <?php selected($settings['assistant_gender'] ?? 'feminin', 'masculin'); ?>><?php _e('Masculine', 'ai-hero-assistant'); ?></option>
                                         </select>
-                                        <div class="form-text"><?php _e('Selectează genul asistentului virtual. Acest lucru va influența modul în care AI-ul se exprimă (ex: "bucuroasă" vs "bucuros").', 'ai-hero-assistant'); ?></div>
+                                        <div class="form-text"><?php _e('Select the virtual assistant gender. This will influence how the AI expresses itself (e.g., "happy" vs "happy" with gender-specific forms).', 'ai-hero-assistant'); ?></div>
                                     </div>
                                     
                                     <!-- Video URLs -->
@@ -653,7 +653,7 @@ class AIHA_Admin_Settings
                                                value="<?php echo esc_attr($settings['video_silence_url'] ?? ''); ?>" 
                                                class="form-control"
                                                placeholder="https://example.com/videos/tacere.mp4">
-                                        <div class="form-text"><?php _e('URL-ul videoclipului cu persoana care tace. Acest video va fi afișat când AI nu vorbește.', 'ai-hero-assistant'); ?></div>
+                                        <div class="form-text"><?php _e('URL of the video with the person being silent. This video will be displayed when AI is not speaking.', 'ai-hero-assistant'); ?></div>
                                     </div>
                                     
                                     <div class="col-md-6">
@@ -664,12 +664,12 @@ class AIHA_Admin_Settings
                                                value="<?php echo esc_attr($settings['video_speaking_url'] ?? ''); ?>" 
                                                class="form-control"
                                                placeholder="https://example.com/videos/vorbire.mp4">
-                                        <div class="form-text"><?php _e('URL-ul videoclipului cu persoana care vorbește. Acest video va fi afișat când AI răspunde.', 'ai-hero-assistant'); ?></div>
+                                        <div class="form-text"><?php _e('URL of the video with the person speaking. This video will be displayed when AI responds.', 'ai-hero-assistant'); ?></div>
                                     </div>
                                     
                                     <!-- Video Playback Rates -->
                                     <div class="col-md-6">
-                                        <label for="video_silence_playback_rate" class="form-label fw-bold"><?php _e('Viteză Redare Video (Silence)', 'ai-hero-assistant'); ?></label>
+                                        <label for="video_silence_playback_rate" class="form-label fw-bold"><?php _e('Video Playback Rate (Silence)', 'ai-hero-assistant'); ?></label>
                                         <input type="number" 
                                                id="video_silence_playback_rate" 
                                                name="aiha_settings[video_silence_playback_rate]" 
@@ -678,11 +678,11 @@ class AIHA_Admin_Settings
                                                min="0.25"
                                                max="4.0"
                                                step="0.1">
-                                        <div class="form-text"><?php _e('Viteza de redare pentru videoclipul când AI tace (0.25 = 25% viteza normală, 1.0 = viteza normală, 2.0 = dublă viteză, maxim 4.0)', 'ai-hero-assistant'); ?></div>
+                                        <div class="form-text"><?php _e('Playback speed for video when AI is silent (0.25 = 25% normal speed, 1.0 = normal speed, 2.0 = double speed, max 4.0)', 'ai-hero-assistant'); ?></div>
                                     </div>
                                     
                                     <div class="col-md-6">
-                                        <label for="video_speaking_playback_rate" class="form-label fw-bold"><?php _e('Viteză Redare Video (Speaking)', 'ai-hero-assistant'); ?></label>
+                                        <label for="video_speaking_playback_rate" class="form-label fw-bold"><?php _e('Video Playback Rate (Speaking)', 'ai-hero-assistant'); ?></label>
                                         <input type="number" 
                                                id="video_speaking_playback_rate" 
                                                name="aiha_settings[video_speaking_playback_rate]" 
@@ -691,17 +691,17 @@ class AIHA_Admin_Settings
                                                min="0.25"
                                                max="4.0"
                                                step="0.1">
-                                        <div class="form-text"><?php _e('Viteza de redare pentru videoclipul când AI vorbește (0.25 = 25% viteza normală, 1.0 = viteza normală, 2.0 = dublă viteză, maxim 4.0)', 'ai-hero-assistant'); ?></div>
+                                        <div class="form-text"><?php _e('Playback speed for video when AI is speaking (0.25 = 25% normal speed, 1.0 = normal speed, 2.0 = double speed, max 4.0)', 'ai-hero-assistant'); ?></div>
                                     </div>
                                     
                                     <!-- Voice Settings -->
                                     <div class="col-12">
                                         <hr>
-                                        <h3 class="h5"><?php _e('Setări Voce', 'ai-hero-assistant'); ?></h3>
+                                        <h3 class="h5"><?php _e('Voice Settings', 'ai-hero-assistant'); ?></h3>
                                     </div>
                                     
                                     <div class="col-md-6">
-                                        <label for="enable_voice" class="form-label fw-bold"><?php _e('Activează Voce', 'ai-hero-assistant'); ?></label>
+                                        <label for="enable_voice" class="form-label fw-bold"><?php _e('Enable Voice', 'ai-hero-assistant'); ?></label>
                                         <div class="form-check form-switch">
                                             <input 
                                                 type="checkbox" 
@@ -710,47 +710,47 @@ class AIHA_Admin_Settings
                                                 name="aiha_settings[enable_voice]" 
                                                 value="1"
                                                 <?php checked($settings['enable_voice'] ?? 0, 1); ?>>
-                                            <label class="form-check-label" for="enable_voice"><?php _e('Activează citirea vocală a răspunsurilor AI', 'ai-hero-assistant'); ?></label>
+                                            <label class="form-check-label" for="enable_voice"><?php _e('Enable voice reading of AI responses', 'ai-hero-assistant'); ?></label>
                                         </div>
                                     </div>
                                     
                                     <div class="col-md-6">
-                                        <label for="voice_name" class="form-label fw-bold"><?php _e('Voce', 'ai-hero-assistant'); ?></label>
+                                        <label for="voice_name" class="form-label fw-bold"><?php _e('Voice', 'ai-hero-assistant'); ?></label>
                                         <select id="voice_name" name="aiha_settings[voice_name]" class="form-select">
-                                            <option value="default" <?php selected($settings['voice_name'] ?? 'default', 'default'); ?>><?php _e('Voce Implicită', 'ai-hero-assistant'); ?></option>
-                                            <optgroup label="<?php _e('Română', 'ai-hero-assistant'); ?>">
-                                                <option value="Microsoft Andrei - Romanian (Romania)" <?php selected($settings['voice_name'] ?? 'default', 'Microsoft Andrei - Romanian (Romania)'); ?>>Microsoft Andrei (Română)</option>
+                                            <option value="default" <?php selected($settings['voice_name'] ?? 'default', 'default'); ?>><?php _e('Default Voice', 'ai-hero-assistant'); ?></option>
+                                            <optgroup label="<?php _e('Romanian', 'ai-hero-assistant'); ?>">
+                                                <option value="Microsoft Andrei - Romanian (Romania)" <?php selected($settings['voice_name'] ?? 'default', 'Microsoft Andrei - Romanian (Romania)'); ?>>Microsoft Andrei (Romanian)</option>
                                             </optgroup>
-                                            <optgroup label="<?php _e('Engleză - Femei', 'ai-hero-assistant'); ?>">
+                                            <optgroup label="<?php _e('English - Female', 'ai-hero-assistant'); ?>">
                                                 <option value="Google UK English Female" <?php selected($settings['voice_name'] ?? 'default', 'Google UK English Female'); ?>>Google UK English Female</option>
                                                 <option value="Google US English" <?php selected($settings['voice_name'] ?? 'default', 'Google US English'); ?>>Google US English</option>
                                             </optgroup>
-                                            <optgroup label="<?php _e('Engleză - Bărbați', 'ai-hero-assistant'); ?>">
+                                            <optgroup label="<?php _e('English - Male', 'ai-hero-assistant'); ?>">
                                                 <option value="Google UK English Male" <?php selected($settings['voice_name'] ?? 'default', 'Google UK English Male'); ?>>Google UK English Male</option>
                                                 <option value="Google US English" <?php selected($settings['voice_name'] ?? 'default', 'Google US English'); ?>>Google US English</option>
                                             </optgroup>
-                                            <optgroup label="<?php _e('Alte Limbi', 'ai-hero-assistant'); ?>">
-                                                <option value="Google Deutsch" <?php selected($settings['voice_name'] ?? 'default', 'Google Deutsch'); ?>>Google Deutsch (Germană)</option>
-                                                <option value="Google español" <?php selected($settings['voice_name'] ?? 'default', 'Google español'); ?>>Google español (Spaniolă)</option>
-                                                <option value="Google español de Estados Unidos" <?php selected($settings['voice_name'] ?? 'default', 'Google español de Estados Unidos'); ?>>Google español de Estados Unidos (Spaniolă US)</option>
-                                                <option value="Google français" <?php selected($settings['voice_name'] ?? 'default', 'Google français'); ?>>Google français (Franceză)</option>
-                                                <option value="Google italiano" <?php selected($settings['voice_name'] ?? 'default', 'Google italiano'); ?>>Google italiano (Italiană)</option>
-                                                <option value="Google Nederlands" <?php selected($settings['voice_name'] ?? 'default', 'Google Nederlands'); ?>>Google Nederlands (Olandeză)</option>
-                                                <option value="Google polski" <?php selected($settings['voice_name'] ?? 'default', 'Google polski'); ?>>Google polski (Poloneză)</option>
-                                                <option value="Google português do Brasil" <?php selected($settings['voice_name'] ?? 'default', 'Google português do Brasil'); ?>>Google português do Brasil (Portugheză)</option>
-                                                <option value="Google русский" <?php selected($settings['voice_name'] ?? 'default', 'Google русский'); ?>>Google русский (Rusă)</option>
+                                            <optgroup label="<?php _e('Other Languages', 'ai-hero-assistant'); ?>">
+                                                <option value="Google Deutsch" <?php selected($settings['voice_name'] ?? 'default', 'Google Deutsch'); ?>>Google Deutsch (German)</option>
+                                                <option value="Google español" <?php selected($settings['voice_name'] ?? 'default', 'Google español'); ?>>Google español (Spanish)</option>
+                                                <option value="Google español de Estados Unidos" <?php selected($settings['voice_name'] ?? 'default', 'Google español de Estados Unidos'); ?>>Google español de Estados Unidos (Spanish US)</option>
+                                                <option value="Google français" <?php selected($settings['voice_name'] ?? 'default', 'Google français'); ?>>Google français (French)</option>
+                                                <option value="Google italiano" <?php selected($settings['voice_name'] ?? 'default', 'Google italiano'); ?>>Google italiano (Italian)</option>
+                                                <option value="Google Nederlands" <?php selected($settings['voice_name'] ?? 'default', 'Google Nederlands'); ?>>Google Nederlands (Dutch)</option>
+                                                <option value="Google polski" <?php selected($settings['voice_name'] ?? 'default', 'Google polski'); ?>>Google polski (Polish)</option>
+                                                <option value="Google português do Brasil" <?php selected($settings['voice_name'] ?? 'default', 'Google português do Brasil'); ?>>Google português do Brasil (Portuguese)</option>
+                                                <option value="Google русский" <?php selected($settings['voice_name'] ?? 'default', 'Google русский'); ?>>Google русский (Russian)</option>
                                             </optgroup>
                                         </select>
-                                        <div class="form-text"><?php _e('Selectează vocea care va citi răspunsurile AI. Notă: Voci disponibile pot varia în funcție de browser și sistem de operare. Plugin-ul va încerca să găsească cea mai apropiată voce disponibilă.', 'ai-hero-assistant'); ?></div>
+                                        <div class="form-text"><?php _e('Select the voice that will read AI responses. Note: Available voices may vary depending on browser and operating system. The plugin will try to find the closest available voice.', 'ai-hero-assistant'); ?></div>
                                     </div>
                                       
                                       <div class="col-12">
                                           <hr>
-                                          <h3 class="h5"><?php _e('Lead-uri & Notificări', 'ai-hero-assistant'); ?></h3>
+                                          <h3 class="h5"><?php _e('Leads & Notifications', 'ai-hero-assistant'); ?></h3>
                                       </div>
                                       
                                       <div class="col-md-6">
-                                          <label for="send_lead_email" class="form-label fw-bold"><?php _e('Trimite email la lead nou', 'ai-hero-assistant'); ?></label>
+                                          <label for="send_lead_email" class="form-label fw-bold"><?php _e('Send email on new lead', 'ai-hero-assistant'); ?></label>
                                           <div class="form-check form-switch">
                                               <input 
                                                   type="checkbox" 
@@ -759,12 +759,12 @@ class AIHA_Admin_Settings
                                                   name="aiha_settings[send_lead_email]" 
                                                   value="1"
                                                   <?php checked($settings['send_lead_email'] ?? 0, 1); ?>>
-                                              <label class="form-check-label" for="send_lead_email"><?php _e('Activează trimiterea automată de email când este capturat un lead', 'ai-hero-assistant'); ?></label>
+                                              <label class="form-check-label" for="send_lead_email"><?php _e('Enable automatic email sending when a lead is captured', 'ai-hero-assistant'); ?></label>
                                           </div>
                                       </div>
                                       
                                       <div class="col-md-6">
-                                          <label for="lead_notification_email" class="form-label fw-bold"><?php _e('Adresă email notificări lead', 'ai-hero-assistant'); ?></label>
+                                          <label for="lead_notification_email" class="form-label fw-bold"><?php _e('Lead notification email address', 'ai-hero-assistant'); ?></label>
                                           <input 
                                               type="email" 
                                               id="lead_notification_email" 
@@ -772,12 +772,12 @@ class AIHA_Admin_Settings
                                               class="form-control"
                                               value="<?php echo esc_attr($settings['lead_notification_email'] ?? get_option('admin_email')); ?>"
                                               placeholder="office@example.com">
-                                          <div class="form-text"><?php _e('La această adresă se trimit notificările când se identifică un număr de telefon sau o adresă de email.', 'ai-hero-assistant'); ?></div>
+                                          <div class="form-text"><?php _e('Notifications will be sent to this address when a phone number or email address is identified.', 'ai-hero-assistant'); ?></div>
                                       </div>
                                 </div>
                             </div>
                             <div class="card-footer bg-white">
-                                <?php submit_button(__('Salvează Setările', 'ai-hero-assistant'), 'primary', 'submit', false, array('class' => 'btn btn-primary')); ?>
+                                <?php submit_button(__('Save Settings', 'ai-hero-assistant'), 'primary', 'submit', false, array('class' => 'btn btn-primary')); ?>
                             </div>
                         </div>
                     </form>

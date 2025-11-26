@@ -147,13 +147,13 @@ class AIHA_Shortcode
                         <textarea 
                             id="aiha-input-<?php echo esc_attr($instance_id); ?>" 
                             class="aiha-textarea form-control" 
-                            placeholder="<?php esc_attr_e('Scrieți mesajul dvs...', 'ai-hero-assistant'); ?>"
+                            placeholder="<?php esc_attr_e('Type your message...', 'ai-hero-assistant'); ?>"
                             rows="1"></textarea>
                         <button 
                             id="aiha-send-<?php echo esc_attr($instance_id); ?>" 
                             class="aiha-send-btn btn btn-light d-flex align-items-center justify-content-center flex-shrink-0"
                             style="width: 50px; height: 50px;"
-                            aria-label="<?php esc_attr_e('Trimite mesaj', 'ai-hero-assistant'); ?>">
+                            aria-label="<?php esc_attr_e('Send message', 'ai-hero-assistant'); ?>">
                             <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                                 <line x1="22" y1="2" x2="11" y2="13"></line>
                                 <polygon points="22 2 15 22 11 13 2 9 22 2"></polygon>

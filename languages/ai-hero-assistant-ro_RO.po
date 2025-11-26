@@ -1,0 +1,408 @@
+# Translation file for AI Hero Assistant (Romanian)
+# Copyright (C) 2024
+# This file is distributed under the same license as the AI Hero Assistant plugin.
+msgid ""
+msgstr ""
+"Project-Id-Version: AI Hero Assistant 1.0.0\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2024-01-01 00:00+0000\n"
+"PO-Revision-Date: 2024-01-01 00:00+0000\n"
+"Last-Translator: \n"
+"Language-Team: Romanian\n"
+"Language: ro_RO\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=3; plural=(n==1 ? 0 : n==0 || (n!=1 && n%100>=1 && n%100<=19) ? 1 : 2);\n"
+
+#: includes/class-admin-settings.php:22
+msgid "AI Hero Assistant Settings"
+msgstr "Setări AI Hero Assistant"
+
+#: includes/class-admin-settings.php:23
+msgid "AI Hero Assistant"
+msgstr "AI Hero Assistant"
+
+#: includes/class-admin-settings.php:150
+msgid "Conversations"
+msgstr "Conversații"
+
+#: includes/class-admin-settings.php:162
+msgid "Settings"
+msgstr "Setări"
+
+#: includes/class-admin-settings.php:177
+msgid "Filter Conversations"
+msgstr "Filtrare Conversații"
+
+#: includes/class-admin-settings.php:182
+msgid "IP"
+msgstr "IP"
+
+#: includes/class-admin-settings.php:183
+msgid "Filter by IP"
+msgstr "Filtrează după IP"
+
+#: includes/class-admin-settings.php:186
+msgid "From Date"
+msgstr "De la dată"
+
+#: includes/class-admin-settings.php:190
+msgid "To Date"
+msgstr "Până la dată"
+
+#: includes/class-admin-settings.php:194
+msgid "Min. Messages"
+msgstr "Min. mesaje"
+
+#: includes/class-admin-settings.php:198
+msgid "Max. Messages"
+msgstr "Max. mesaje"
+
+#: includes/class-admin-settings.php:202
+msgid "Search in Messages"
+msgstr "Caută în mesaje"
+
+#: includes/class-admin-settings.php:203
+msgid "Search text..."
+msgstr "Caută text..."
+
+#: includes/class-admin-settings.php:206
+msgid "Has Leads"
+msgstr "Are Lead-uri"
+
+#: includes/class-admin-settings.php:208
+msgid "All"
+msgstr "Toate"
+
+#: includes/class-admin-settings.php:209
+msgid "Yes"
+msgstr "Da"
+
+#: includes/class-admin-settings.php:210
+msgid "No"
+msgstr "Nu"
+
+#: includes/class-admin-settings.php:214
+msgid "Filter"
+msgstr "Filtrează"
+
+#: includes/class-admin-settings.php:215
+msgid "Reset"
+msgstr "Resetează"
+
+#: includes/class-admin-settings.php:217
+msgid "conversations found"
+msgstr "conversații găsite"
+
+#: includes/class-admin-settings.php:227
+msgid "Conversations"
+msgstr "Conversații"
+
+#: includes/class-admin-settings.php:230
+msgid "Delete Selected"
+msgstr "Șterge selectate"
+
+#: includes/class-admin-settings.php:282
+msgid "ID"
+msgstr "ID"
+
+#: includes/class-admin-settings.php:283
+msgid "IP"
+msgstr "IP"
+
+#: includes/class-admin-settings.php:284
+msgid "Messages"
+msgstr "Mesaje"
+
+#: includes/class-admin-settings.php:285
+msgid "Leads"
+msgstr "Lead-uri"
+
+#: includes/class-admin-settings.php:286
+msgid "Date"
+msgstr "Data"
+
+#: includes/class-admin-settings.php:287
+msgid "Actions"
+msgstr "Acțiuni"
+
+#: includes/class-admin-settings.php:326
+msgid "Has captured leads"
+msgstr "Are lead-uri capturate"
+
+#: includes/class-admin-settings.php:342
+msgid "No"
+msgstr "Nu"
+
+#: includes/class-admin-settings.php:348
+msgid "View"
+msgstr "Vezi"
+
+#: includes/class-admin-settings.php:361
+msgid "Conversation pagination"
+msgstr "Paginare conversații"
+
+#: includes/class-admin-settings.php:378
+msgid "No conversations found."
+msgstr "Nu există conversații."
+
+#: includes/class-admin-settings.php:390
+msgid "Conversation"
+msgstr "Conversație"
+
+#: includes/class-admin-settings.php:391
+msgid "Close"
+msgstr "Închide"
+
+#: includes/class-admin-settings.php:396
+msgid "Loading..."
+msgstr "Se încarcă..."
+
+#: includes/class-admin-settings.php:402
+msgid "Delete Conversation"
+msgstr "Șterge Conversația"
+
+#: includes/class-admin-settings.php:420
+msgid "General Configuration"
+msgstr "Configurare Generală"
+
+#: includes/class-admin-settings.php:426
+msgid "Google Gemini API Key"
+msgstr "Cheie API Google Gemini"
+
+#: includes/class-admin-settings.php:433
+msgid "Get API key from <a href=\"https://makersuite.google.com/app/apikey\" target=\"_blank\">Google AI Studio</a>"
+msgstr "Obține cheia API de la <a href=\"https://makersuite.google.com/app/apikey\" target=\"_blank\">Google AI Studio</a>"
+
+#: includes/class-admin-settings.php:438
+msgid "Model Gemini"
+msgstr "Model Gemini"
+
+#: includes/class-admin-settings.php:462
+msgid "Select Gemini model. Flash models are faster and more efficient, while Pro models offer superior performance for complex tasks."
+msgstr "Selectează modelul Gemini. Modelele Flash sunt mai rapide și mai eficiente, iar modelele Pro oferă performanță superioară pentru sarcini complexe."
+
+#: includes/class-admin-settings.php:466
+msgid "Company Name"
+msgstr "Nume Firmă"
+
+#: includes/class-admin-settings.php:472
+msgid "Your company name that will appear in chatbot messages"
+msgstr "Numele firmei tale care va apărea în mesajele chatbot-ului"
+
+#: includes/class-admin-settings.php:476
+msgid "AI Name (Optional)"
+msgstr "Nume AI (Opțional)"
+
+#: includes/class-admin-settings.php:482
+msgid "Ex: Alex, Maria, etc."
+msgstr "Ex: Alex, Maria, etc."
+
+#: includes/class-admin-settings.php:483
+msgid "Custom name for AI. If filled, AI will introduce itself with this name when asked. If left empty, it will work as before."
+msgstr "Numele personalizat pentru AI. Dacă este completat, AI se va recomanda cu acest nume când este întrebat cum se numește. Dacă rămâne gol, va funcționa ca până acum."
+
+#: includes/class-admin-settings.php:488
+msgid "Initial Hero Message"
+msgstr "Mesaj Inițial Hero"
+
+#: includes/class-admin-settings.php:493
+msgid "Use {company_name} to insert the company name"
+msgstr "Folosește {company_name} pentru a insera numele firmei"
+
+#: includes/class-admin-settings.php:498
+msgid "AI Instructions"
+msgstr "Instrucțiuni AI"
+
+#: includes/class-admin-settings.php:503
+msgid "Detailed instructions for AI behavior. You can include information about services, prices, processes, etc."
+msgstr "Instrucțiuni detaliate pentru comportamentul AI. Poți include informații despre servicii, prețuri, procese, etc."
+
+#: includes/class-admin-settings.php:508
+msgid "Documentation (Files)"
+msgstr "Documentație (Fișiere)"
+
+#: includes/class-admin-settings.php:515
+msgid "Upload PDF, DOC or TXT files containing information about company services. These will be used to instruct the AI."
+msgstr "Încarcă documente PDF, DOC sau TXT care conțin informații despre serviciile firmei. Acestea vor fi folosite pentru a instrui AI-ul."
+
+#: includes/class-admin-settings.php:526
+msgid "Delete"
+msgstr "Șterge"
+
+#: includes/class-admin-settings.php:537
+msgid "Gradient Start Color"
+msgstr "Culoare Gradient Start"
+
+#: includes/class-admin-settings.php:546
+msgid "Gradient End Color"
+msgstr "Culoare Gradient End"
+
+#: includes/class-admin-settings.php:555
+msgid "Gradient Color 3"
+msgstr "Culoare Gradient 3"
+
+#: includes/class-admin-settings.php:564
+msgid "Gradient Color 4"
+msgstr "Culoare Gradient 4"
+
+#: includes/class-admin-settings.php:574
+msgid "Base Gradient Animation Duration (seconds)"
+msgstr "Durata Animație Gradient Base (secunde)"
+
+#: includes/class-admin-settings.php:583
+msgid "Animation duration for base gradient (1-60 seconds)"
+msgstr "Durata animației pentru gradientul de bază (1-60 secunde)"
+
+#: includes/class-admin-settings.php:587
+msgid "Wave Animation Duration (seconds)"
+msgstr "Durata Animație Valuri (secunde)"
+
+#: includes/class-admin-settings.php:596
+msgid "Animation duration for color waves (1-60 seconds)"
+msgstr "Durata animației pentru valurile de culori (1-60 secunde)"
+
+#: includes/class-admin-settings.php:601
+msgid "Font Family"
+msgstr "Font Family"
+
+#: includes/class-admin-settings.php:613
+msgid "Code Font Family (Monospace)"
+msgstr "Font Family pentru Cod (Monospace)"
+
+#: includes/class-admin-settings.php:621
+msgid "Font used for code blocks and inline code"
+msgstr "Fontul folosit pentru blocuri de cod și cod inline"
+
+#: includes/class-admin-settings.php:625
+msgid "Base Font Size (px)"
+msgstr "Dimensiune Font de Bază (px)"
+
+#: includes/class-admin-settings.php:634
+msgid "Base font size for text (10-24px)"
+msgstr "Dimensiunea de bază a fontului pentru text (10-24px)"
+
+#: includes/class-admin-settings.php:639
+msgid "Virtual Assistant Gender"
+msgstr "Gen Asistent Virtual"
+
+#: includes/class-admin-settings.php:641
+msgid "Feminine"
+msgstr "Feminin"
+
+#: includes/class-admin-settings.php:642
+msgid "Masculine"
+msgstr "Masculin"
+
+#: includes/class-admin-settings.php:644
+msgid "Select the virtual assistant gender. This will influence how the AI expresses itself (e.g., \"happy\" vs \"happy\" with gender-specific forms)."
+msgstr "Selectează genul asistentului virtual. Acest lucru va influența modul în care AI-ul se exprimă (ex: \"bucuroasă\" vs \"bucuros\")."
+
+#: includes/class-admin-settings.php:649
+msgid "Video URL (Silence)"
+msgstr "Video URL (Silence)"
+
+#: includes/class-admin-settings.php:656
+msgid "URL of the video with the person being silent. This video will be displayed when AI is not speaking."
+msgstr "URL-ul videoclipului cu persoana care tace. Acest video va fi afișat când AI nu vorbește."
+
+#: includes/class-admin-settings.php:660
+msgid "Video URL (Speaking)"
+msgstr "Video URL (Speaking)"
+
+#: includes/class-admin-settings.php:667
+msgid "URL of the video with the person speaking. This video will be displayed when AI responds."
+msgstr "URL-ul videoclipului cu persoana care vorbește. Acest video va fi afișat când AI răspunde."
+
+#: includes/class-admin-settings.php:672
+msgid "Video Playback Rate (Silence)"
+msgstr "Viteză Redare Video (Silence)"
+
+#: includes/class-admin-settings.php:681
+msgid "Playback speed for video when AI is silent (0.25 = 25% normal speed, 1.0 = normal speed, 2.0 = double speed, max 4.0)"
+msgstr "Viteza de redare pentru videoclipul când AI tace (0.25 = 25% viteza normală, 1.0 = viteza normală, 2.0 = dublă viteză, maxim 4.0)"
+
+#: includes/class-admin-settings.php:685
+msgid "Video Playback Rate (Speaking)"
+msgstr "Viteză Redare Video (Speaking)"
+
+#: includes/class-admin-settings.php:694
+msgid "Playback speed for video when AI is speaking (0.25 = 25% normal speed, 1.0 = normal speed, 2.0 = double speed, max 4.0)"
+msgstr "Viteza de redare pentru videoclipul când AI vorbește (0.25 = 25% viteza normală, 1.0 = viteza normală, 2.0 = dublă viteză, maxim 4.0)"
+
+#: includes/class-admin-settings.php:700
+msgid "Voice Settings"
+msgstr "Setări Voce"
+
+#: includes/class-admin-settings.php:704
+msgid "Enable Voice"
+msgstr "Activează Voce"
+
+#: includes/class-admin-settings.php:713
+msgid "Enable voice reading of AI responses"
+msgstr "Activează citirea vocală a răspunsurilor AI"
+
+#: includes/class-admin-settings.php:718
+msgid "Voice"
+msgstr "Voce"
+
+#: includes/class-admin-settings.php:720
+msgid "Default Voice"
+msgstr "Voce Implicită"
+
+#: includes/class-admin-settings.php:721
+msgid "Romanian"
+msgstr "Română"
+
+#: includes/class-admin-settings.php:724
+msgid "English - Female"
+msgstr "Engleză - Femei"
+
+#: includes/class-admin-settings.php:728
+msgid "English - Male"
+msgstr "Engleză - Bărbați"
+
+#: includes/class-admin-settings.php:732
+msgid "Other Languages"
+msgstr "Alte Limbi"
+
+#: includes/class-admin-settings.php:744
+msgid "Select the voice that will read AI responses. Note: Available voices may vary depending on browser and operating system. The plugin will try to find the closest available voice."
+msgstr "Selectează vocea care va citi răspunsurile AI. Notă: Voci disponibile pot varia în funcție de browser și sistem de operare. Plugin-ul va încerca să găsească cea mai apropiată voce disponibilă."
+
+#: includes/class-admin-settings.php:749
+msgid "Leads & Notifications"
+msgstr "Lead-uri & Notificări"
+
+#: includes/class-admin-settings.php:753
+msgid "Send email on new lead"
+msgstr "Trimite email la lead nou"
+
+#: includes/class-admin-settings.php:762
+msgid "Enable automatic email sending when a lead is captured"
+msgstr "Activează trimiterea automată de email când este capturat un lead"
+
+#: includes/class-admin-settings.php:767
+msgid "Lead notification email address"
+msgstr "Adresă email notificări lead"
+
+#: includes/class-admin-settings.php:775
+msgid "Notifications will be sent to this address when a phone number or email address is identified."
+msgstr "La această adresă se trimit notificările când se identifică un număr de telefon sau o adresă de email."
+
+#: includes/class-admin-settings.php:780
+msgid "Save Settings"
+msgstr "Salvează Setările"
+
+#: includes/class-shortcode.php:133
+msgid "Please configure video URLs in plugin settings"
+msgstr "Vă rugăm să configurați URL-urile video în setările plugin-ului"
+
+#: includes/class-shortcode.php:150
+msgid "Type your message..."
+msgstr "Scrieți mesajul dvs..."
+
+#: includes/class-shortcode.php:156
+msgid "Send message"
+msgstr "Trimite mesaj"
