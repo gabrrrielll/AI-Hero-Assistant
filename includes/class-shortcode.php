@@ -175,7 +175,8 @@ class AIHA_Shortcode
             "videoSilencePlaybackRate": <?php echo esc_js($video_silence_playback_rate); ?>,
             "videoSpeakingPlaybackRate": <?php echo esc_js($video_speaking_playback_rate); ?>,
             "enableVoice": <?php echo $enable_voice ? 'true' : 'false'; ?>,
-            "voiceName": "<?php echo esc_js($voice_name); ?>"
+            "voiceName": "<?php echo esc_js($voice_name); ?>",
+            "aiName": <?php echo json_encode(AIHA_Message_Formatter::get_ai_name(), JSON_UNESCAPED_UNICODE); ?>
         }
         </script>
         <?php

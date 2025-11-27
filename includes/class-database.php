@@ -473,11 +473,13 @@ class AIHA_Database
         }
 
         // Convert to format expected by Gemini API (role, content)
+        // Also include created_at for display purposes
         $history = array();
         foreach ($messages as $message) {
             $history[] = (object) array(
                 'role' => $message['role'] ?? '',
-                'content' => $message['content'] ?? ''
+                'content' => $message['content'] ?? '',
+                'created_at' => $message['created_at'] ?? ''
             );
         }
 

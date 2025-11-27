@@ -394,32 +394,12 @@ class AIHA_Ajax_Handler
         }
         $body .= '</ul>';
 
-        // Add full conversation
+        // Add full conversation using common formatting function
         $messages = AIHA_Database::get_conversation_history($conversation_id, 1000);
         if (!empty($messages)) {
             $body .= '<hr style="margin: 20px 0; border: none; border-top: 1px solid #ddd;">';
             $body .= '<h3 style="margin-top: 0;">' . esc_html__('Conversația completă', 'ai-hero-assistant') . '</h3>';
-            $body .= '<div style="background: #f5f5f5; padding: 15px; border-radius: 5px; max-height: 600px; overflow-y: auto;">';
-
-            foreach ($messages as $msg) {
-                $is_user = $msg->role === 'user';
-                $bg_color = $is_user ? '#0073aa' : '#f0f0f1';
-                $text_color = $is_user ? '#fff' : '#000';
-                $align = $is_user ? 'right' : 'left';
-                $sender = $is_user ? esc_html__('Utilizator', 'ai-hero-assistant') : esc_html__('AI', 'ai-hero-assistant');
-
-                $body .= '<div style="margin-bottom: 15px; text-align: ' . $align . ';">';
-                $body .= '<div style="display: inline-block; max-width: 80%; background: ' . $bg_color . '; color: ' . $text_color . '; padding: 10px 15px; border-radius: 8px; text-align: left;">';
-                $body .= '<div style="font-weight: bold; margin-bottom: 5px; font-size: 12px; opacity: 0.9;">' . esc_html($sender) . '</div>';
-                $body .= '<div style="line-height: 1.5;">' . nl2br(esc_html($msg->content)) . '</div>';
-                if (!empty($msg->created_at)) {
-                    $body .= '<div style="font-size: 11px; margin-top: 5px; opacity: 0.7;">' . esc_html($msg->created_at) . '</div>';
-                }
-                $body .= '</div>';
-                $body .= '</div>';
-            }
-
-            $body .= '</div>';
+            $body .= AIHA_Message_Formatter::format_conversation_for_email($messages);
         }
 
         $body .= '<hr style="margin: 20px 0; border: none; border-top: 1px solid #ddd;">';
@@ -547,25 +527,29 @@ class AIHA_Ajax_Handler
         // Parse JSON (should always exist now, but handle backwards compatibility)
         $messages = array();
         if (!empty($conversation->conversation_json)) {
-            $messages = json_decode($conversation->conversation_json, true);
-            if (!is_array($messages)) {
-                $messages = array();
+            $messages_raw = json_decode($conversation->conversation_json, true);
+            if (is_array($messages_raw)) {
+                // Convert to objects for formatting function
+                foreach ($messages_raw as $msg) {
+                    $messages[] = (object) array(
+                        'role' => $msg['role'] ?? '',
+                        'content' => $msg['content'] ?? '',
+                        'created_at' => $msg['created_at'] ?? ''
+                    );
+                }
             }
         } else {
             // Fallback: try to get from history (for backwards compatibility)
-            $messages_raw = AIHA_Database::get_conversation_history($conversation_id, 1000);
-            foreach ($messages_raw as $msg) {
-                $messages[] = array(
-                    'role' => $msg->role ?? '',
-                    'content' => $msg->content ?? '',
-                    'created_at' => $msg->created_at ?? ''
-                );
-            }
+            $messages = AIHA_Database::get_conversation_history($conversation_id, 1000);
         }
+
+        // Format messages using common formatter
+        $formatted_messages = AIHA_Message_Formatter::format_conversation_for_admin($messages);
 
         wp_send_json_success(array(
             'conversation' => $conversation,
-            'messages' => $messages
+            'messages' => $formatted_messages,
+            'ai_name' => AIHA_Message_Formatter::get_ai_name()
         ));
     }
 
