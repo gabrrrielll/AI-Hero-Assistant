@@ -244,6 +244,7 @@
                     if (response.success && response.data) {
                         const conv = response.data.conversation;
                         const messages = response.data.messages || [];
+                        const aiName = response.data.ai_name || 'AI'; // Get AI name from response
 
                         let html = '<div class="conversation-details mb-3">';
                         html += '<div class="row g-3">';
@@ -263,10 +264,12 @@
                                 const isUser = msg.role === 'user';
                                 const bgClass = isUser ? 'bg-primary text-white' : 'bg-light';
                                 const alignClass = isUser ? 'text-end' : 'text-start';
+                                // Use sender from formatted message or fallback
+                                const sender = msg.sender || (isUser ? 'Utilizator' : aiName);
 
                                 html += '<div class="message mb-3 ' + alignClass + '">';
                                 html += '<div class="d-inline-block p-3 rounded ' + bgClass + '" style="max-width: 80%;">';
-                                html += '<div class="fw-bold mb-1">' + (isUser ? 'Utilizator' : 'AI') + '</div>';
+                                html += '<div class="fw-bold mb-1">' + sender + '</div>';
                                 // Use markdown formatting
                                 const formattedContent = typeof formatMarkdownMessage !== 'undefined' 
                                     ? formatMarkdownMessage(msg.content) 

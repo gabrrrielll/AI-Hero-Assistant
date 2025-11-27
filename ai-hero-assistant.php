@@ -45,6 +45,7 @@ spl_autoload_register(function ($class) {
 // Include necessary files
 require_once AIHA_PLUGIN_DIR . 'includes/class-gemini-api.php';
 require_once AIHA_PLUGIN_DIR . 'includes/class-database.php';
+require_once AIHA_PLUGIN_DIR . 'includes/class-message-formatter.php';
 require_once AIHA_PLUGIN_DIR . 'includes/class-shortcode.php';
 require_once AIHA_PLUGIN_DIR . 'includes/class-admin-settings.php';
 require_once AIHA_PLUGIN_DIR . 'includes/class-ajax-handler.php';

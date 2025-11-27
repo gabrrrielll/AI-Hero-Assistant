@@ -43,6 +43,7 @@
             // Voice settings
             this.enableVoice = config.enableVoice || false;
             this.voiceName = config.voiceName || 'default';
+            this.aiName = config.aiName || 'AI'; // AI name from settings
             this.synth = null;
             this.voices = [];
             this.selectedVoice = null;
@@ -736,7 +737,7 @@
                 if (this.subtitleEl) {
                     const initialMessageHTML = '<div class="aiha-message-wrapper aiha-message-assistant">' +
                         '<div class="aiha-message-bubble aiha-message-bubble-assistant">' +
-                        '<div class="aiha-message-sender">AI</div>' +
+                        '<div class="aiha-message-sender">' + this.escapeHtml(this.aiName) + '</div>' +
                         '<div class="aiha-message-content">' + this.formatMessageText(this.config.heroMessage) + '</div>' +
                         '</div></div>';
                     this.subtitleEl.innerHTML = initialMessageHTML;
@@ -786,7 +787,7 @@
                     conversationHTML += '<div class="aiha-message-content">' + this.escapeHtml(msg.text) + '</div>';
                 } else {
                     // Assistant message - format with markdown
-                    conversationHTML += '<div class="aiha-message-sender">AI</div>';
+                    conversationHTML += '<div class="aiha-message-sender">' + this.escapeHtml(this.aiName) + '</div>';
                     const formatted = this.formatMessageText(msg.text);
                     conversationHTML += '<div class="aiha-message-content">' + formatted + '</div>';
                 }
@@ -896,7 +897,7 @@
                 let lastAssistantIndex = -1;
                 for (let i = existingMessages.length - 1; i >= 0; i--) {
                     const sender = existingMessages[i].querySelector('.aiha-message-sender');
-                    if (sender && sender.textContent === 'AI') {
+                    if (sender && sender.textContent === this.aiName) {
                         lastAssistantIndex = i;
                         break;
                     }
@@ -926,7 +927,7 @@
                         // Append new assistant message bubble to existing conversation
                         const newMessageHTML = '<div class="aiha-message-wrapper aiha-message-assistant">' +
                             '<div class="aiha-message-bubble aiha-message-bubble-assistant">' +
-                            '<div class="aiha-message-sender">AI</div>' +
+                            '<div class="aiha-message-sender">' + this.escapeHtml(this.aiName) + '</div>' +
                             '<div class="aiha-message-content">' + partialFormatted + '</div>' +
                             '</div></div>';
 
@@ -943,7 +944,7 @@
                         // At the end, display fully formatted text (to ensure everything is correct)
                         const finalMessageHTML = '<div class="aiha-message-wrapper aiha-message-assistant">' +
                             '<div class="aiha-message-bubble aiha-message-bubble-assistant">' +
-                            '<div class="aiha-message-sender">AI</div>' +
+                            '<div class="aiha-message-sender">' + this.escapeHtml(this.aiName) + '</div>' +
                             '<div class="aiha-message-content">' + formattedText + '</div>' +
                             '</div></div>';
 
